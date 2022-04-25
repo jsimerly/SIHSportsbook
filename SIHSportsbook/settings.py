@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#Self Defined User Model
+AUTH_USER_MODEL = 'Account.User'
 
 # Application definition
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'Betting',
+    'Account',
 ]
 
 MIDDLEWARE = [

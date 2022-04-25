@@ -3,8 +3,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
-
 # Create your models here. 
 class NflState(models.Model):
     week = models.IntegerField()
@@ -136,7 +134,7 @@ class Player(models.Model):
 
 class League(models.Model):
     #Identity
-    owner = models.ForeignKey(User, on_delete=models.PROTECT, null=FALSE, related_name='owner')
+    owner = models.ForeignKey(User, on_delete=models.PROTECT, null=False, related_name='owner')
     sleeperId = models.IntegerField(null=False)
     name = models.CharField(null=True, max_length=256)
 
