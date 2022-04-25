@@ -134,8 +134,8 @@ class Player(models.Model):
 
 class League(models.Model):
     #Identity
+    sleeperId = models.IntegerField(primary_key=True, null=False)
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=False, related_name='owner')
-    sleeperId = models.IntegerField(null=False)
     name = models.CharField(null=True, max_length=256)
 
     #State
