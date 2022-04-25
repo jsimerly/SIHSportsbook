@@ -8,9 +8,9 @@ class CreateLeague(APIView):
     serializer_class = CreateLeagueSerializer
 
     def post(self, request, format='json'):
-        serializer = self.serializer_class(data=request.data)
+        league = self.serializer_class(data=request.data)
 
-        if serializer.is_valid():
+        if league.is_valid():
             return Response(status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST) 

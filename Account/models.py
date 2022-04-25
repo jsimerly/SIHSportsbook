@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 # Create your models here.
 class UserManager(BaseUserManager):
@@ -29,23 +29,26 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-class User(AbstractUser):
+class User(AbstractBaseUser):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     
-    email=models.EmailField(
-        verbose_name='Email',
-        max_length=255,
-        unique=True
-    )
-
+    email = models.EmailField(('email address'), unique=True)
     password=models.CharField(
         max_length=255, 
         null=False
     )
 
+    username = None
+    first_name = None
+    last_name = None
+
     is_active = models.BooleanField(default=True)
 
-    USERNAME_FIELDS = 'email'
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
     
     def __str__(self):
         return self.email
