@@ -1,8 +1,3 @@
-from email.policy import default
-from pickle import FALSE
-from secrets import choice
-from statistics import mode
-from telnetlib import DET
 from django.db import models
 from django.contrib.auth import get_user_model
 
