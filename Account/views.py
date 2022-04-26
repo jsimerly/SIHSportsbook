@@ -17,7 +17,6 @@ class CreateUser(APIView):
             email = serializer.data.get('email')
             password = serializer.data.get('password')
 
-            print('view password: ' + str(password))
             userObj = User.objects.create_user(email=email, password=password)
             userObj.save()
             return Response(status=status.HTTP_201_CREATED)
@@ -36,15 +35,9 @@ class LogIn(APIView):
             password = serializer.data.get('password')
 
             tObj = User.objects.get(email=email)
-            hashed_pwd = make_password("123456")
-            print(hashed_pwd)
-            print(tObj.password)
-
-            print(tObj.check_password(password))
-            
+            hashed_pwd = make_password("123456")            
 
             user = authenticate(email=email, password=password)
-            print(user)
 
             if user is not None:
                 if user.is_active:
@@ -60,6 +53,6 @@ class LogIn(APIView):
 
 class Logout(APIView):
     def post(self, request, format=None):
-        request.user.auth_token.delete()
+        logout(request)
         return Response(status=status.HTTP_200_OK)
 
