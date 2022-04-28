@@ -14,3 +14,6 @@ class CreateLeagueSerializer(serializers.ModelSerializer):
             'nFlexWrRbTe', 'nFlexWrRb', 'nFlexWrTe', 'nSuperFlex'
         )
 
+        def create(self, validated_data):
+            return League(validated_data)
+
