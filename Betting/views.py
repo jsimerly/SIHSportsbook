@@ -1,9 +1,8 @@
-import re
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import *
 
+from .serializers import *
 from .sleeperEndpoint import SleeperEndpoint
 
 # Create your views here.
@@ -11,6 +10,7 @@ class CreateLeague(APIView, SleeperEndpoint):
     serializer_class = CreateLeagueSerializer
 
     def post(self, request, format='json'):
+        #Data directly sent in the request
         sleeperId = request.data['sleeperId']
         owner = request.data['owner']
         token = request.data['csrfmiddlewaretoken']
@@ -46,10 +46,11 @@ class CreateLeague(APIView, SleeperEndpoint):
         data['nFlexWrTe'] = (leagueJson['roster_positions']).count('') #
         data['nSuperFlex'] = (leagueJson['roster_positions']).count('SUPER_FLEX')
 
-        print(data)
-        serializer = self.serializer_class(data=data)        
+        serializer = self.serializer_class(data=data)  #assigning new data to the serializer     
 
         if serializer.is_valid():
-            print('made it through validator')
+            league = serializer.save() #Creating a new League Object in our db
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
