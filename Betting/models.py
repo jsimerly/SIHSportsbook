@@ -125,7 +125,7 @@ class Player(models.Model):
     age = models.IntegerField(null=True)
 
     #Betting
-    currentProj = models.FloatField(null=True)
+    currentProj = models.DecimalField(decimal_places=3, max_digits=8, null=True)
 
     #Functions
     def saveCurrentProj(self, proj):
@@ -139,7 +139,7 @@ class League(models.Model):
     name = models.CharField(null=True, max_length=256)
 
     #State
-    status = models.IntegerField()
+    status = models.CharField(max_length=60)
 
     #League Settings
     LEAGUE_SIZE_CHOICE = (
@@ -169,22 +169,8 @@ class League(models.Model):
     )
     playoffSize = models.IntegerField(default=4, choices=PLAYOFF_SIZE_CHOICE)
 
-    STD = 0
-    HALF = 1
-    FULL = 2
-
-    PPR_CHOICE = (
-        (STD, 0),
-        (HALF, 0.5),
-        (FULL, 1),
-    )
-    TE_PREM_CHOICE = (
-        (STD, 0),
-        (HALF, 0.5),
-        (FULL, 1),
-    )
-    ppr = models.IntegerField(default=FULL, choices=PPR_CHOICE)
-    tePremium = models.IntegerField(default=STD, choices=TE_PREM_CHOICE)
+    ppr = models.DecimalField(decimal_places=3, max_digits=8, )
+    tePremium = models.DecimalField(decimal_places=3, max_digits=8, )
 
     #Startable Roster
     nQB = models.IntegerField(default=1)
