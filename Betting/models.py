@@ -12,12 +12,19 @@ class NflState(models.Model):
 
 class Player(models.Model):
     #Static
-    QB = 1
-    RB = 2
-    WR = 3
-    TE = 4
-    K = 5
-    DST = 6
+    QB = 'QB'
+    RB = 'RB'
+    WR = 'WR'
+    TE = 'TE'
+    K = 'K'
+    DST = 'DEF'
+    
+    OL = 'OL'
+    DL = 'DL'
+    DT = 'DT'
+    LB = 'LB'
+    P = 'P'
+    DB = 'DB'
 
     POS_CHOICES = (
         (QB, 'Quarterback'),
@@ -28,47 +35,47 @@ class Player(models.Model):
         (DST, 'Defense and Special Teams')
     )
 
-    BUF = 1
-    MIA = 2
-    NE = 3
-    NYJ = 4
+    BUF = 'BUF'
+    MIA = 'MIA'
+    NE = 'NE'
+    NYJ = 'NYJ'
 
-    BAL = 5
-    CIN = 6
-    CLE = 7
-    PIT = 8
+    BAL = 'BAL'
+    CIN = 'CIN'
+    CLE = 'CLE'
+    PIT = 'PIT'
 
-    HOU = 9
-    IND = 10
-    JAX = 11
-    TEN = 12
+    HOU = 'HOU'
+    IND = 'IND'
+    JAX = 'JAX'
+    TEN = 'TEN'
 
-    DEN = 13
-    KC = 14
-    LV = 15
-    LAC = 16
+    DEN = 'DEN'
+    KC = 'KC'
+    LV = 'LV'
+    LAC = 'LAC'
 
-    DAL = 17
-    NYG = 18
-    PHI = 19
-    WAS = 20
+    DAL = 'DAL'
+    NYG = 'NYG'
+    PHI = 'PHI'
+    WAS = 'WAS'
 
-    CHI = 21
-    DET = 22
-    GB = 23
-    MIN = 24
+    CHI = 'CHI'
+    DET = 'DET'
+    GB = 'GB'
+    MIN = 'MIN'
 
-    ATL = 25
-    CAR = 26
-    NO = 27
-    TB = 28
+    ATL = 'ATL'
+    CAR = 'CAR'
+    NO = 'NO'
+    TB = 'TB'
 
-    ARI = 29
-    LAR = 30
-    SF = 31
-    SEA = 32
+    ARI = 'ARI'
+    LAR = 'LAR'
+    SF = 'SF'
+    SEA = 'SEA'
 
-    FREE= 0
+    FREE = None
 
     NFL_TEAM_CHOICES = (
         (BUF, 'Buffalo Bills'),
@@ -118,13 +125,13 @@ class Player(models.Model):
     name = models.CharField(null=False, max_length=80)
 
     #About
-    pos = models.IntegerField(null=False, choices=POS_CHOICES)
-    pos2 = models.IntegerField(null=True, choices=POS_CHOICES)
+    pos = models.CharField(null=True, max_length=5, choices=POS_CHOICES)
+    pos2 = models.CharField(null=True, max_length=5, choices=POS_CHOICES)
 
-    nflTeam = models.IntegerField(null=True, choices=NFL_TEAM_CHOICES)
+    nflTeam = models.CharField(null=True, max_length=64,choices=NFL_TEAM_CHOICES)
     age = models.IntegerField(null=True)
 
-    #Betting
+    #Betting Related
     currentProj = models.DecimalField(decimal_places=3, max_digits=8, null=True)
 
     #Functions

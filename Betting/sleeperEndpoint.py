@@ -15,3 +15,8 @@ class SleeperEndpoint():
         url = f'https://api.sleeper.app/v1/league/{leagueId}'
         data = self.jsonFetch(url)
         return data
+
+    #get all NFL players
+    def getPlayers(self):
+        url = 'https://api.sleeper.app/v1/players/nfl'
+        return self.jsonFetch(url)
