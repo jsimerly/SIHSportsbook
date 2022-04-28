@@ -194,21 +194,23 @@ class League(models.Model):
 
 class FantasyTeam(models.Model):
     #Identity
-    sleeperId = models.CharField(max_length=12, null=False, primary_key=True)
-    sleeperName = models.CharField(null=False, max_length=50)
-    funName = models.CharField(null=False, max_length=30)
-    matchupId = models.IntegerField(null=True)
+    sleeperId = models.CharField(max_length=64, null=False, primary_key=True)
+    rosterId = models.IntegerField(null=True)
+
+    sleeperName = models.CharField(null=True, max_length=50)
+    funName = models.CharField(null=True, max_length=30)
 
     userAccount = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
     #Current Week
-    currentProj = models.FloatField()
-    currentMathcupId = models.IntegerField()
+    currentProj = models.FloatField(null=True)
+    currentMathcupId = models.IntegerField(null=True)
 
     #Season
-    win = models.IntegerField(default=0)
-    loss = models.IntegerField(default=0)
-    tie = models.IntegerField(default=0)
+    wins = models.IntegerField(default=0)
+    losses = models.IntegerField(default=0)
+    ties = models.IntegerField(default=0)
+    fpts = models.IntegerField(default=0)
 
     #Betting Season
     spreadWin = models.IntegerField(default=0)
@@ -216,7 +218,7 @@ class FantasyTeam(models.Model):
 
     #Team
     players = models.ManyToManyField(Player)
-    league = models.ForeignKey(League, on_delete=models.PROTECT, default=0)
+    league = models.ForeignKey(League, on_delete=models.PROTECT, default=0, null=False)
 
     
     #Functions

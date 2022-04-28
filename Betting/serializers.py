@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import League, Player
+from .models import FantasyTeam, League, Player
 
 class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,6 +14,19 @@ class LeagueSerializer(serializers.ModelSerializer):
 
         def create(self, validated_data):
             return League(validated_data)
+
+class FantasyTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FantasyTeam
+        fields = (
+            'sleeperId', 'sleeperName', 'funName', 'rosterId',
+            'wins', 'losses', 'ties', 'fpts',
+            'league',
+        )
+
+        def create(self, validated_data):
+            return FantasyTeam(validated_data)
+
 
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:

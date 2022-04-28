@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('create-league/', views.CreateLeague.as_view(), name='create-league'),
-    path('update-player-info/', views.UpdateNflPlayers.as_view(), name='update-player-info')
+    path('update-player-info/', views.UpdateNflPlayers.as_view(), name='update-player-info'),
+    # path('update-rosters', views.UpdateLeagueRosters.as_view())
 ]

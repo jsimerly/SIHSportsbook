@@ -13,8 +13,18 @@ class SleeperEndpoint():
     #uses GET request using sleeperId to get league info
     def getLeague(self, leagueId):
         url = f'https://api.sleeper.app/v1/league/{leagueId}'
-        data = self.jsonFetch(url)
-        return data
+        return self.jsonFetch(url)
+        
+
+    #GET request to get rosters based on leagueId
+    def getRosters(self, leagueId):
+        url = f'https://api.sleeper.app/v1/league/{leagueId}/rosters'
+        return self.jsonFetch(url)
+
+    #GET request to get users in league
+    def getLeagueUsers(self,leagueId):
+        url = f'https://api.sleeper.app/v1/league/{leagueId}/users'
+        return self.jsonFetch(url)
 
     #get all NFL players
     def getPlayers(self):
