@@ -56,7 +56,7 @@ class CreateLeague(APIView, SleeperEndpoint):
         else:
             return Response(leagueSerializer.errors, status=status.HTTP_201_CREATED)
 
-        # Creating the rosters and teams in the league
+        #sends GET request to sleeper for rosters and users in the league
         rosterJson = self.getRosters(leagueId)
         userJson = self.getLeagueUsers(leagueId)
     
@@ -71,6 +71,7 @@ class CreateLeague(APIView, SleeperEndpoint):
 
         #iterate through the rosters
         for team in rosterJson:
+            #create serialize data
             rosterData = {} 
             ownerId = team['owner_id']
 
@@ -89,14 +90,18 @@ class CreateLeague(APIView, SleeperEndpoint):
             fantasyTeamSerializer = FantasyTeamSerializer(data=rosterData)
 
             if fantasyTeamSerializer.is_valid():
+                #create new FantasyTeam
                 newTeam = fantasyTeamSerializer.save()
                 print(newTeam)
 
+                #Iterate through the team's json to get their players
                 for playerId in team['players']:
                     try:
+                        #find player and add to team
                         player = Player.objects.get(pk=playerId)
                         newTeam.players.add(player)
                     except:
+                        #this error will mean you need to POST to UpdateNflPlayers below
                         print('ERROR - missing player ID: {}'.format(playerId))
                 newTeam.save()
 
