@@ -26,10 +26,12 @@ class FprosEndpoint():
 
             #get the name of the player
             name = row.find('a', class_='player-name').text
+            #Attempt to map their name to Primary Key
             try:
                 pk = FP_TO_ID['qb'][name]
+            #Skip this player if they're not found in the dict 
             except Exception as e:
-                print(name + "FP_TO_ID Error | " + str(e))
+                print(name + "FP_TO_ID Error | " + str(e)) #this usually means FP spells a players name different from sleeper
                 continue
 
             #parse out all the stats from the row | This could change if the HTML format of the page changes

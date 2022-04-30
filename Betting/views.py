@@ -192,10 +192,14 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
         qbData = self.getPosStats(self.QB)
         qbJson = self.stripQbStats(qbData)
 
-        #if this is too slow use this: https://stackoverflow.com/questions/41744096/efficient-way-to-update-multiple-fields-of-django-model-object
+        #if this is too slow remake using this this: https://stackoverflow.com/questions/41744096/efficient-way-to-update-multiple-fields-of-django-model-object
+        
+        #update QB Stats *** This should be refactors to be more legible, a lot of copy + paste ***
         for qb in qbJson:
+            #set the player from FP and the end point data
             qbInfo = qbJson[qb]
             try:
+                #update the projection fields relevant to QB
                 Player.objects.filter(pk=qb).update(
                     projPassingYds = qbInfo['passYds'],
                     projPassingTds = qbInfo['passTds'],
@@ -204,6 +208,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projRushingTds = qbInfo['rushTds'],
                     projFumbles = qbInfo['fls'],
                 )
+            #kick out an except if we're unable to update the player
             except Exception as e:
                 print(str(qb) + 'Player Update Error |' + str(e))
         
@@ -258,6 +263,43 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                 )
             except Exception as e:
                 print(str(te) + 'Player Update Error | ' + str(e))
+
+        #update K stats
+        kData = self.getPosStats(self.K)
+        kJson = self.stripTeStats(teData)
+
+        for k in kJson:
+            kInfo = kJson[k]
+            try:
+                Player.objects.filter(pk=k).update(
+                    projFg = kInfo['fg'],
+                    projXpt = kInfo['xpt'],
+                    projKtotals = kInfo['fpts'],
+                )
+            except Exception as e:
+                print(str(k) + 'Player Update Error | ' + str(e))
+
+        #update K stats
+        dstData = self.getPosStats(self.DST)
+        dstJson = self.stripTeStats(dstData)
+
+        for dst in dstJson:
+            dstInfo = dstJson[dst]
+            try:
+                Player.objects.filter(pk=dst).update(
+                    projSacks = dstInfo['sacks'],
+                    projDInts = dstInfo['ints'],
+                    projFumbleRec = dstInfo['fr'],
+                    projForcedFum = dstInfo['ff'],
+                    projDTds = dstInfo['tds'],
+                    projSaftey = dstInfo['saftey'],
+                    projPA = dstInfo['pa'],
+                    projYdsAgn = dstInfo['ydsAgn'],
+                    projDtotal = dstInfo['fpts'],
+                )
+            except Exception as e:
+                print(str(k) + 'Player Update Error | ' + str(e))
+
 
         t1 = time.time()
         runTime = t1-t0
