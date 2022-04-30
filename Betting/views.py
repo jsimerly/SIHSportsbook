@@ -183,7 +183,27 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
         return Response('Player Update Completed', status=status.HTTP_200_OK)
 
 class UpdatePlayerProjections(APIView, FprosEndpoint):
-    def post(self, request, format='json'):
-        pass
+    def put(self, request, format='json'):
+        #update QBs stats
+        qbData = self.getPosStats(self.QB)
+        qbJson = self.stripQbStats(qbData)
+
+        #if this is too slow use this: https://stackoverflow.com/questions/41744096/efficient-way-to-update-multiple-fields-of-django-model-object
+        for qb in qbJson:
+            qbInfo = qbJson[qb]
+            try:
+                Player.objects.filter(pk=qb).update(
+                    projPassingYds = qbInfo['passYds'],
+                    projPassingTds = qbInfo['passTds'],
+                    projInts = qbInfo['ints'],
+                    projRushingYds = qbInfo['rushYds'],
+                    projRushingTds = qbInfo['rushTds'],
+                    projFumbles = qbInfo['fls'],
+                )
+            except Exception as e:
+                print(str(qb) + '|' + str(e))
+        
+    
+        return Response(status=status.HTTP_200_OK)
                 
                 
