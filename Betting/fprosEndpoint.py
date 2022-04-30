@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import time
 
 from .FP_TO_ID import *
 
@@ -18,6 +19,7 @@ class FprosEndpoint():
 
     #strip all of the stats out of the tables from FantasyPros
     def stripQbStats(self, rows):
+        t0 = time.time()
         qbs = {}
 
         #iterate through each row of the table
@@ -45,10 +47,13 @@ class FprosEndpoint():
             info['fls'] = statCols[8].text
 
             qbs[pk] = info
-
+        
+        t1 = time.time()
+        print(f'stripQbState Run Time: {str(t1-t0)}')
         return qbs
     
     def stripRbStats(self, rows):
+        t0 = time.time()
         rbs = {}
 
         for row in rows[2:]:
@@ -72,9 +77,12 @@ class FprosEndpoint():
 
             rbs[pk] = info
 
+        t1 = time.time()
+        print(f'stripRbState Run Time: {str(t1-t0)}')
         return rbs
 
     def stripWrStats(self, rows):
+        t0 = time.time()
         wrs = {}
 
         for row in rows[2:]:
@@ -97,10 +105,13 @@ class FprosEndpoint():
             info['fls'] = statCols[6].text
 
             wrs[pk] = info
-
+        
+        t1 = time.time()
+        print(f'stripWrState Run Time: {str(t1-t0)}')
         return wrs
 
     def stripTeStats(self, rows):
+        t0 = time.time()
         tes = {}
 
         for row in rows[2:]:
@@ -122,9 +133,12 @@ class FprosEndpoint():
 
             tes[pk] = info
 
+        t1 = time.time()
+        print(f'stripTeState Run Time: {str(t1-t0)}')
         return tes
 
     def stripKStats(self, rows):
+        t0 = time.time()
         ks = {}
 
         for row in rows[2:]:
@@ -145,9 +159,12 @@ class FprosEndpoint():
 
             ks[pk] = info
 
+        t1 = time.time()
+        print(f'stripKState Run Time: {str(t1-t0)}')
         return ks
 
     def stripDstStats(self, rows):
+        t0 = time.time()
         dst = {}
 
         for row in rows[2:]:
@@ -172,6 +189,8 @@ class FprosEndpoint():
 
             dst[pk] = info
 
+        t1 = time.time()
+        print(f'stripDstState Run Time: {str(t1-t0)}')
         return dst
 
     #pre setting these as they are on FantasyPros URL

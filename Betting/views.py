@@ -187,7 +187,7 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
 
 class UpdatePlayerProjections(APIView, FprosEndpoint):
     def put(self, request, format='json'):
-        t0 = time.time()
+        t0t = time.time()
         #update QBs stats
         qbData = self.getPosStats(self.QB)
         qbJson = self.stripQbStats(qbData)
@@ -195,6 +195,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
         #if this is too slow remake using this this: https://stackoverflow.com/questions/41744096/efficient-way-to-update-multiple-fields-of-django-model-object
         
         #update QB Stats *** This should be refactors to be more legible, a lot of copy + paste ***
+        t0 = time.time()
         for qb in qbJson:
             #set the player from FP and the end point data
             qbInfo = qbJson[qb]
@@ -211,8 +212,12 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
             #kick out an except if we're unable to update the player
             except Exception as e:
                 print(str(qb) + 'Player Update Error |' + str(e))
+
+        t1 = time.time()
+        print(f'QB Data Updates Run Time: {str(t1-t0)}')
         
         #update RBs stats
+        t0 = time.time()
         rbData = self.getPosStats(self.RB)
         rbJson = self.stripRbStats(rbData)
 
@@ -230,7 +235,11 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
             except Exception as e:
                 print(str(rb) + 'Player Update Error | ' + str(e))
 
+        t1 = time.time()
+        print(f'rb Data Updates Run Time: {str(t1-t0)}')
+
         #update WR stats
+        t0 = time.time()
         wrData = self.getPosStats(self.WR)
         wrJson = self.stripWrStats(wrData)
 
@@ -247,8 +256,12 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                 )
             except Exception as e:
                 print(str(wr) + 'Player Update Error | ' + str(e))
+
+        t1 = time.time()
+        print(f'WR Data Updates Run Time: {str(t1-t0)}')
         
         #update TE stats
+        t0 = time.time()
         teData = self.getPosStats(self.TE)
         teJson = self.stripTeStats(teData)
 
@@ -264,7 +277,11 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
             except Exception as e:
                 print(str(te) + 'Player Update Error | ' + str(e))
 
+        t1 = time.time()
+        print(f'TE Data Updates Run Time: {str(t1-t0)}')
+
         #update K stats
+        t0 = time.time()
         kData = self.getPosStats(self.K)
         kJson = self.stripKStats(kData)
 
@@ -279,7 +296,11 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
             except Exception as e:
                 print(str(k) + 'Player Update Error | ' + str(e))
 
-        #update K stats
+        t1 = time.time()
+        print(f'K  Data Updates Run Time: {str(t1-t0)}')
+
+        #update DST stats
+        t0 = time.time()
         dstData = self.getPosStats(self.DST)
         dstJson = self.stripDstStats(dstData)
 
@@ -299,10 +320,12 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                 )
             except Exception as e:
                 print(str(k) + 'Player Update Error | ' + str(e))
-
-
         t1 = time.time()
-        runTime = t1-t0
+        print(f'QB Data Updates Run Time: {str(t1-t0)}')
+
+
+        t1t = time.time()
+        runTime = t1t-t0t
         print('Update Run Time: ' + str(runTime))
 
         return Response(status=status.HTTP_200_OK)
