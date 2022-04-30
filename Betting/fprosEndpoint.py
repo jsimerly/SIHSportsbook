@@ -26,7 +26,11 @@ class FprosEndpoint():
 
             #get the name of the player
             name = row.find('a', class_='player-name').text
-            pk = FP_TO_ID['qb'][name]
+            try:
+                pk = FP_TO_ID['qb'][name]
+            except Exception as e:
+                print(name + "FP_TO_ID Error | " + str(e))
+                continue
 
             #parse out all the stats from the row | This could change if the HTML format of the page changes
             statCols = row.findAll('td', class_='center')
@@ -46,19 +50,25 @@ class FprosEndpoint():
         rbs = {}
 
         for row in rows[2:]:
-            stats = {}
+            info = {}
 
             name = row.find('a', class_='player-name').text
+            try:
+                pk = FP_TO_ID['rb'][name]
+            except Exception as e:
+                print(name + 'FP_TO_ID Error | ' + str(e))
+                continue
 
             statCols = row.findAll('td', class_='center')
-            stats['rushYds'] = statCols[1].text
-            stats['rushTds'] = statCols[2].text
-            stats['rec'] = statCols[3].text
-            stats['recYds'] = statCols[4].text
-            stats['recTds'] = statCols[5].text
-            stats['fls'] = statCols[6].text
+            info['name'] = name
+            info['rushYds'] = statCols[1].text
+            info['rushTds'] = statCols[2].text
+            info['rec'] = statCols[3].text
+            info['recYds'] = statCols[4].text
+            info['recTds'] = statCols[5].text
+            info['fls'] = statCols[6].text
 
-            rbs[name] = stats
+            rbs[pk] = info
 
         return rbs
 
@@ -66,37 +76,49 @@ class FprosEndpoint():
         wrs = {}
 
         for row in rows[2:]:
-            stats = {}
+            info = {}
 
             name = row.find('a', class_='player-name').text
+            try:
+                pk = FP_TO_ID['wr'][name]
+            except Exception as e:
+                print(name + 'FP_TO_ID Error | ' + str(e))
+                continue
 
             statCols = row.findAll('td', class_='center')
-            stats['rec'] = statCols[0].text
-            stats['recYds'] = statCols[1].text
-            stats['recTds'] = statCols[2].text
-            stats['rushYds'] = statCols[4].text
-            stats['rushTds'] = statCols[5].text
-            stats['fls'] = statCols[6].text
+            info['name'] = name
+            info['rec'] = statCols[0].text
+            info['recYds'] = statCols[1].text
+            info['recTds'] = statCols[2].text
+            info['rushYds'] = statCols[4].text
+            info['rushTds'] = statCols[5].text
+            info['fls'] = statCols[6].text
 
-            wrs[name] = stats
+            wrs[pk] = info
 
         return wrs
 
-    def stripWrStats(self, rows):
+    def stripTeStats(self, rows):
         tes = {}
 
         for row in rows[2:]:
-            stats = {}
+            info = {}
 
             name = row.find('a', class_='player-name').text
+            try:
+                pk = FP_TO_ID['te'][name]
+            except Exception as e:
+                print(name + 'FP_TO_ID Error | ' + str(e))
+                continue
 
             statCols = row.findAll('td', class_='center')
-            stats['rec'] = statCols[0].text
-            stats['recYds'] = statCols[1].text
-            stats['recTds'] = statCols[2].text
-            stats['fls'] = statCols[3].text
+            info['name'] = name
+            info['rec'] = statCols[0].text
+            info['recYds'] = statCols[1].text
+            info['recTds'] = statCols[2].text
+            info['fls'] = statCols[3].text
 
-            tes[name] = stats
+            tes[pk] = info
 
         return tes
 
@@ -104,16 +126,22 @@ class FprosEndpoint():
         ks = {}
 
         for row in rows[2:]:
-            stats = {}
+            info = {}
 
             name = row.find('a', class_='player-name').text
+            try:
+                pk = FP_TO_ID['k'][name]
+            except Exception as e:
+                print(name + 'FP_TO_ID Error | ' + str(e))
+                continue
 
             statCols = row.findAll('td', class_='center')
-            stats['fg'] = statCols[0].text
-            stats['xpt'] = statCols[2].text
-            stats['fpts'] = statCols[3].text
+            info['name'] = name
+            info['fg'] = statCols[0].text
+            info['xpt'] = statCols[2].text
+            info['fpts'] = statCols[3].text
 
-            ks[name] = stats
+            ks[pk] = info
 
         return ks
 
@@ -121,22 +149,27 @@ class FprosEndpoint():
         dst = {}
 
         for row in rows[2:]:
-            stats = {}
+            info = {}
 
             name = row.find('a', class_='player-name').text
+            try:
+                pk = FP_TO_ID['dst'][name]
+            except Exception as e:
+                print(name + ': FP_TO_ID error | ' + str(e))
+                continue
 
             statCols = row.findAll('td', class_='center')
-            stats['sacks'] = statCols[0].text
-            stats['ints'] = statCols[1].text
-            stats['fr'] = statCols[2].text
-            stats['ff'] = statCols[3].text
-            stats['tds'] = statCols[4].text
-            stats['saftey'] = statCols[5].text
-            stats['pa'] = statCols[6].text
-            stats['ydsAgn'] = statCols[7].text
-            stats['fpts'] = statCols[8].text
+            info['sacks'] = statCols[0].text
+            info['ints'] = statCols[1].text
+            info['fr'] = statCols[2].text
+            info['ff'] = statCols[3].text
+            info['tds'] = statCols[4].text
+            info['saftey'] = statCols[5].text
+            info['pa'] = statCols[6].text
+            info['ydsAgn'] = statCols[7].text
+            info['fpts'] = statCols[8].text
 
-            dst[name] = stats
+            dst[name] = info
 
         return dst
 

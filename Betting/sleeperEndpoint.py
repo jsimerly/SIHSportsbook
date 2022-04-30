@@ -3,7 +3,6 @@ import requests
 import json
 
 class SleeperEndpoint():
-
     #gets json form a GET request
     def jsonFetch(self, https):
         j = requests.get(https)
