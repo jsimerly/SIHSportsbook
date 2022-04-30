@@ -2,24 +2,25 @@ import requests
 from bs4 import BeautifulSoup
 
 class FprosEndpoint():
+
+    #Turn HTML response into BS4 soup object for easy parsing
     def _getSoup(self, url):
         resp = requests.get(url)
         soup = BeautifulSoup(resp.content, 'html.parser')
         return soup
 
-    def _getWeekString(week):
-        if week is not None:
-            return f'?week={week}'
-        return ''
-
+    #strip all of the stats out of the tables from FantasyPros
     def stripQbStats(rows):
         qbs = {}
 
+        #iterate through each row of the table
         for row in rows[2:]:
             stats = {}
 
+            #get the name of the player
             name = row.find('a', class_='player-name').text
 
+            #parse out all the stats from the row | This could change if the HTML format of the page changes
             statCols = row.findAll('td', class_='center')
             stats['passYds'] = statCols[2]
             stats['passTds'] = statCols[3]
@@ -130,6 +131,7 @@ class FprosEndpoint():
 
         return dst
 
+    #pre setting these as they are on FantasyPros URL
     QB = 'qb'
     RB = 'rb'
     WR = 'wr'
@@ -137,9 +139,14 @@ class FprosEndpoint():
     K = 'k'
     DST = 'dst'
 
+    #Gets the out of Fantasy Pros page
     def getPosStats(self, pos, week=None):
+        #used if you're trying to get past weeks data
         weekString = self._getWeekString(week)
+
         url = f'https://www.fantasypros.com/nfl/projections/{pos}.php{weekString}'
+
+        #BS4 parsing
         soup = self._getSoup(url)
         table = soup.find('table', id='data')
         rows = table.findAll('tr')

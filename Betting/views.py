@@ -6,6 +6,7 @@ from rest_framework import status
 
 from .serializers import *
 from .sleeperEndpoint import SleeperEndpoint
+from .fprosEndpoint import FprosEndpoint
 
 # Create your views here.
 class CreateLeague(APIView, SleeperEndpoint):
@@ -181,6 +182,8 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
             player.save()
         return Response('Player Update Completed', status=status.HTTP_200_OK)
 
-                    
+class UpdatePlayerProjections(APIView, FprosEndpoint):
+    def post(self, request, format='json'):
+        pass
                 
                 
