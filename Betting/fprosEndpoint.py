@@ -84,7 +84,7 @@ class FprosEndpoint():
             try:
                 pk = FP_TO_ID['wr'][name]
             except Exception as e:
-                print(name + 'FP_TO_ID Error | ' + str(e))
+                print(name + ' FP_TO_ID Error | ' + str(e))
                 continue
 
             statCols = row.findAll('td', class_='center')
@@ -110,7 +110,7 @@ class FprosEndpoint():
             try:
                 pk = FP_TO_ID['te'][name]
             except Exception as e:
-                print(name + 'FP_TO_ID Error | ' + str(e))
+                print(name + ' FP_TO_ID Error | ' + str(e))
                 continue
 
             statCols = row.findAll('td', class_='center')
@@ -134,7 +134,7 @@ class FprosEndpoint():
             try:
                 pk = FP_TO_ID['k'][name]
             except Exception as e:
-                print(name + 'FP_TO_ID Error | ' + str(e))
+                print(name + ' FP_TO_ID Error | ' + str(e))
                 continue
 
             statCols = row.findAll('td', class_='center')
@@ -152,7 +152,6 @@ class FprosEndpoint():
 
         for row in rows[2:]:
             info = {}
-
             name = row.find('a', class_='player-name').text
             try:
                 pk = FP_TO_ID['dst'][name]
@@ -171,7 +170,7 @@ class FprosEndpoint():
             info['ydsAgn'] = statCols[7].text
             info['fpts'] = statCols[8].text
 
-            dst[name] = info
+            dst[pk] = info
 
         return dst
 
