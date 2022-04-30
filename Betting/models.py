@@ -144,6 +144,20 @@ class Player(models.Model):
     projRecYds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
     projRecTds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
 
+    projFg = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projXpt = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projKtotal = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    
+    projSacks = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projDInts = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projFumbleRec = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projForcedFum = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projDTds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projSaftey = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projPA = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projYdsAgn = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projDtotal = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+
     currentPassingYds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
     currentPassingTds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
     currentInts = models.DecimalField(decimal_places=3, max_digits=8, null=True)
@@ -155,6 +169,16 @@ class Player(models.Model):
     currentRec = models.DecimalField(decimal_places=3, max_digits=8, null=True)
     currentRecYds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
     currentRecTds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
+
+    currentSacks = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentDInts = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentFumbleRec = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentForcedFum = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentDTds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentSaftey = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentPA = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentYdsAgn = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    currentDtotal = models.DecimalField(decimal_places=2, max_digits=8, default=0)
 
     #Functions
     def saveCurrentProj(self, proj):
