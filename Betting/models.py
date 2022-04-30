@@ -132,13 +132,17 @@ class Player(models.Model):
     age = models.IntegerField(null=True)
 
     #Betting Related
-    projPassingYds = models.DecimalField(decimal_places=2, max_digits=8, null=True)
-    projPassingTds = models.DecimalField(decimal_places=2, max_digits=8, null=True)
-    projInts = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+    projPassingYds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projPassingTds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projInts = models.DecimalField(decimal_places=2, max_digits=8, default=0)
     
-    projRushingYds = models.DecimalField(decimal_places=2, max_digits=8, null=True)
-    projRushingTds = models.DecimalField(decimal_places=2, max_digits=8, null=True)
-    projFumbles = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+    projRushingYds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projRushingTds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projFumbles = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+
+    projRec = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projRecYds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
+    projRecTds = models.DecimalField(decimal_places=2, max_digits=8, default=0)
 
     currentPassingYds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
     currentPassingTds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
@@ -147,6 +151,10 @@ class Player(models.Model):
     currentRushingYds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
     currentRushingTds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
     currentFumbles = models.DecimalField(decimal_places=3, max_digits=8, null=True)
+
+    currentRec = models.DecimalField(decimal_places=3, max_digits=8, null=True)
+    currentRecYds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
+    currentRecTds = models.DecimalField(decimal_places=3, max_digits=8, null=True)
 
     #Functions
     def saveCurrentProj(self, proj):

@@ -1,5 +1,4 @@
-from os import stat
-from time import sleep
+import time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,6 +12,7 @@ class CreateLeague(APIView, SleeperEndpoint):
     serializer_class = LeagueSerializer
 
     def post(self, request, format='json'):
+        t0 = time.time()
         #Data directly sent in the request
         leagueId = request.data['sleeperId']
         owner = request.data['owner']
@@ -109,6 +109,9 @@ class CreateLeague(APIView, SleeperEndpoint):
             else:
                 return Response(fantasyTeamSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
+        t1 = time.time()
+        runTime = t1-t0
+        print('Create League Run Time: ' + str(runTime))
         return Response(leagueSerializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -184,6 +187,7 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
 
 class UpdatePlayerProjections(APIView, FprosEndpoint):
     def put(self, request, format='json'):
+        t0 = time.time()
         #update QBs stats
         qbData = self.getPosStats(self.QB)
         qbJson = self.stripQbStats(qbData)
@@ -201,9 +205,64 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projFumbles = qbInfo['fls'],
                 )
             except Exception as e:
-                print(str(qb) + '|' + str(e))
+                print(str(qb) + 'Player Update Error |' + str(e))
         
-    
+        #update RBs stats
+        rbData = self.getPosStats(self.RB)
+        rbJson = self.stripRbStats(rbData)
+
+        for rb in rbJson:
+            rbInfo = rbJson[rb]
+            try:
+                Player.objects.filter(pk=rb).update(
+                    projRushingYds = rbInfo['rushYds'],
+                    projRushingTds = rbInfo['rushTds'],
+                    projRec = rbInfo['rec'],
+                    projRecYds = rbInfo['recYds'],
+                    projRecTds = rbInfo['recTds'],
+                    projFumbles = rbInfo['fls'],
+                )
+            except Exception as e:
+                print(str(rb) + 'Player Update Error | ' + str(e))
+
+        #update WR stats
+        wrData = self.getPosStats(self.WR)
+        wrJson = self.stripWrStats(wrData)
+
+        for wr in wrJson:
+            wrInfo = wrJson[wr]
+            try:
+                Player.objects.filter(pk=wr).update(
+                    projRec = wrInfo['rec'],
+                    projRecYds = wrInfo['recYds'],
+                    projRecTds = wrInfo['recTds'],
+                    projRushingYds = wrInfo['rushYds'],
+                    projRushingTds = wrInfo['rushTds'],
+                    projFumbles = wrInfo['fls'],
+                )
+            except Exception as e:
+                print(str(wr) + 'Player Update Error | ' + str(e))
+        
+        #update TE stats
+        teData = self.getPosStats(self.TE)
+        teJson = self.stripTeStats(teData)
+
+        for te in teJson:
+            teInfo = teJson[te]
+            try:
+                Player.objects.filter(pk=te).update(
+                    projRec = teInfo['rec'],
+                    projRecYds = teInfo['recYds'],
+                    projRecTds = teInfo['recTds'],
+                    projFumbles = teInfo['fls'],
+                )
+            except Exception as e:
+                print(str(te) + 'Player Update Error | ' + str(e))
+
+        t1 = time.time()
+        runTime = t1-t0
+        print('Update Run Time: ' + str(runTime))
+
         return Response(status=status.HTTP_200_OK)
                 
                 
