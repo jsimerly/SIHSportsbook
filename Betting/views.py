@@ -266,7 +266,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
 
         #update K stats
         kData = self.getPosStats(self.K)
-        kJson = self.stripTeStats(teData)
+        kJson = self.stripKStats(kData)
 
         for k in kJson:
             kInfo = kJson[k]
@@ -274,14 +274,14 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                 Player.objects.filter(pk=k).update(
                     projFg = kInfo['fg'],
                     projXpt = kInfo['xpt'],
-                    projKtotals = kInfo['fpts'],
+                    projKtotal = kInfo['fpts'],
                 )
             except Exception as e:
                 print(str(k) + 'Player Update Error | ' + str(e))
 
         #update K stats
         dstData = self.getPosStats(self.DST)
-        dstJson = self.stripTeStats(dstData)
+        dstJson = self.stripDstStats(dstData)
 
         for dst in dstJson:
             dstInfo = dstJson[dst]
