@@ -1,4 +1,5 @@
 import time
+from django import http
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -184,6 +185,7 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
             player.save()
         return Response('Player Update Completed', status=status.HTTP_200_OK)
 
+#Clean this up, do much repeat code
 class UpdatePlayerProjections(APIView, FprosEndpoint):
     def put(self, request, format='json'):
         t0t = time.time()
@@ -350,3 +352,20 @@ class UpdateLeagueProjections(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateLeagueRosters(APIView, SleeperEndpoint):
+    serializer_class = LeagueOnlySerializer
+
+    def put(self, request, format='json'):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            
+            pk = serializer.data.get('sleeperId')
+            leagueRosterData = self.getRosters(pk)
+            league = League.objects.get(pk=pk)
+
+            league.updateRosters(leagueRosterData)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)

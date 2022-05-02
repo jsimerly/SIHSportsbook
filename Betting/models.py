@@ -191,9 +191,6 @@ class Player(models.Model):
         self.save()
 
 class League(models.Model):
-    ### NEED AN UPDATE ROSTERS METHOD BEFORE FINISHING PROJECTIONS
-
-
     #Identity
     sleeperId = models.IntegerField(primary_key=True, null=False)
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=False, related_name='owner')
@@ -276,7 +273,6 @@ class League(models.Model):
     pp_pa_34 = -1
     pp_pa_35_ = -4
 
-
     #Startable Roster
     nQB = models.IntegerField(default=1)
     nRB = models.IntegerField(default=2)
@@ -289,6 +285,31 @@ class League(models.Model):
     nFlexWrRb = models.IntegerField(default=None)
     nFlexWrTe = models.IntegerField(default=None)
     nSuperFlex = models.IntegerField(default=1)
+
+    def updateRosters(self,rosterData):
+        t0 = time.time()
+        teamObjs = self.FantasyTeams.all()
+        nonFAs = []
+
+        for teamJson in rosterData:
+            teamObj = teamObjs.get(rosterId = teamJson['roster_id'])
+            teamObj.players.clear()
+
+            players = []
+
+            for playerId in teamJson['players']:
+                playerObj = Player.objects.get(pk=playerId)
+                players.append(playerObj)
+                nonFAs.append(playerObj)
+
+            teamObj.players.add(*players)
+
+        self.freeAgents.set(Player.objects.all()) #this takes .5sec to make quicker might need to record changes rather than reupdate all Players
+        
+        self.freeAgents.remove(*nonFAs)
+
+        t1 = time.time()
+        print(f'models.League.updateRosters runtime: {str(t1-t0)}')
 
     def _mapPlayerProj(self, playerQset):
             projMap = {}
@@ -319,25 +340,28 @@ class League(models.Model):
             return projMap
 
     def _getTopFreeAgent(self, pos):
-        leagueFreeAgents = self.FantasyTeams.all()
-        print(leagueFreeAgents)
+        if pos is None:
+            freeAgents = self.freeAgents.all()
+        else:
+            freeAgents = self.freeAgents.filter(pos=pos)
+        topFreeAgent = freeAgents.order_by('-estProj')[0]
+        topFreeAgentTup = (topFreeAgent, topFreeAgent.estProj)
+        return topFreeAgentTup
 
-
-    def _getTopPlayers(self, set, n, pos):
+    def _getTopPlayers(self, qSet, n, pos=None):
         playerList = []
         for _ in range(n):
             try:
-                top = set[0][0]
-                set.pop(0)
-                if top.estProj != 0:
-                    playerList.append(top)
+                topPlayer = qSet[0]
+                if topPlayer[1] == decimal.Decimal(0):
+                    topFa = self._getTopFreeAgent(pos=pos)
+                    playerList.append(topFa)
                 else:
-                    topFA = self._getTopFreeAgent(pos)
-                    playerList.append(topFA)
+                    qSet.pop(0)
+                    playerList.append(topPlayer)
             except Exception as e:
-                print(e)
-                topFA = self._getTopFreeAgent(pos)
-                playerList.append(topFA)
+                topFa = self._getTopFreeAgent(pos=pos)
+                playerList.append(topFa)
 
         return playerList
 
@@ -346,6 +370,7 @@ class League(models.Model):
         teams = self.FantasyTeams.all()
 
         for team in teams:
+            print(team.funName)
             currentProj = decimal.Decimal(0)
 
             teamQbs = team.players.filter(pos=Player.QB)
@@ -369,21 +394,30 @@ class League(models.Model):
 
             starters = []
 
+            #Standard Slots
             starters.extend(self._getTopPlayers(qbs, self.nQB, Player.QB))
             starters.extend(self._getTopPlayers(rbs, self.nRB, Player.RB))
             starters.extend(self._getTopPlayers(wrs, self.nWR, Player.WR))
             starters.extend(self._getTopPlayers(tes, self.nTE, Player.TE))
             starters.extend(self._getTopPlayers(k, self.nK, Player.K))
             starters.extend(self._getTopPlayers(dst, self.nDST, Player.DST))
-                    
-            print(team.funName)
-            print(starters)
+            #Flex and misc
+            flex = rbs + wrs + tes
+            starters.extend(self._getTopPlayers(flex, self.nFlexWrRbTe,))
+            #Super Flex
+            superFlex = flex + qbs
+            starters.extend(self._getTopPlayers(superFlex, self.nSuperFlex,))
+
+            for playerTup in starters:
+                currentProj += playerTup[1]
+
+            team.currentProj = currentProj
             print(currentProj)
-
-
+            team.save()
+          
         t1 = time.time()
         runtime = t1-t0
-        print(f'Runtime for updateTeamProjections: {runtime}')
+        print(f'models.League.updateTeamProjections runtime: {runtime}')
 
 class FantasyTeam(models.Model):
     #Team

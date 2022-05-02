@@ -6,4 +6,5 @@ urlpatterns = [
     path('update-player-info/', views.UpdateNflPlayers.as_view(), name='update-player-info'),
     path('update-all-projections', views.UpdatePlayerProjections.as_view()),
     path('update-league-projections', views.UpdateLeagueProjections.as_view()),
+    path('update-league-rosters', views.UpdateLeagueRosters.as_view()),
 ]
