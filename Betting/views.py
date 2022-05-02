@@ -189,20 +189,10 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
 class UpdatePlayerProjections(APIView, FprosEndpoint):
     def put(self, request, format='json'):
         t0t = time.time()
-        #update QBs stats
-        qbData = self.getPosStats(self.QB)
-        qbJson = self.stripQbStats(qbData)
 
         #if this is too slow remake using this this: https://stackoverflow.com/questions/41744096/efficient-way-to-update-multiple-fields-of-django-model-object
-        
-        #update QB Stats *** This should be refactors to be more legible, a lot of copy + paste ***
-        t0 = time.time()
-        for qb in qbJson:
-            #set the player from FP and the end point data
-            qbInfo = qbJson[qb]
-            try:
-                #update the projection fields relevant to QB
-                Player.objects.filter(pk=qb).update(
+        def qbPlayerUpdate(self, qbInfo, pk):
+            Player.objects.filter(pk=pk).update(
                     projPassingYds = qbInfo['passYds'],
                     projPassingTds = qbInfo['passTds'],
                     projInts = qbInfo['ints'],
@@ -211,22 +201,8 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projFumbles = qbInfo['fls'],
                     estProj = qbInfo['fp']
                 )
-            #kick out an except if we're unable to update the player
-            except Exception as e:
-                print(str(qb) + 'Player Update Error |' + str(e))
-
-        t1 = time.time()
-        print(f'QB Data Updates Run Time: {str(t1-t0)}')
-        
-        #update RBs stats
-        t0 = time.time()
-        rbData = self.getPosStats(self.RB)
-        rbJson = self.stripRbStats(rbData)
-
-        for rb in rbJson:
-            rbInfo = rbJson[rb]
-            try:
-                Player.objects.filter(pk=rb).update(
+        def rbPlayerUpdate(self, rbInfo, pk):
+            Player.objects.filter(pk=pk).update(
                     projRushingYds = rbInfo['rushYds'],
                     projRushingTds = rbInfo['rushTds'],
                     projRec = rbInfo['rec'],
@@ -235,21 +211,9 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projFumbles = rbInfo['fls'],
                     estProj = rbInfo['fp']
                 )
-            except Exception as e:
-                print(str(rb) + 'Player Update Error | ' + str(e))
 
-        t1 = time.time()
-        print(f'rb Data Updates Run Time: {str(t1-t0)}')
-
-        #update WR stats
-        t0 = time.time()
-        wrData = self.getPosStats(self.WR)
-        wrJson = self.stripWrStats(wrData)
-
-        for wr in wrJson:
-            wrInfo = wrJson[wr]
-            try:
-                Player.objects.filter(pk=wr).update(
+        def wrPlayerUpdate(self, wrInfo, pk):
+            Player.objects.filter(pk=pk).update(
                     projRec = wrInfo['rec'],
                     projRecYds = wrInfo['recYds'],
                     projRecTds = wrInfo['recTds'],
@@ -258,62 +222,23 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projFumbles = wrInfo['fls'],
                     estProj = wrInfo['fp']
                 )
-            except Exception as e:
-                print(str(wr) + 'Player Update Error | ' + str(e))
-
-        t1 = time.time()
-        print(f'WR Data Updates Run Time: {str(t1-t0)}')
-        
-        #update TE stats
-        t0 = time.time()
-        teData = self.getPosStats(self.TE)
-        teJson = self.stripTeStats(teData)
-
-        for te in teJson:
-            teInfo = teJson[te]
-            try:
-                Player.objects.filter(pk=te).update(
+        def tePlayerUpdate(self, teInfo, pk):
+            Player.objects.filter(pk=pk).update(
                     projRec = teInfo['rec'],
                     projRecYds = teInfo['recYds'],
                     projRecTds = teInfo['recTds'],
                     projFumbles = teInfo['fls'],
-                    estProj = wrInfo['fp']
+                    estProj = teInfo['fp']
                 )
-            except Exception as e:
-                print(str(te) + 'Player Update Error | ' + str(e))
-
-        t1 = time.time()
-        print(f'TE Data Updates Run Time: {str(t1-t0)}')
-
-        #update K stats
-        t0 = time.time()
-        kData = self.getPosStats(self.K)
-        kJson = self.stripKStats(kData)
-
-        for k in kJson:
-            kInfo = kJson[k]
-            try:
-                Player.objects.filter(pk=k).update(
+        def kPlayerUpdate(self, kInfo, pk):
+            Player.objects.filter(pk=pk).update(
                     projFg = kInfo['fg'],
                     projXpt = kInfo['xpt'],
                     projKtotal = kInfo['fpts'],
                     estProj = kInfo['fpts'],
                 )
-            except Exception as e:
-                print(str(k) + 'Player Update Error | ' + str(e))
-
-        t1 = time.time()
-        print(f'K  Data Updates Run Time: {str(t1-t0)}')
-
-        #update DST stats
-        t0 = time.time()
-        dstData = self.getPosStats(self.DST)
-        dstJson = self.stripDstStats(dstData)
-
-        for dst in dstJson:
-            dstInfo = dstJson[dst]
-            try:
-                Player.objects.filter(pk=dst).update(
+        def dstPlayerUpdate(self, dstInfo, pk):
+            Player.objects.filter(pk=pk).update(
                     projSacks = dstInfo['sacks'],
                     projDInts = dstInfo['ints'],
                     projFumbleRec = dstInfo['fr'],
@@ -325,11 +250,40 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projDtotal = dstInfo['fpts'],
                     estProj = dstInfo['fpts'],
                 )
-            except Exception as e:
-                print(str(k) + 'Player Update Error | ' + str(e))
-        t1 = time.time()
-        print(f'QB Data Updates Run Time: {str(t1-t0)}')
 
+        def updatePlayerPosProj(self, posJson, posUpdater):
+            for player in posJson:
+                playerInfo = posJson[player]
+                try:
+                    posUpdater(self, playerInfo, player)
+                except Exception as e:
+                    print(str(player) + 'Player Update Error |' + str(e))
+
+        t0 = time.time()
+        qbData = self.getPosStats(self.QB)
+        qbJson = self.stripQbStats(qbData)
+        rbData = self.getPosStats(self.RB)
+        rbJson = self.stripRbStats(rbData)
+        wrData = self.getPosStats(self.WR)
+        wrJson = self.stripWrStats(wrData)
+        teData = self.getPosStats(self.TE)
+        teJson = self.stripTeStats(teData)
+        kData = self.getPosStats(self.K)
+        kJson = self.stripKStats(kData)
+        dstData = self.getPosStats(self.DST)
+        dstJson = self.stripDstStats(dstData)
+        t1 = time.time()
+        print(f'stripping all stats time {str(t1-t0)}')
+
+        t0 = time.time()
+        updatePlayerPosProj(self, qbJson, qbPlayerUpdate)
+        updatePlayerPosProj(self, rbJson, rbPlayerUpdate)
+        updatePlayerPosProj(self, wrJson, wrPlayerUpdate)
+        updatePlayerPosProj(self, teJson, tePlayerUpdate)
+        updatePlayerPosProj(self, kJson, kPlayerUpdate)
+        updatePlayerPosProj(self, dstJson, dstPlayerUpdate)
+        t1 = time.time()
+        print(f'Player Proj Update runtime: {str(t1-t0)}')
 
         t1t = time.time()
         runTime = t1t-t0t
@@ -368,7 +322,7 @@ class UpdateLeagueRosters(APIView, SleeperEndpoint):
             #find league and update rosters
             league = League.objects.get(pk=pk)
             league.updateRosters(leagueRosterData)
-            
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
