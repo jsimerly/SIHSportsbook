@@ -199,6 +199,7 @@ class League(models.Model):
     #State
     status = models.CharField(max_length=60)
     freeAgents = models.ManyToManyField(Player)
+    standardVig = models.DecimalField(decimal_places=4, max_digits=7, default=0.075)
 
     #League Settings
     LEAGUE_SIZE_CHOICE = (
@@ -475,6 +476,54 @@ class FantasyTeam(models.Model):
     spreadWin = models.IntegerField(default=0)
     spreadLoss = models.IntegerField(default=0)
     
+class Matchup(models.Model):
+    matchupId = models.IntegerField()
+
+    team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchupTeam1')
+    team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchupTeam2')
+
+    over_under = models.DecimalField(decimal_places=3, max_digits=8)
+
+    t1_ML = models.DecimalField(decimal_places=3, max_digits=8)
+    t2_ML = models.DecimalField(decimal_places=3, max_digits=8)
+
+    t1_SP = models.DecimalField(decimal_places=3, max_digits=8)
+    t2_SP = models.DecimalField(decimal_places=3, max_digits=8)
+    
+class Bettor(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    fantasyTeams = models.ForeignKey(FantasyTeam, on_delete=models.CASCADE)
+
+    balance = models.DecimalField(decimal_places=2, max_digits=10,)
+
+class Bets(models.Model):
+    bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)
+    BET_STATUS_CHOCIES = (
+        ('O', 'Open'),
+        ('W', 'Won'),
+        ('L', 'Lost'),
+        ('R', 'Refunded'),
+        ('C', 'Cashed Out')
+    )
+    betStatus = models.CharField(choices=BET_STATUS_CHOCIES, max_length=64)
+
+    BET_TYPE_CHOICES = (
+        ('ML', 'Moneyline'),
+        ('OU', 'Over Under'),
+        ('SP', 'Spread'),
+    )
+    betType = models.CharField(choices=BET_TYPE_CHOICES, max_length=64)
+    betAmount = models.DecimalField(decimal_places=2, max_digits=10,)
+    vig = models.DecimalField(decimal_places=4, max_digits=7)
+
+    teamToWin = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='teamToWin')
+    matchup = models.ForeignKey(Matchup, on_delete=models.CASCADE)
+
+    week = models.IntegerField()
+
+
+
+
     
 
 
