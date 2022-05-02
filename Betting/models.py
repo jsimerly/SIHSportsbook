@@ -1,7 +1,7 @@
 from re import M
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.db.models import Max
+from django.db.models import Q
 import decimal
 import time
 
@@ -286,105 +286,131 @@ class League(models.Model):
     nFlexWrTe = models.IntegerField(default=None)
     nSuperFlex = models.IntegerField(default=1)
 
+    #used to update all of the rosters in a league
     def updateRosters(self,rosterData):
         t0 = time.time()
+
+        #get all teams in League instance
         teamObjs = self.FantasyTeams.all()
-        nonFAs = []
+        nonFAs = [] #used to keep track of players that are on a team
 
+        #loop through the rosterData obtained from sleeper
         for teamJson in rosterData:
-            teamObj = teamObjs.get(rosterId = teamJson['roster_id'])
-            teamObj.players.clear()
+            teamObj = teamObjs.get(rosterId = teamJson['roster_id']) #get FantasyTeam object assocaited with rosterId on sleeper
+            teamObj.players.clear() #clear all teams players-fantasyTeam relationships before we add new ones
 
-            players = []
-
+            #loop through all players from sleepers Json response and find their associate objects
+            players = [] 
             for playerId in teamJson['players']:
                 playerObj = Player.objects.get(pk=playerId)
                 players.append(playerObj)
                 nonFAs.append(playerObj)
 
+            #add the many to many relationship back
             teamObj.players.add(*players)
 
+
+        #set all players to FA then remove the players who are not taken
         self.freeAgents.set(Player.objects.all()) #this takes .5sec to make quicker might need to record changes rather than reupdate all Players
-        
         self.freeAgents.remove(*nonFAs)
 
         t1 = time.time()
         print(f'models.League.updateRosters runtime: {str(t1-t0)}')
 
-    def _mapPlayerProj(self, playerQset):
+    #playerQset finds a teams players at a specific position
+    def _mapPlayerProj(self, playerQset): 
             projMap = {}
-
+            #loop through player set to parse data and calculate a score based on the league settings
             for player in playerQset:
+                #not currently doing calculations for def scoring differencess
                 if player.pos == Player.DST:
                     projMap[player] = player.projDtotal
+                #not currently doing calcs for k
                 elif player.pos == Player.K:
                     projMap[player] = player.projKtotal
                 else:
                     proj = 0
-
+                    #passing calculations
                     proj += player.projPassingYds * self.pp_passing_yard
                     proj += player.projPassingTds * self.pp_Passing_td
                     proj += player.projInts * self.pp_passing_int
-
+                    #rushing calculations
                     proj += player.projRushingYds * self.pp_rushing_yard
                     proj += player.projRushingTds * self.pp_rushing_td
                     proj += player.projFumbles * self.pp_rushing_2pt
-
+                    #rec calculations
                     proj += player.projRec * self.ppr
                     proj += player.projRecYds * self.pp_rec_yard
                     proj += player.projRecTds * self.pp_rec_td
 
+                    #round and store in a dict {PlayerObject : calcultedProjection}
                     projMap[player] = round(proj, 3)
                     
+            #sort the dict so that we can grab the [0] item in the array as the highest scorer
             projMap = sorted(projMap.items(), key=lambda x: x[1], reverse=True)
             return projMap
 
+    #used to find the best free agent avaliable if a team doesn't meet the treshhold requirements
     def _getTopFreeAgent(self, pos):
+        #This will just grab the best overall player
         if pos is None:
             freeAgents = self.freeAgents.all()
+        elif pos == 'flex':
+            #Grab a all freeAgents who are either RB, WR, OR TE
+            freeAgents = self.freeAgents.filter(Q(pos=Player.RB) | Q(pos=Player.WR) | Q(pos=Player.TE))
         else:
             freeAgents = self.freeAgents.filter(pos=pos)
+        #get to top freeAgent, save their proj, and return a tuple
         topFreeAgent = freeAgents.order_by('-estProj')[0]
         topFreeAgentTup = (topFreeAgent, topFreeAgent.estProj)
         return topFreeAgentTup
 
+    #returns the player with the highest projection or finds the best Free Agent if they have no players to start
     def _getTopPlayers(self, qSet, n, pos=None):
         playerList = []
+        #n is the number of this position that they start, this runs that many times
         for _ in range(n):
             try:
+                #find highest scoring player
                 topPlayer = qSet[0]
+                #if player is projected no point get a free agent
                 if topPlayer[1] == decimal.Decimal(0):
                     topFa = self._getTopFreeAgent(pos=pos)
                     playerList.append(topFa)
                 else:
+                    #remove player from list so they're not reused in team projections
                     qSet.pop(0)
                     playerList.append(topPlayer)
+            #most likely error thrown is an empty list 'index out of range', this happens because don't have anyone at the positions
             except Exception as e:
                 topFa = self._getTopFreeAgent(pos=pos)
                 playerList.append(topFa)
 
+        #return list of tuples (PlayerObj, Projection)
         return playerList
 
+    #called to update all teams projections 
     def updateTeamProjections(self):
         t0 = time.time()
         teams = self.FantasyTeams.all()
 
+        #run through all of the teams to make updates
         for team in teams:
             print(team.funName)
-            currentProj = decimal.Decimal(0)
-
+            currentProj = decimal.Decimal(0) #use Decimal so the type are the same
+            #get all of the player on the team
             teamQbs = team.players.filter(pos=Player.QB)
             teamRbs = team.players.filter(pos=Player.RB)
             teamWrs = team.players.filter(pos=Player.WR)
             teamTes = team.players.filter(pos=Player.TE)
             teamKs = team.players.filter(pos=Player.K)
             teamDst = team.players.filter(pos=Player.DST)
-
+            #get players that can play multiple positions. This is not currently in use
             teamQBs2 = team.players.filter(pos2=Player.QB)
             teamRbs2 = team.players.filter(pos2=Player.RB)
             teamWrs2 = team.players.filter(pos2=Player.WR)
             teamTes2 = team.players.filter(pos2=Player.TE)
-
+            #get all of the players projections
             qbs = self._mapPlayerProj(teamQbs)
             rbs = self._mapPlayerProj(teamRbs)
             wrs = self._mapPlayerProj(teamWrs)
@@ -393,7 +419,7 @@ class League(models.Model):
             dst = self._mapPlayerProj(teamDst)
 
             starters = []
-
+            #find all of the players who would be in a starting line up
             #Standard Slots
             starters.extend(self._getTopPlayers(qbs, self.nQB, Player.QB))
             starters.extend(self._getTopPlayers(rbs, self.nRB, Player.RB))
@@ -403,14 +429,16 @@ class League(models.Model):
             starters.extend(self._getTopPlayers(dst, self.nDST, Player.DST))
             #Flex and misc
             flex = rbs + wrs + tes
-            starters.extend(self._getTopPlayers(flex, self.nFlexWrRbTe,))
+            starters.extend(self._getTopPlayers(flex, self.nFlexWrRbTe, pos='flex'))
             #Super Flex
             superFlex = flex + qbs
             starters.extend(self._getTopPlayers(superFlex, self.nSuperFlex,))
 
+            #update the proj based on assumed starting lineup
             for playerTup in starters:
                 currentProj += playerTup[1]
 
+            #set teams currentProj
             team.currentProj = currentProj
             print(currentProj)
             team.save()

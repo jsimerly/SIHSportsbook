@@ -185,7 +185,7 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
             player.save()
         return Response('Player Update Completed', status=status.HTTP_200_OK)
 
-#Clean this up, do much repeat code
+##Clean this up, do much repeat code
 class UpdatePlayerProjections(APIView, FprosEndpoint):
     def put(self, request, format='json'):
         t0t = time.time()
@@ -345,8 +345,9 @@ class UpdateLeagueProjections(APIView):
        
         if serializer.is_valid():
             pk = serializer.data.get('sleeperId')
-            league = League.objects.get(pk=pk)
 
+            #Find league and update their projections
+            league = League.objects.get(pk=pk)
             league.updateTeamProjections()
         
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -360,12 +361,14 @@ class UpdateLeagueRosters(APIView, SleeperEndpoint):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            
             pk = serializer.data.get('sleeperId')
+            #get updated rosters from sleeper
             leagueRosterData = self.getRosters(pk)
+    
+            #find league and update rosters
             league = League.objects.get(pk=pk)
-
             league.updateRosters(leagueRosterData)
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
