@@ -29,3 +29,9 @@ class SleeperEndpoint():
     def getPlayers(self):
         url = 'https://api.sleeper.app/v1/players/nfl'
         return self.jsonFetch(url)
+
+    #get matchups for specific week
+    def getMatchupForLeague(self, leagueId, week):
+        url = f'https://api.sleeper.app/v1/league/{leagueId}/matchups/{str(week)}'
+        return self.jsonFetch(url)
+

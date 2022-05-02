@@ -114,8 +114,7 @@ class CreateLeague(APIView, SleeperEndpoint):
         print('Create League Run Time: ' + str(runTime))
         return Response(leagueSerializer.data, status=status.HTTP_201_CREATED)
 
-
-## NEED TO ADD PERMISSIONED TO HIT THIS REQUEST
+## NEED TO ADD PERMISSION TO HIT THIS REQUEST
 class UpdateNflPlayers(APIView, SleeperEndpoint):
     def post(self, request, format='json'):
         #request sent to sleepers API for players
@@ -208,6 +207,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projRushingYds = qbInfo['rushYds'],
                     projRushingTds = qbInfo['rushTds'],
                     projFumbles = qbInfo['fls'],
+                    estProj = qbInfo['fp']
                 )
             #kick out an except if we're unable to update the player
             except Exception as e:
@@ -231,6 +231,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projRecYds = rbInfo['recYds'],
                     projRecTds = rbInfo['recTds'],
                     projFumbles = rbInfo['fls'],
+                    estProj = rbInfo['fp']
                 )
             except Exception as e:
                 print(str(rb) + 'Player Update Error | ' + str(e))
@@ -253,6 +254,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projRushingYds = wrInfo['rushYds'],
                     projRushingTds = wrInfo['rushTds'],
                     projFumbles = wrInfo['fls'],
+                    estProj = wrInfo['fp']
                 )
             except Exception as e:
                 print(str(wr) + 'Player Update Error | ' + str(e))
@@ -273,6 +275,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projRecYds = teInfo['recYds'],
                     projRecTds = teInfo['recTds'],
                     projFumbles = teInfo['fls'],
+                    estProj = wrInfo['fp']
                 )
             except Exception as e:
                 print(str(te) + 'Player Update Error | ' + str(e))
@@ -292,6 +295,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projFg = kInfo['fg'],
                     projXpt = kInfo['xpt'],
                     projKtotal = kInfo['fpts'],
+                    estProj = kInfo['fpts'],
                 )
             except Exception as e:
                 print(str(k) + 'Player Update Error | ' + str(e))
@@ -317,6 +321,7 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     projPA = dstInfo['pa'],
                     projYdsAgn = dstInfo['ydsAgn'],
                     projDtotal = dstInfo['fpts'],
+                    estProj = dstInfo['fpts'],
                 )
             except Exception as e:
                 print(str(k) + 'Player Update Error | ' + str(e))
@@ -330,4 +335,18 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
 
         return Response(status=status.HTTP_200_OK)
                 
-                
+class UpdateLeagueProjections(APIView):
+    serializer_class = LeagueOnlySerializer
+
+    def put(self, request, format='json'):
+        serializer = self.serializer_class(data=request.data)
+       
+        if serializer.is_valid():
+            pk = serializer.data.get('sleeperId')
+            league = League.objects.get(pk=pk)
+
+            league.updateTeamProjections()
+        
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

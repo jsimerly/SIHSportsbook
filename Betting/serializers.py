@@ -15,6 +15,17 @@ class LeagueSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
             return League(validated_data)
 
+class LeagueOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = League
+        fields = ('sleeperId',)
+        extra_kwargs = {
+            'sleeperId' : {
+                'read_only': False,
+                'validators' : [],
+            },
+        }
+
 class FantasyTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = FantasyTeam

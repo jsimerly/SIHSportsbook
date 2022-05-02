@@ -45,6 +45,7 @@ class FprosEndpoint():
             info['rushYds'] = statCols[6].text
             info['rushTds'] = statCols[7].text
             info['fls'] = statCols[8].text
+            info['fp'] = statCols[9].text
 
             qbs[pk] = info
         
@@ -74,6 +75,7 @@ class FprosEndpoint():
             info['recYds'] = statCols[4].text
             info['recTds'] = statCols[5].text
             info['fls'] = statCols[6].text
+            info['fp'] = statCols[7].text
 
             rbs[pk] = info
 
@@ -103,6 +105,7 @@ class FprosEndpoint():
             info['rushYds'] = statCols[4].text
             info['rushTds'] = statCols[5].text
             info['fls'] = statCols[6].text
+            info['fp'] = statCols[7].text
 
             wrs[pk] = info
         
@@ -130,6 +133,7 @@ class FprosEndpoint():
             info['recYds'] = statCols[1].text
             info['recTds'] = statCols[2].text
             info['fls'] = statCols[3].text
+            info['fp'] = statCols[4].text
 
             tes[pk] = info
 
