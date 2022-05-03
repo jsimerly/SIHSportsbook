@@ -349,3 +349,15 @@ class UpdateNflState(APIView, SleeperEndpoint):
 class UpdateLeagueMatchups(APIView):
     def put(self, request, format='json'):
         return Response(status=status.HTTP_200_OK)
+
+class AttachedTeamToUser(APIView):
+    serializer_class = FantasyTeamOnlySerializer
+    def post(self, request, format='json'):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            sleeperName = serializer.data.get('sleeperName')
+            teamObj = FantasyTeam.objects.get(sleeperName=sleeperName)
+            teamObj.userAccount = request.user
+            teamObj.save()
+        return Response(status=status.HTTP_200_OK)

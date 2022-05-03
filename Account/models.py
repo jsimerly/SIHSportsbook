@@ -12,8 +12,6 @@ class UserManager(BaseUserManager):
             email = self.normalize_email(email),
         )
         
-        print('---password----')
-        print(password)
         user.set_password(password)
         user.save()
         return user

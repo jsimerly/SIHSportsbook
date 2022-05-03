@@ -39,6 +39,13 @@ class FantasyTeamSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
             return FantasyTeam(validated_data)
 
+class FantasyTeamOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FantasyTeam
+        fields = (
+            'sleeperName',
+        )
+
 class MatchupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Matchup
