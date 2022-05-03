@@ -1,10 +1,11 @@
+from difflib import Match
 import time
 from django import http
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from Betting.models import NflState
+from Betting.models import NflState, Bettor
 
 from .serializers import *
 from .sleeperEndpoint import SleeperEndpoint
@@ -346,11 +347,17 @@ class UpdateNflState(APIView, SleeperEndpoint):
         )
         return Response('Updated', status=status.HTTP_200_OK)
 
+#needs works just used to create matchup for now
 class UpdateLeagueMatchups(APIView):
-    def put(self, request, format='json'):
+    serializer_class = MatchupSerializer
+    def post(self, request, format='json'):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            print(serializer.save())
         return Response(status=status.HTTP_200_OK)
 
-class AttachedTeamToUser(APIView):
+class AttachedTeamToBettor(APIView):
     serializer_class = FantasyTeamOnlySerializer
     def post(self, request, format='json'):
         serializer = self.serializer_class(data=request.data)
@@ -358,6 +365,42 @@ class AttachedTeamToUser(APIView):
         if serializer.is_valid():
             sleeperName = serializer.data.get('sleeperName')
             teamObj = FantasyTeam.objects.get(sleeperName=sleeperName)
-            teamObj.userAccount = request.user
+            bettorObj = Bettor.objects.get_or_create(user=request.user)
+            teamObj.bettor = bettorObj[0]
+
             teamObj.save()
-        return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PlaceBet(APIView):
+    serializer_class = BetSerializer
+    def post(self, request, format='json'):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            bettorId = serializer.data.get('bettor')
+            matchupId = serializer.data.get('matchup')
+            teamToWinId = serializer.data.get('teamToWin')
+
+            teamToWinObj = FantasyTeam.objects.get(pk=teamToWinId)
+            matchupObj = Matchup.objects.get(pk=matchupId)
+            bettorObj = Bettor.objects.get(pk=bettorId)
+
+            fantasyTeam = bettorObj.fantasyteam_set.first()
+            league = fantasyTeam.league
+            
+            vig = league.standardVig
+            betStatus = 'O'
+
+            Bets.objects.create(
+                bettor=bettorObj,
+                betStatus=betStatus,
+                betType=serializer.data.get('betType'),
+                betAmount=serializer.data.get('betAmount'),
+                vig=vig,
+                teamToWin=teamToWinObj,
+                matchup=matchupObj,
+            )
+
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
