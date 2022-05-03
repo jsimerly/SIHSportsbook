@@ -1,6 +1,7 @@
 from dataclasses import field
 from rest_framework import serializers
-from .models import FantasyTeam, League, Player, Matchup
+
+from .models import FantasyTeam, League, Player, Matchup, Bets
 
 class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,10 +50,14 @@ class FantasyTeamOnlySerializer(serializers.ModelSerializer):
 class MatchupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Matchup
-        fields = (
-            ''
-        )
+        fields = '__all__'
 
+class BetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bets
+        fields = (
+            'bettor', 'betType', 'betAmount', 'teamToWin', 'matchup'
+        )
 
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:

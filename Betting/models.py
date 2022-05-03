@@ -456,10 +456,16 @@ class League(models.Model):
         runtime = t1-t0
         print(f'models.League.updateTeamProjections runtime: {runtime}')
 
+class Bettor(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    betsLeft = models.IntegerField(default=2)
+
 class FantasyTeam(models.Model):
     #Team
     players = models.ManyToManyField(Player)
-    league = models.ForeignKey(League, on_delete=models.PROTECT, default=0, null=False, related_name='FantasyTeams')
+    league = models.ForeignKey(League, on_delete=models.PROTECT, default=0, null=False, related_name='FantasyTeam')
 
     #Identity
     sleeperId = models.CharField(max_length=64, null=False, primary_key=True)
@@ -468,7 +474,7 @@ class FantasyTeam(models.Model):
     sleeperName = models.CharField(null=True, max_length=50)
     funName = models.CharField(null=True, max_length=30)
 
-    userAccount = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+    bettor = models.ForeignKey(Bettor, on_delete=models.PROTECT, null=True)
 
     #Current Week
     currentProj = models.DecimalField(max_digits=9, decimal_places=3, null=True)
@@ -495,8 +501,8 @@ class Matchup(models.Model):
     t1_projection = models.DecimalField(decimal_places=3, max_digits=6)
     t2_projection = models.DecimalField(decimal_places=3, max_digits=6)
 
-    t1_finalScore = models.DecimalField(decimal_places=3, max_digits=6)
-    t2_finalScore = models.DecimalField(decimal_places=3, max_digits=6)
+    t1_finalScore = models.DecimalField(decimal_places=3, max_digits=6, null=True, blank=True)
+    t2_finalScore = models.DecimalField(decimal_places=3, max_digits=6, null=True, blank=True)
 
     over_under = models.DecimalField(decimal_places=3, max_digits=8)
 
@@ -505,14 +511,6 @@ class Matchup(models.Model):
 
     t1_SP = models.DecimalField(decimal_places=3, max_digits=8)
     t2_SP = models.DecimalField(decimal_places=3, max_digits=8)
-
-
-    
-class Bettor(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    fantasyTeams = models.ForeignKey(FantasyTeam, on_delete=models.CASCADE)
-
-    balance = models.DecimalField(decimal_places=2, max_digits=10,)
 
 class Bets(models.Model):
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)

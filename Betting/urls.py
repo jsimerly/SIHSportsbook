@@ -8,5 +8,7 @@ urlpatterns = [
     path('update-league-projections', views.UpdateLeagueProjections.as_view()),
     path('update-league-rosters', views.UpdateLeagueRosters.as_view()),
     path('update-league-state', views.UpdateNflState.as_view()),
-    path('attatch-team-to-user', views.AttachedTeamToUser.as_view()),
+    path('update-league-matchups', views.UpdateLeagueMatchups.as_view()),
+    path('attatch-team-to-user', views.AttachedTeamToBettor.as_view()),
+    path('place-bet', views.PlaceBet.as_view())
 ]
