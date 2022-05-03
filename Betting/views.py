@@ -1,9 +1,8 @@
-from difflib import Match
 import time
-from django import http
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import decimal
 
 from Betting.models import NflState, Bettor
 
@@ -380,6 +379,7 @@ class PlaceBet(APIView):
             bettorId = serializer.data.get('bettor')
             matchupId = serializer.data.get('matchup')
             teamToWinId = serializer.data.get('teamToWin')
+            betAmount = serializer.data.get('betAmount')
 
             teamToWinObj = FantasyTeam.objects.get(pk=teamToWinId)
             matchupObj = Matchup.objects.get(pk=matchupId)
@@ -395,11 +395,15 @@ class PlaceBet(APIView):
                 bettor=bettorObj,
                 betStatus=betStatus,
                 betType=serializer.data.get('betType'),
-                betAmount=serializer.data.get('betAmount'),
+                betAmount=betAmount,
                 vig=vig,
                 teamToWin=teamToWinObj,
                 matchup=matchupObj,
             )
+
+            bettorObj.betsLeft -= 1
+            bettorObj.balance -= decimal.Decimal(betAmount)
+            bettorObj.save()
 
             return Response(status=status.HTTP_200_OK)
 
