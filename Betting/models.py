@@ -1,9 +1,11 @@
-from re import M
-from django.db import models
+import django
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.db.models import Q
 import decimal
 import time
+
+from django.db import models
 
 User = get_user_model()
 
@@ -12,6 +14,13 @@ class NflState(models.Model):
     week = models.IntegerField()
     displayWeek = models.IntegerField()
     season = models.IntegerField()
+    non_reg_week = models.IntegerField()
+    lastPlayerUpdate = models.DateTimeField(null=True)
+
+    def updateLastPlayerDateTime(self):
+        self.lastPlayerUpdate = timezone.now()
+        self.save()
+        
 
 class Player(models.Model):
     #Static
@@ -310,7 +319,6 @@ class League(models.Model):
             #add the many to many relationship back
             teamObj.players.add(*players)
 
-
         #set all players to FA then remove the players who are not taken
         self.freeAgents.set(Player.objects.all()) #this takes .5sec to make quicker might need to record changes rather than reupdate all Players
         self.freeAgents.remove(*nonFAs)
@@ -478,9 +486,17 @@ class FantasyTeam(models.Model):
     
 class Matchup(models.Model):
     matchupId = models.IntegerField()
+    week = models.IntegerField()
+    season = models.IntegerField()
 
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchupTeam1')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchupTeam2')
+
+    t1_projection = models.DecimalField(decimal_places=3, max_digits=6)
+    t2_projection = models.DecimalField(decimal_places=3, max_digits=6)
+
+    t1_finalScore = models.DecimalField(decimal_places=3, max_digits=6)
+    t2_finalScore = models.DecimalField(decimal_places=3, max_digits=6)
 
     over_under = models.DecimalField(decimal_places=3, max_digits=8)
 
@@ -489,6 +505,8 @@ class Matchup(models.Model):
 
     t1_SP = models.DecimalField(decimal_places=3, max_digits=8)
     t2_SP = models.DecimalField(decimal_places=3, max_digits=8)
+
+
     
 class Bettor(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -518,8 +536,6 @@ class Bets(models.Model):
 
     teamToWin = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='teamToWin')
     matchup = models.ForeignKey(Matchup, on_delete=models.CASCADE)
-
-    week = models.IntegerField()
 
 
 

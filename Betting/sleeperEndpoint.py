@@ -1,4 +1,4 @@
-from django.forms import JSONField
+from .models import NflState
 import requests
 import json
 
@@ -30,8 +30,15 @@ class SleeperEndpoint():
         url = 'https://api.sleeper.app/v1/players/nfl'
         return self.jsonFetch(url)
 
+    #get the state of the NFL
+    def getNflState(self):
+        url = 'https://api.sleeper.app/v1/state/nfl'
+        return self.jsonFetch(url)
+
     #get matchups for specific week
-    def getMatchupForLeague(self, leagueId, week):
+    def getMatchupForLeague(self, leagueId, week=None):
+        if week is None:
+            week = NflState.objects.get(pk=1).week
         url = f'https://api.sleeper.app/v1/league/{leagueId}/matchups/{str(week)}'
         return self.jsonFetch(url)
 
