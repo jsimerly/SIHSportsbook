@@ -4,6 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from Betting.models import NflState
+
 from .serializers import *
 from .sleeperEndpoint import SleeperEndpoint
 from .fprosEndpoint import FprosEndpoint
@@ -118,6 +120,7 @@ class CreateLeague(APIView, SleeperEndpoint):
 ## NEED TO ADD PERMISSION TO HIT THIS REQUEST
 class UpdateNflPlayers(APIView, SleeperEndpoint):
     def post(self, request, format='json'):
+        t0 = time.time()
         #request sent to sleepers API for players
         playersJson = self.getPlayers()
 
@@ -183,9 +186,14 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
 
             print(f'Current Player: {player.name}')
             player.save()
+
+        state = NflState.objects.get(pk=1)
+        state.updateLastPlayerDateTime()
+
+        t1 = time.time()
+        print(f'views.UpdateNflPlayers runtime: {str(t1-t0)}')
         return Response('Player Update Completed', status=status.HTTP_200_OK)
 
-##Clean this up, do much repeat code
 class UpdatePlayerProjections(APIView, FprosEndpoint):
     def put(self, request, format='json'):
         t0t = time.time()
@@ -326,3 +334,18 @@ class UpdateLeagueRosters(APIView, SleeperEndpoint):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateNflState(APIView, SleeperEndpoint):
+    def put(self, request, format='json'):
+        nflStateJson = self.getNflState()
+        NflState.objects.filter(pk=1).update(
+            week=nflStateJson['leg'],
+            displayWeek=nflStateJson['display_week'],
+            season=nflStateJson['league_season'],
+            non_reg_week=nflStateJson['week']
+        )
+        return Response('Updated', status=status.HTTP_200_OK)
+
+class UpdateLeagueMatchups(APIView):
+    def put(self, request, format='json'):
+        return Response(status=status.HTTP_200_OK)

@@ -1,5 +1,6 @@
+from dataclasses import field
 from rest_framework import serializers
-from .models import FantasyTeam, League, Player
+from .models import FantasyTeam, League, Player, Matchup
 
 class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,6 +38,13 @@ class FantasyTeamSerializer(serializers.ModelSerializer):
 
         def create(self, validated_data):
             return FantasyTeam(validated_data)
+
+class MatchupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Matchup
+        fields = (
+            ''
+        )
 
 
 class PlayerSerializer(serializers.ModelSerializer):
