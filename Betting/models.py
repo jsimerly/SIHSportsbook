@@ -1,9 +1,11 @@
+from turtle import undo
 import django
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db.models import Q
 import decimal
 import time
+import numpy as np
 
 from django.db import models
 
@@ -506,11 +508,49 @@ class Matchup(models.Model):
 
     over_under = models.DecimalField(decimal_places=3, max_digits=8)
 
+    t1_SP = models.DecimalField(decimal_places=3, max_digits=8)
+    t2_SP = models.DecimalField(decimal_places=3, max_digits=8)
+
     t1_ML = models.DecimalField(decimal_places=3, max_digits=8)
     t2_ML = models.DecimalField(decimal_places=3, max_digits=8)
 
-    t1_SP = models.DecimalField(decimal_places=3, max_digits=8)
-    t2_SP = models.DecimalField(decimal_places=3, max_digits=8)
+    vig = models.DecimalField(decimal_places=4, max_digits=7)
+
+    def setLines(self):
+        MAX_SPREAD = .40
+        vig = self.vig
+        #over under
+        self.over_under = abs(self.t1_projection + self.t2_projection)
+        #spread
+        self.t1_SP = -(self.t1_projection - self.t2_projection)
+        self.t2_SP = -(self.t2_projection - self.t1_projection)
+        #money line
+        spread = abs(self.t1_SP)
+        percentSpread = (1/1.75)*np.log(spread*.0175+1)
+
+        if percentSpread > MAX_SPREAD:
+            percentSpread = MAX_SPREAD
+
+        favOdds = .5 + percentSpread
+        undOdds = 1 - percentSpread
+        favOdds += vig/2
+        undOdds += vig/2
+
+        favML = (-1*favOdds/(1-favOdds)*100)
+        if undOdds < .5:
+            undML = ((1-undOdds)/undOdds)*100
+        else:
+            undML = (-1*undOdds/(1-undOdds)*100)
+
+        if self.t1_projection > self.t2_projection:
+            self.t1_ML = favML
+            self.t2_ML = undML
+        elif self.t2_projection > self.t1_projection:
+            self.t2_ML = favML
+            self.t1_ML = undML
+        else:
+            self.t1_ML = -(100+vig/2)
+            self.t2_ML = -(100+vig/2)
 
 class Bets(models.Model):
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)

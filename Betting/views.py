@@ -10,8 +10,11 @@ from .serializers import *
 from .sleeperEndpoint import SleeperEndpoint
 from .fprosEndpoint import FprosEndpoint
 
+sleeperEndpoint = SleeperEndpoint()
+fantasyProsEndpoint = FprosEndpoint()
+
 # Create your views here.
-class CreateLeague(APIView, SleeperEndpoint):
+class CreateLeague(APIView):
     serializer_class = LeagueSerializer
 
     def post(self, request, format='json'):
@@ -21,7 +24,7 @@ class CreateLeague(APIView, SleeperEndpoint):
         owner = request.data['owner']
         token = request.data['csrfmiddlewaretoken']
         
-        leagueJson = self.getLeague(leagueId) #sends get request to sleeper API
+        leagueJson = sleeperEndpoint.getLeague(leagueId) #sends get request to sleeper API
 
         if leagueJson is None:
             return Response('League Not Found', status=status.HTTP_404_NOT_FOUND)
@@ -61,8 +64,8 @@ class CreateLeague(APIView, SleeperEndpoint):
             return Response(leagueSerializer.errors, status=status.HTTP_201_CREATED)
 
         #sends GET request to sleeper for rosters and users in the league
-        rosterJson = self.getRosters(leagueId)
-        userJson = self.getLeagueUsers(leagueId)
+        rosterJson = sleeperEndpoint.getRosters(leagueId)
+        userJson = sleeperEndpoint.getLeagueUsers(leagueId)
     
         nameDict = {}
         for user in userJson:
@@ -118,11 +121,11 @@ class CreateLeague(APIView, SleeperEndpoint):
         return Response(leagueSerializer.data, status=status.HTTP_201_CREATED)
 
 ## NEED TO ADD PERMISSION TO HIT THIS REQUEST
-class UpdateNflPlayers(APIView, SleeperEndpoint):
+class UpdateNflPlayers(APIView):
     def post(self, request, format='json'):
         t0 = time.time()
         #request sent to sleepers API for players
-        playersJson = self.getPlayers()
+        playersJson = sleeperEndpoint.getPlayers()
 
         #iterate through the all Players
         for playerId in playersJson:
@@ -194,7 +197,7 @@ class UpdateNflPlayers(APIView, SleeperEndpoint):
         print(f'views.UpdateNflPlayers runtime: {str(t1-t0)}')
         return Response('Player Update Completed', status=status.HTTP_200_OK)
 
-class UpdatePlayerProjections(APIView, FprosEndpoint):
+class UpdatePlayerProjections(APIView):
     def put(self, request, format='json'):
         t0t = time.time()
 
@@ -268,18 +271,23 @@ class UpdatePlayerProjections(APIView, FprosEndpoint):
                     print(str(player) + 'Player Update Error |' + str(e))
 
         t0 = time.time()
-        qbData = self.getPosStats(self.QB)
-        qbJson = self.stripQbStats(qbData)
-        rbData = self.getPosStats(self.RB)
-        rbJson = self.stripRbStats(rbData)
-        wrData = self.getPosStats(self.WR)
-        wrJson = self.stripWrStats(wrData)
-        teData = self.getPosStats(self.TE)
-        teJson = self.stripTeStats(teData)
-        kData = self.getPosStats(self.K)
-        kJson = self.stripKStats(kData)
-        dstData = self.getPosStats(self.DST)
-        dstJson = self.stripDstStats(dstData)
+        qbData = fantasyProsEndpoint.getPosStats(self.QB)
+        qbJson = fantasyProsEndpoint.stripQbStats(qbData)
+
+        rbData = fantasyProsEndpoint.getPosStats(self.RB)
+        rbJson = fantasyProsEndpoint.stripRbStats(rbData)
+
+        wrData = fantasyProsEndpoint.getPosStats(self.WR)
+        wrJson = fantasyProsEndpoint.stripWrStats(wrData)
+
+        teData = fantasyProsEndpoint.getPosStats(self.TE)
+        teJson = fantasyProsEndpoint.stripTeStats(teData)
+
+        kData = fantasyProsEndpoint.getPosStats(self.K)
+        kJson = fantasyProsEndpoint.stripKStats(kData)
+        
+        dstData = fantasyProsEndpoint.getPosStats(self.DST)
+        dstJson = fantasyProsEndpoint.stripDstStats(dstData)
         t1 = time.time()
         print(f'stripping all stats time {str(t1-t0)}')
 
@@ -316,7 +324,7 @@ class UpdateLeagueProjections(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UpdateLeagueRosters(APIView, SleeperEndpoint):
+class UpdateLeagueRosters(APIView):
     serializer_class = LeagueOnlySerializer
 
     def put(self, request, format='json'):
@@ -325,7 +333,7 @@ class UpdateLeagueRosters(APIView, SleeperEndpoint):
         if serializer.is_valid():
             pk = serializer.data.get('sleeperId')
             #get updated rosters from sleeper
-            leagueRosterData = self.getRosters(pk)
+            leagueRosterData = sleeperEndpoint.getRosters(pk)
     
             #find league and update rosters
             league = League.objects.get(pk=pk)
@@ -335,9 +343,9 @@ class UpdateLeagueRosters(APIView, SleeperEndpoint):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-class UpdateNflState(APIView, SleeperEndpoint):
+class UpdateNflState(APIView):
     def put(self, request, format='json'):
-        nflStateJson = self.getNflState()
+        nflStateJson = sleeperEndpoint.getNflState()
         NflState.objects.filter(pk=1).update(
             week=nflStateJson['leg'],
             displayWeek=nflStateJson['display_week'],
@@ -376,11 +384,13 @@ class PlaceBet(APIView):
     def post(self, request, format='json'):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
+            #get bet info from front end
             bettorId = serializer.data.get('bettor')
             matchupId = serializer.data.get('matchup')
             teamToWinId = serializer.data.get('teamToWin')
             betAmount = serializer.data.get('betAmount')
 
+            #get objects needed for bet model
             teamToWinObj = FantasyTeam.objects.get(pk=teamToWinId)
             matchupObj = Matchup.objects.get(pk=matchupId)
             bettorObj = Bettor.objects.get(pk=bettorId)
