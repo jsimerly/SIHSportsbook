@@ -361,6 +361,7 @@ class UpdateNflState(APIView):
 #needs works just used to create matchup for now
 class UpdateLeagueMatchups(APIView):
     serializer_class = MatchupSerializer
+    
     def post(self, request, format='json'):
         serializer = self.serializer_class(data=request.data)
 
@@ -388,7 +389,7 @@ class AttachedTeamToBettor(APIView):
 class PlaceBet(APIView):
     serializer_class = BetSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, format='json'):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
