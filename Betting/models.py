@@ -551,6 +551,8 @@ class Matchup(models.Model):
             self.t1_ML = -(100+vig/2)
             self.t2_ML = -(100+vig/2)
 
+        self.save()
+
 class Bets(models.Model):
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)
     BET_STATUS_CHOCIES = (
