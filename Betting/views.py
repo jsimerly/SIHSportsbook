@@ -2,6 +2,7 @@ import time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 import decimal
 
 from Betting.models import NflState, Bettor
@@ -16,6 +17,7 @@ fantasyProsEndpoint = FprosEndpoint()
 # Create your views here.
 class CreateLeague(APIView):
     serializer_class = LeagueSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, format='json'):
         t0 = time.time()
@@ -122,6 +124,8 @@ class CreateLeague(APIView):
 
 ## NEED TO ADD PERMISSION TO HIT THIS REQUEST
 class UpdateNflPlayers(APIView):
+    permission_classes = [IsAdminUser]
+
     def post(self, request, format='json'):
         t0 = time.time()
         #request sent to sleepers API for players
@@ -285,7 +289,7 @@ class UpdatePlayerProjections(APIView):
 
         kData = fantasyProsEndpoint.getPosStats(self.K)
         kJson = fantasyProsEndpoint.stripKStats(kData)
-        
+
         dstData = fantasyProsEndpoint.getPosStats(self.DST)
         dstJson = fantasyProsEndpoint.stripDstStats(dstData)
         t1 = time.time()
@@ -366,6 +370,8 @@ class UpdateLeagueMatchups(APIView):
 
 class AttachedTeamToBettor(APIView):
     serializer_class = FantasyTeamOnlySerializer
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format='json'):
         serializer = self.serializer_class(data=request.data)
 
@@ -381,6 +387,8 @@ class AttachedTeamToBettor(APIView):
 
 class PlaceBet(APIView):
     serializer_class = BetSerializer
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, format='json'):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
