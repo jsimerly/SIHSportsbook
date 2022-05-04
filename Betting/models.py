@@ -23,7 +23,6 @@ class NflState(models.Model):
         self.lastPlayerUpdate = timezone.now()
         self.save()
         
-
 class Player(models.Model):
     #Static
     QB = 'QB'
