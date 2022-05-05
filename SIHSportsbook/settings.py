@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     #local
     'Betting',
     'Account',
+    'Frontend',
 ]
 
 REST_FRAMEWORK = {
