@@ -7,7 +7,7 @@ import {
 
 export default function BetTile(props){
     const betTileButton = (
-        <ToggleButton fullWidth={true}>
+        <ToggleButton fullWidth={true} value={props.betValue} aria-label="t1">
             {props.betValue}
         </ToggleButton>
     )
