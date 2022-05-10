@@ -7,12 +7,16 @@ import {
 import MatchUp from "../molecules/MatchUp";
 
 export default function Matchups(props){
-    const matchups = 
-    (<Grid item container direction={'column'} sx={{border:1}}>
+    const matchups = (
+        <Box>
             {['Matchup 1', 'Matchup 2', 'Matchup 3', 'Matchup 4', 'Matchup 5'].map((matchup, index) =>
                 <MatchUp/>
             )}
-    </Grid>)
-    return (<div>{matchups}</div>)
+        </Box>
+   )
+   
+    return (
+        <div>{matchups}</div>
+    )
 }
   

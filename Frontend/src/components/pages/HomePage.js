@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import DrawerComp from "../organisms/Drawer";
 import Matchups from "../organisms/Matchups";
+import MatchUp from "../molecules/MatchUp";
 import {
     Box,
     Grid
@@ -17,100 +18,10 @@ export default function App(props){
                         <DrawerComp/>
                     </Box>
                 </Grid>
-                <Grid margin={2} md={7} sx={{border:1}}>
-                    <Grid sx={{border:1, margin:1}}>
-                        <Grid container columns={20}>
-                            <Grid item md={8} sx={{border:1, padding:2}}>
-                                test 20
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                        </Grid>
-                        <Grid container columns={20}>
-                            <Grid item md={8} sx={{border:1, padding:2}}>
-                                test 1
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid sx={{border:1, margin:1}}>
-                        <Grid container columns={20}>
-                            <Grid item md={8} sx={{border:1, padding:2}}>
-                                test 20
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                        </Grid>
-                        <Grid container columns={20}>
-                            <Grid item md={8} sx={{border:1, padding:2}}>
-                                test 1
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid sx={{border:1, margin:1}}>
-                        <Grid container columns={20}>
-                            <Grid item md={8} sx={{border:1, padding:2}}>
-                                test 20
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                        </Grid>
-                        <Grid container columns={20}>
-                            <Grid item md={8} sx={{border:1, padding:2}}>
-                                test 1
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                            <Grid item md={4} sx={{border:1, padding:2}}>
-                                test 2
-                            </Grid>
-                        </Grid>
-                    </Grid>
+                <Grid margin={2} md={7} spacing={1} sx={{border:1}}>
+                    <Matchups/>
                 </Grid>
             </Grid>
-            
         </div>
     )
 }

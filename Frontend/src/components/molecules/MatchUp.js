@@ -8,16 +8,36 @@ import {
 import BetTile from "../atoms/BetTile"
 
 export default function MatchUp(props){
-    const matchups = 
-    (<Box>
-        <Grid container spacing={0} gap={0}>
-            <Grid item md={4}>
+    return (
+    <Box sx={{margin:1}}>
+        <Grid container columns={20}>
+            <Grid item md={8} sx={{border:1, padding:2}}>
                 test 1
             </Grid>
-            <Grid item>
+            <Grid item md={4} sx={{border:1, padding:2}}>
+                test 2
+            </Grid>
+            <Grid item md={4} sx={{border:1, padding:2}}>
+                test 2
+            </Grid>
+            <Grid item md={4} sx={{border:1, padding:2}}>
                 test 2
             </Grid>
         </Grid>
-    </Box>)
-    return (<Box>{matchups}</Box>)
+        <Grid container columns={20}>
+            <Grid item md={8} sx={{border:1, padding:2}}>
+                test 1
+            </Grid>
+            <Grid item md={4} sx={{border:1, padding:2}}>
+                test 2
+            </Grid>
+            <Grid item md={4} sx={{border:1, padding:2}}>
+                test 2
+            </Grid>
+            <Grid item md={4} sx={{border:1, padding:2}}>
+                test 2
+            </Grid>
+        </Grid>
+    </Box>
+    )
 }
