@@ -24,7 +24,7 @@ export default function MatchUp(props){
                 <BetTile betData={data.over} betId={id} type="over"/>
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.ml_pos} betId={id}/>
+                <BetTile betData={data.ml_pos} betId={id} type="pos"/>
             </Grid>
         </Grid>
         <Grid container columns={20}>
@@ -38,7 +38,7 @@ export default function MatchUp(props){
                 <BetTile betData={data.under} betId={id} type="under"/>
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.ml_pos} betId={id}/>
+                <BetTile betData={data.ml_neg} betId={id}/>
             </Grid>
         </Grid>
     </Box>

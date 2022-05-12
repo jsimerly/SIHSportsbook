@@ -21,6 +21,12 @@ export default function BetTile(props){
                     U {props.betData}
                 </ToggleButton>
                 )
+        } else if (props.type === "pos"){
+            return (
+                <ToggleButton fullWidth={true} value={props.betValue} aria-label="t1">
+                    +{props.betData}
+                </ToggleButton>
+                )
         } else {
             return (
                 <ToggleButton fullWidth={true} value={props.betValue} aria-label="t1">

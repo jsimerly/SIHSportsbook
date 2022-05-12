@@ -18,8 +18,8 @@ export default function Matchups(props){
             under: "220",
             sp_pos: "+3.5",
             sp_neg: "-3.5",
-            ml_pos: "+210",
-            ml_neg: "-180"
+            ml_pos: +210,
+            ml_neg: -180
         }},
         {
         id: 2,    
@@ -30,8 +30,8 @@ export default function Matchups(props){
             under: "120",
             sp_pos: "+5.5",
             sp_neg: "-5.5",
-            ml_pos: "+115",
-            ml_neg: "-129"
+            ml_pos: 115,
+            ml_neg: -129,
         }},
         {
         id: 3,    
@@ -42,8 +42,8 @@ export default function Matchups(props){
             under: "120",
             sp_pos: "+5.5",
             sp_neg: "-5.5",
-            ml_pos: "+115",
-            ml_neg: "-129"
+            ml_pos: 115,
+            ml_neg: -129
         }},
     ]
 
