@@ -48,10 +48,18 @@ export default function Matchups(props){
     ]
 
     const [matchups, setMatchups] = useState(matchupsJson);
+    const [bets, setBets] = useState([]);
+
+    function handleBetSelected(event, newBets) {
+        setBets(newBets);
+        console.log(newBets)
+    }
 
     const matchupsDiv = (
         <Box>
-            <ToggleButtonGroup 
+            <ToggleButtonGroup
+                value={bets}
+                onChange = {handleBetSelected}
                 fullWidth="true"
                 orientation="vertical"
             >            

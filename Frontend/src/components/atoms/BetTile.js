@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { 
     Grid,
     Box,
@@ -7,36 +7,46 @@ import {
 
 export default function BetTile(props){
     const betData = props.betData
+    const [selectedBool, setSelected] = useState(false);
+
+    function buttonSelected() {
+        setSelected(!selectedBool);
+    }
+
+    function BetButton(text) {
+        return (<ToggleButton
+            fullWidth={true} 
+            value={props.betValue}
+            selected={selectedBool}
+            onChange={buttonSelected}
+        >
+            {text}
+        </ToggleButton>)
+    }
 
     function main() {
         if (props.type === "over") {
+            const text = "O " + props.betData
             return (
-            <ToggleButton fullWidth={true} value={props.betValue} aria-label="t1">
-                O {props.betData}
-            </ToggleButton>
+                BetButton(text)
             )
         } else if (props.type === "under") {
+            const text = "U " + props.betData
             return (
-                <ToggleButton fullWidth={true} value={props.betValue} aria-label="t1">
-                    U {props.betData}
-                </ToggleButton>
+                BetButton(text)
                 )
         } else if (props.type === "pos"){
+            const text = "+" + props.betData
             return (
-                <ToggleButton fullWidth={true} value={props.betValue} aria-label="t1">
-                    +{props.betData}
-                </ToggleButton>
+                BetButton(text)
                 )
         } else {
+            const text = props.betData
             return (
-                <ToggleButton fullWidth={true} value={props.betValue} aria-label="t1">
-                    {props.betData}
-                </ToggleButton>
+                BetButton(text)
             )
         }
     }
-
-    console.log(props.type)
 
     return (
         main()

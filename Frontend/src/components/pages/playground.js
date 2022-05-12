@@ -30,10 +30,12 @@ export default function Playground(props){
             <ToggleButtonGroup
                 value={bets}
                 onChange={handleBetSelected}
-            >       
-                {betButton('test1')}
-                {betButton('test2')}
-                {betButton('test3')}
+            >          
+                <Box>
+                    {betButton('test1')}
+                    {betButton('test2')}
+                    {betButton('test3')}
+                </Box>
             </ToggleButtonGroup> 
         </div>
     )
