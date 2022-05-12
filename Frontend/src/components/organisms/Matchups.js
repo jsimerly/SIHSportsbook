@@ -48,15 +48,37 @@ export default function Matchups(props){
     ]
 
     const [matchups, setMatchups] = useState(matchupsJson);
-    const [bets, setBets] = useState([]);
+    let betList = []
+    const [bets, setBets] = useState(betList);
 
-    function handleBetSelected(event, newBets) {
-        setBets(newBets);
-        console.log(newBets)
+    function addBet(newBet) {
+        const currentBets = bets;
+        setBets({currentBets: [...currentBets, + newBet]});
+    }
+
+    function removeBet(newBet) {
+        const currentBets = bets;
+        if (currentBets.length > 0){
+            setBets(currentBets.filter(newBet))
+        }
+    }
+
+    function handleBetSelected(id, betType) {
+        const newBet = [id, betType]
+        console.log("new Bet: " + newBet)
+
+        if (betList.includes(newBet)) {
+            console.log("FOUND DUPLICATE")
+        } else {
+            console.log("not found")
+        }
+
+        betList.push(newBet)
+        console.log("betList: " + betList)
     }
 
     const matchupsDiv = (
-        <Box>
+        <Box> 
             <ToggleButtonGroup
                 value={bets}
                 onChange = {handleBetSelected}
@@ -65,9 +87,11 @@ export default function Matchups(props){
             >            
             {matchups.map((matchupJson, index) => {
                 const matchupData = matchupJson
-                console.log(matchupData)
                 return (
-                   <MatchUp data={matchupData}/>
+                   <MatchUp 
+                        matchupData={matchupData}
+                        betHandler={handleBetSelected}
+                    />
                 )
             })}
             </ToggleButtonGroup>

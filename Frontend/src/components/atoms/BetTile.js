@@ -6,17 +6,17 @@ import {
 } from "@mui/material";
 
 export default function BetTile(props){
-    const betData = props.betData
     const [selectedBool, setSelected] = useState(false);
 
-    function buttonSelected() {
+    function buttonSelected(event) {
         setSelected(!selectedBool);
+        props.betHandler(props.betType)
     }
 
     function BetButton(text) {
         return (<ToggleButton
             fullWidth={true} 
-            value={props.betValue}
+            value={props.data}
             selected={selectedBool}
             onChange={buttonSelected}
         >
@@ -24,24 +24,24 @@ export default function BetTile(props){
         </ToggleButton>)
     }
 
-    function main() {
-        if (props.type === "over") {
-            const text = "O " + props.betData
+    function ifButton() {
+        if (props.betType === "over") {
+            const text = "O " + props.data
             return (
                 BetButton(text)
             )
-        } else if (props.type === "under") {
-            const text = "U " + props.betData
+        } else if (props.betType === "under") {
+            const text = "U " + props.data
             return (
                 BetButton(text)
                 )
-        } else if (props.type === "pos"){
-            const text = "+" + props.betData
+        } else if (props.betType === "ml_pos"){
+            const text = "+" + props.data
             return (
                 BetButton(text)
                 )
         } else {
-            const text = props.betData
+            const text = props.data
             return (
                 BetButton(text)
             )
@@ -49,6 +49,6 @@ export default function BetTile(props){
     }
 
     return (
-        main()
+        ifButton()
     )
 }

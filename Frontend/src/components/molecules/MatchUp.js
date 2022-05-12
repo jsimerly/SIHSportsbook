@@ -2,14 +2,16 @@ import React, { Component } from "react";
 import { 
     Grid,
     Box,
-    ToggleButtonGroup,
-    Typography,
 } from "@mui/material";
 import BetTile from "../atoms/BetTile"
 
 export default function MatchUp(props){
-    const data = props.data.data
-    const id = props.betId
+    const id = props.matchupData.id
+    const data =  props.matchupData.data
+
+    function handleBetButtonSelected(betType) {
+        props.betHandler(id, betType)
+    }
 
     return (
     <Box sx={{margin:1}}>
@@ -18,13 +20,25 @@ export default function MatchUp(props){
                 {data.team1}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.sp_pos} betId={id}/>
+                <BetTile 
+                    betType="sp_pos" 
+                    data={data.sp_pos} 
+                    betHandler={handleBetButtonSelected}
+                />
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.over} betId={id} type="over"/>
+                <BetTile 
+                    betType="over" 
+                    data={data.over} 
+                    betHandler={handleBetButtonSelected}
+                />
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.ml_pos} betId={id} type="pos"/>
+                <BetTile 
+                    betType="ml_pos" 
+                    data={data.ml_pos} 
+                    betHandler={handleBetButtonSelected} 
+                />
             </Grid>
         </Grid>
         <Grid container columns={20}>
@@ -32,13 +46,25 @@ export default function MatchUp(props){
                 {data.team2}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.sp_neg} betId={id}/>
+                <BetTile 
+                    betType="sp_neg" 
+                    data={data.sp_neg}
+                    betHandler={handleBetButtonSelected}
+                />
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.under} betId={id} type="under"/>
+                <BetTile 
+                    betType="under" 
+                    data={data.under} 
+                    betHandler={handleBetButtonSelected}
+                />
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betData={data.ml_neg} betId={id}/>
+                <BetTile 
+                    betType="ml_neg" 
+                    data={data.ml_neg} 
+                    betHandler={handleBetButtonSelected}
+                />
             </Grid>
         </Grid>
     </Box>
