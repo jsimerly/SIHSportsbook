@@ -8,35 +8,37 @@ import {
 import BetTile from "../atoms/BetTile"
 
 export default function MatchUp(props){
+    const data = props.data.data
+    const id = props.betId
 
     return (
     <Box sx={{margin:1}}>
         <Grid container columns={20}>
             <Grid item md={8} sx={{border:1}}>
-                Team 1
+                {data.team1}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betValue="+3.5"/>
+                <BetTile betData={data.sp_pos} betId={id}/>
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betValue="O 200"/>
+                <BetTile betData={data.over} betId={id} type="over"/>
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betValue="+220"/>
+                <BetTile betData={data.ml_pos} betId={id}/>
             </Grid>
         </Grid>
         <Grid container columns={20}>
             <Grid item md={8} sx={{border:1}}>
-                test 1
+                {data.team2}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betValue="-3.5"/>
+                <BetTile betData={data.sp_neg} betId={id}/>
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betValue="U 200"/>
+                <BetTile betData={data.under} betId={id} type="under"/>
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile betValue="-180"/>
+                <BetTile betData={data.ml_pos} betId={id}/>
             </Grid>
         </Grid>
     </Box>
