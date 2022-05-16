@@ -23,7 +23,7 @@ export default function BetSlip(props){
                        2 -  Betslip
                     </Grid>
                     <Grid item xs={2}>
-                        Trash
+                        Parlay
                     </Grid>
                 </Grid>
                 <List>
@@ -31,6 +31,11 @@ export default function BetSlip(props){
                         <BetSlipTile betData={bet}/>
                     )}
                 </List>
+                <Box sx={{border:1, width:'100%'}}>
+                    <Box>
+                        Remove All
+                    </Box>
+                </Box>
                 <Button>
                     Place Bet
                 </Button>
