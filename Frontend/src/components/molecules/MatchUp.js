@@ -16,7 +16,7 @@ export default function MatchUp(props){
     return (
     <Box sx={{margin:1}}>
         <Grid container columns={20}>
-            <Grid item md={8} sx={{border:1}}>
+            <Grid item md={8}  sx={{border:1, display: "flex", alignItems: "center" }}>
                 {data.team1}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
@@ -42,7 +42,7 @@ export default function MatchUp(props){
             </Grid>
         </Grid>
         <Grid container columns={20}>
-            <Grid item md={8} sx={{border:1}}>
+            <Grid item md={8} sx={{border:1, display: "flex", alignItems: "center" }}>
                 {data.team2}
             </Grid>
             <Grid item md={4} sx={{border:1}}>

@@ -3,6 +3,7 @@ import { render } from "react-dom";
 import DrawerComp from "../organisms/Drawer";
 import Matchups from "../organisms/Matchups";
 import MatchUp from "../molecules/MatchUp";
+import BetSlip from "../organisms/BetSlip";
 import {
     Box,
     Grid
@@ -20,6 +21,9 @@ export default function App(props){
                 </Grid>
                 <Grid margin={2} md={7} spacing={1} sx={{border:1}}>
                     <Matchups/>
+                </Grid>
+                <Grid margin={2} md={2} spacing={1} sx={{border:1}}>
+                    <BetSlip/>
                 </Grid>
             </Grid>
         </div>
