@@ -7,43 +7,33 @@ import {
     TextField,
     Box
  } from '@mui/material';
+ import BetSlipTile from "../molecules/BetSlipTile";
 
 export default function BetSlip(props){
     return (
-        <div>
             <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
                 flexDirection: 'column',
-                p: 1,
-                m: 1,
                 borderRadius: 1,
                 }}
             >
-                <Grid container>
-                    <Grid item>
-                        Bet Slip Title
+                <Grid container sx={{border:1, p:1, mb:1}}>
+                    <Grid item xs={10}>
+                       2 -  Betslip
                     </Grid>
-                    <Grid item>
-                        <Button>
-                            parlay
-                        </Button>
+                    <Grid item xs={2}>
+                        Trash
                     </Grid>
                 </Grid>
                 <List>
-                    {['Bet 1', 'Bet 2'].map((bet, index) =>
-                        <ListItem>
-                            {bet}
-                        </ListItem>
+                    {['Over 230', 'Under 220'].map((bet, index) =>
+                        <BetSlipTile betData={bet}/>
                     )}
                 </List>
-                <TextField
-                    label="Wager"
-                />
                 <Button>
                     Place Bet
                 </Button>
             </Box>
-        </div>
     )
 }
