@@ -18,7 +18,7 @@ export default function BetSlipTile(props){
                         <Box>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    {props.betData}
+                                    {props.betData.betData.betValue}
                                 </Grid>
                                 <Grid item xs={3}>
                                     -110

@@ -26,10 +26,12 @@ export default function Matchups(props){
     }
 
     function handleBetSelected(matchupData, betType, team) {
+        const betValue = matchupData.data[betType]
         const newBet = {
             matchupData,
             betData : {
                 betType: betType,
+                betValue: betValue,
                 team: team,
             }
         }
@@ -41,7 +43,6 @@ export default function Matchups(props){
         } else {
             newBetList.push(newBet)
         }
-        
         props.betHandler(newBetList)
     }
 

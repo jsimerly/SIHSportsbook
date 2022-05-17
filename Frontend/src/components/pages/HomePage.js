@@ -65,12 +65,14 @@ export default function App(props){
         // const betType = newBet.betData.betType
         // const betValue = newBet.matchupData.data[betType]
      
-        setSelectedBets(newBetList)
+        setSelectedBets([...newBetList])
         console.log(selectedBets)
     }
 
     return (
+        
         <div>
+            {console.log('rerender')}
             <Grid container>
                 <Grid item>
                     <Box sx={{width: 250, height: '100vh', border:1 }}>

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState, useEffect } from "react";
 import {
     Grid,
     List,
@@ -10,6 +10,12 @@ import {
  import BetSlipTile from "../molecules/BetSlipTile";
 
 export default function BetSlip(props){
+    const [selectedBets, setSelectedBets] = useState(props.data)
+
+    useEffect(() => {
+        setSelectedBets(props.data)
+    }, [props.data])
+
     return (
             <Box sx={{
                 display: 'flex',
@@ -27,7 +33,7 @@ export default function BetSlip(props){
                     </Grid>
                 </Grid>
                 <List>
-                    {['Over 230', 'Under 220'].map((bet, index) =>
+                    {selectedBets.map((bet, index) =>
                         <BetSlipTile betData={bet}/>
                     )}
                 </List>
