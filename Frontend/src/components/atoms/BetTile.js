@@ -8,15 +8,18 @@ import {
 export default function BetTile(props){
     const [selectedBool, setSelected] = useState(false);
 
-    function buttonSelected(event) {
+    function buttonSelected(e) {
         setSelected(!selectedBool);
-        props.betHandler(props.betType)
+        const team = e.target.title
+        props.betHandler(props.betType, team)
     }
 
-    function BetButton(text) {
+    function BetButton(text, team) {
         return (<ToggleButton
             fullWidth={true} 
             value={props.data}
+            title={team}
+
             selected={selectedBool}
             onChange={buttonSelected}
         >
@@ -28,22 +31,22 @@ export default function BetTile(props){
         if (props.betType === "over") {
             const text = "O " + props.data
             return (
-                BetButton(text)
+                BetButton(text, null)
             )
         } else if (props.betType === "under") {
             const text = "U " + props.data
             return (
-                BetButton(text)
+                BetButton(text, null)
                 )
         } else if (props.betType === "ml_pos"){
             const text = "+" + props.data
             return (
-                BetButton(text)
+                BetButton(text, props.team)
                 )
         } else {
             const text = props.data
             return (
-                BetButton(text)
+                BetButton(text, props.team)
             )
         }
     }

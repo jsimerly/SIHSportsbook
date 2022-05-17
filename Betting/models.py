@@ -515,6 +515,8 @@ class Matchup(models.Model):
 
     vig = models.DecimalField(decimal_places=4, max_digits=7)
 
+    payoutDate = models.DateTimeField(null=True)
+
     def setLines(self):
         MAX_SPREAD = .40
         vig = self.vig
