@@ -17,6 +17,15 @@ export default function BetSlip(props){
         setSelectedBets(props.data)
     }, [props.data])
 
+    function submitButton() {
+        if (selectedBets.length === 0 ){
+            console.log('empty')
+            return (<div></div>)
+        } else {
+            return (<Button> Submit Bet </Button>)
+        }
+    }
+
     return (
             <Box sx={{
                 display: 'flex',
@@ -43,15 +52,7 @@ export default function BetSlip(props){
                         />
                     )}
                 </List>
-                <Box sx={{width:'100%'}}>
-                    <Box>
-                        Parlay
-
-                    </Box>
-                </Box>
-                <Button>
-                    Place Bet
-                </Button>
+                {submitButton()}
             </Box>
     )
 }
