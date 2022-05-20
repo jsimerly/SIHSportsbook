@@ -17,9 +17,9 @@ export default function BetSlipTile(props){
         <Box sx={{border:1}}>
             <Box sx={{mb:1}}>
                 <Grid container>
-                    <Grid item xs={1} sx={{p:1}}>
+                    <Grid item xs={1}>
                         <IconButton onClick={handleRemoveBet}>
-                            <RemoveCircleOutlineIcon/>
+                            <RemoveCircleOutlineIcon sx={{fontSize: 10}}/>
                         </IconButton>
                     </Grid>
                     <Grid item xs={11}>
