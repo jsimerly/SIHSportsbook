@@ -121,7 +121,8 @@ export default function App(props){
                     <BetSlip 
                         handleRemoveBet={handleRemoveBet} 
                         handleRemoveAllBets={handleRemoveAllBets}
-                        data={selectedBets}/>
+                        data={selectedBets}
+                    />
                 </Grid>
             </Grid>
         </div>

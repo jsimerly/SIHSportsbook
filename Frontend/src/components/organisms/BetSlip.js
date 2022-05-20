@@ -6,12 +6,17 @@ import {
     Box,
     IconButton,
     Icon,
+    Typography
  } from '@mui/material';
- import BetSlipTile from "../molecules/BetSlipTile";
  import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+ import CachedIcon from '@mui/icons-material/Cached';
+
+ import BetSlipTile from "../molecules/BetSlipTile";
+ import ParlayTile from "../molecules/ParlayTile";
 
 export default function BetSlip(props){
     const [selectedBets, setSelectedBets] = useState(props.data)
+    const [parlayStatus, setParlayStatus] = useState(false)
 
     useEffect(() => {
         setSelectedBets(props.data)
@@ -19,13 +24,52 @@ export default function BetSlip(props){
 
     function submitButton() {
         if (selectedBets.length === 0 ){
-            console.log('empty')
             return (<div></div>)
         } else {
             return (<Button> Submit Bet </Button>)
         }
     }
 
+    function handleParlayToggle() {
+        setParlayStatus(!parlayStatus)
+    }
+
+    function parlayButton() {
+        console.log(parlayStatus)
+        if (parlayStatus) {
+            return (
+                <IconButton onClick={handleParlayToggle} sx={{borderRadius: 0}}>
+                    <CachedIcon sx={{fontSize: 18, mr:1}}/> <Typography> Parlay </Typography>
+                </IconButton>
+            )
+        } else {
+            return(
+                <IconButton onClick={handleParlayToggle} sx={{borderRadius: 0}}>
+                    <CachedIcon sx={{fontSize: 18, mr:1 }}/> <Typography> Straight </Typography>
+                </IconButton>
+            )
+        }
+    }
+
+    function parlayToggleComponent(){
+        if (parlayStatus) {
+            return (
+                <ParlayTile/>
+            )
+        } else {
+            return (
+                <List>
+                    {selectedBets.map((bet, index) =>
+                        <BetSlipTile 
+                            bet={bet}
+                            handleRemoveBet={props.handleRemoveBet}
+                        />
+                    )}
+                </List>
+            )
+        }
+    }
+    
     return (
             <Box sx={{
                 display: 'flex',
@@ -36,7 +80,7 @@ export default function BetSlip(props){
             >
                 <Grid container sx={{border:1, p:1, mb:1}}>
                     <Grid item xs={10}>
-                       {selectedBets.length} -  Betslip
+                       {parlayButton()}
                     </Grid>
                     <Grid item xs={2}>
                         <IconButton onClick={props.handleRemoveAllBets}>
@@ -44,14 +88,7 @@ export default function BetSlip(props){
                         </IconButton>
                     </Grid>
                 </Grid>
-                <List>
-                    {selectedBets.map((bet, index) =>
-                        <BetSlipTile 
-                            bet={bet}
-                            handleRemoveBet={props.handleRemoveBet}
-                        />
-                    )}
-                </List>
+                {parlayToggleComponent()}
                 {submitButton()}
             </Box>
     )
