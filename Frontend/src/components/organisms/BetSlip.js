@@ -2,12 +2,13 @@ import React, { Component, useState, useEffect } from "react";
 import {
     Grid,
     List,
-    ListItem,
     Button,
-    TextField,
-    Box
+    Box,
+    IconButton,
+    Icon,
  } from '@mui/material';
  import BetSlipTile from "../molecules/BetSlipTile";
+ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function BetSlip(props){
     const [selectedBets, setSelectedBets] = useState(props.data)
@@ -29,7 +30,9 @@ export default function BetSlip(props){
                        {selectedBets.length} -  Betslip
                     </Grid>
                     <Grid item xs={2}>
-                        Parlay
+                        <IconButton onClick={props.handleRemoveAllBets}>
+                            <DeleteForeverIcon/>
+                        </IconButton>
                     </Grid>
                 </Grid>
                 <List>
@@ -40,9 +43,10 @@ export default function BetSlip(props){
                         />
                     )}
                 </List>
-                <Box sx={{border:1, width:'100%'}}>
+                <Box sx={{width:'100%'}}>
                     <Box>
-                        Remove All
+                        Parlay
+
                     </Box>
                 </Box>
                 <Button>

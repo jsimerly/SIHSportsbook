@@ -96,6 +96,10 @@ export default function App(props){
         ])
     }
 
+    function handleRemoveAllBets() {
+        setSelectedBets([])
+    }
+
     return (
         
         <div>
@@ -114,7 +118,10 @@ export default function App(props){
                     />
                 </Grid>
                 <Grid margin={2} md={2} spacing={1} sx={{border:1}}>
-                    <BetSlip handleRemoveBet={handleRemoveBet} data={selectedBets}/>
+                    <BetSlip 
+                        handleRemoveBet={handleRemoveBet} 
+                        handleRemoveAllBets={handleRemoveAllBets}
+                        data={selectedBets}/>
                 </Grid>
             </Grid>
         </div>
