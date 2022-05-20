@@ -34,7 +34,10 @@ export default function BetSlip(props){
                 </Grid>
                 <List>
                     {selectedBets.map((bet, index) =>
-                        <BetSlipTile betData={bet}/>
+                        <BetSlipTile 
+                            bet={bet}
+                            handleRemoveBet={props.handleRemoveBet}
+                        />
                     )}
                 </List>
                 <Box sx={{border:1, width:'100%'}}>

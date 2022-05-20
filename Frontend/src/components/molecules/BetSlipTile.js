@@ -2,23 +2,31 @@ import React, { Component, useState } from "react";
 import { 
     Grid,
     Box,
-    TextField
+    TextField,
+    IconButton,
 } from "@mui/material";
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 
 export default function BetSlipTile(props){
+    function handleRemoveBet() {
+        props.handleRemoveBet(props.bet)
+    }
+
     return (
         <Box sx={{border:1}}>
             <Box sx={{mb:1}}>
                 <Grid container>
                     <Grid item xs={1} sx={{p:1}}>
-                        -
+                        <IconButton onClick={handleRemoveBet}>
+                            <RemoveCircleOutlineIcon/>
+                        </IconButton>
                     </Grid>
                     <Grid item xs={11}>
                         <Box>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    {props.betData.betData.betValue}
+                                    {props.bet.betData.betValue}
                                 </Grid>
                                 <Grid item xs={3}>
                                     -110
@@ -32,10 +40,10 @@ export default function BetSlipTile(props){
                         <Box sx={{fontSize:10}}>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    {props.betData.matchupData.data.team1} @ {props.betData.matchupData.data.team2}
+                                    {props.bet.matchupData.data.team1} @ {props.bet.matchupData.data.team2}
                                 </Grid>
                                 <Grid item xs={3}>
-                                    {props.betData.matchupData.payoutDate}
+                                    {props.bet.matchupData.payoutDate}
                                 </Grid>
                             </Grid>
                         </Box>

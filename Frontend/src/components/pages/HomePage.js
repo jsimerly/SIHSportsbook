@@ -113,9 +113,9 @@ export default function App(props){
                         checkDupsIndex={checkDupsIndex}
                     />
                 </Grid>
-                {/* <Grid margin={2} md={2} spacing={1} sx={{border:1}}>
-                    <BetSlip removeHandler={handle} data={selectedBets}/>
-                </Grid> */}
+                <Grid margin={2} md={2} spacing={1} sx={{border:1}}>
+                    <BetSlip handleRemoveBet={handleRemoveBet} data={selectedBets}/>
+                </Grid>
             </Grid>
         </div>
     )
