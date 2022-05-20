@@ -15,15 +15,15 @@ import {
  import ParlayTile from "../molecules/ParlayTile";
 
 export default function BetSlip(props){
-    const [selectedBets, setSelectedBets] = useState(props.data)
-    const [parlayStatus, setParlayStatus] = useState(false)
+    const [selectedBets, setSelectedBets] = useState(props.selectedBets)
+    const [parlayStatus, setParlayStatus] = useState(true)
 
     useEffect(() => {
         setSelectedBets(props.data)
     }, [props.data])
 
     function submitButton() {
-        if (selectedBets.length === 0 ){
+        if (props.selectedBets.length === 0 ){
             return (<div></div>)
         } else {
             return (<Button> Submit Bet </Button>)
@@ -54,12 +54,14 @@ export default function BetSlip(props){
     function parlayToggleComponent(){
         if (parlayStatus) {
             return (
-                <ParlayTile/>
+                <ParlayTile 
+                    selectedBets={props.selectedBets}
+                />
             )
         } else {
             return (
                 <List>
-                    {selectedBets.map((bet, index) =>
+                    {props.selectedBets.map((bet, index) =>
                         <BetSlipTile 
                             bet={bet}
                             handleRemoveBet={props.handleRemoveBet}
