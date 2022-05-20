@@ -22,6 +22,7 @@ export default function BetSlipTile(props){
                                 </Grid>
                                 <Grid item xs={3}>
                                     -110
+                                    {/* calculate using vig */}
                                 </Grid>
                             </Grid>
                         </Box>
@@ -31,10 +32,10 @@ export default function BetSlipTile(props){
                         <Box sx={{fontSize:10}}>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    Sugma @ 'Member Berries
+                                    {props.betData.matchupData.data.team1} @ {props.betData.matchupData.data.team2}
                                 </Grid>
                                 <Grid item xs={3}>
-                                    Tues 3:00 AM
+                                    {props.betData.matchupData.payoutDate}
                                 </Grid>
                             </Grid>
                         </Box>

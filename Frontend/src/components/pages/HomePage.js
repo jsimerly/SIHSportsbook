@@ -11,8 +11,6 @@ import {
 
 
 export default function App(props){
-    const [selectedBets, setSelectedBets] = useState([])
-
     const matchupsJson = [
         {   id: 1,
             matchupId: 1,
@@ -61,18 +59,46 @@ export default function App(props){
         },
     ]
 
-    function handleBetSelected(newBetList) {
-        // const betType = newBet.betData.betType
-        // const betValue = newBet.matchupData.data[betType]
-     
-        setSelectedBets([...newBetList])
+    const [selectedBets, setSelectedBets] = useState([]);
+
+    function checkDupsIndex(betArray, newBet) {
+        for (var i=0; i < betArray.length; i++) {
+            const betId = betArray[i].matchupData.id
+            const newBetId = newBet.matchupData.id
+            const betType = betArray[i].betData.betType
+            const newBetType = newBet.betData.betType
+
+            if (betId == newBetId && betType == newBetType) {
+                return i
+            }
+        }
+        return -1
+    }
+
+    function betSelectedHandler(newBet) {
+        let newBetArr = selectedBets;
+        const dupIndex = checkDupsIndex(newBetArr, newBet)
+
+        if (dupIndex != -1) {
+            newBetArr.splice(dupIndex,1)
+        } else {
+            newBetArr.push(newBet)
+        }
+        setSelectedBets([...newBetArr])
         console.log(selectedBets)
+    }
+
+    function handleRemoveBet(removedBet) {
+        const dupIndex = checkDupsIndex(selectedBets, removedBet)
+        setSelectedBets([
+            ...selectedBets.slice(0, dupIndex),
+            ...selectedBets.slice(dupIndex + 1)
+        ])
     }
 
     return (
         
         <div>
-            {console.log('rerender')}
             <Grid container>
                 <Grid item>
                     <Box sx={{width: 250, height: '100vh', border:1 }}>
@@ -80,11 +106,16 @@ export default function App(props){
                     </Box>
                 </Grid>
                 <Grid margin={2} md={7} spacing={1} sx={{border:1}}>
-                    <Matchups data={matchupsJson} betHandler={handleBetSelected}/>
+                    <Matchups 
+                        data={matchupsJson} 
+                        betSelectedHandler={betSelectedHandler}
+                        selectedBets={selectedBets}
+                        checkDupsIndex={checkDupsIndex}
+                    />
                 </Grid>
-                <Grid margin={2} md={2} spacing={1} sx={{border:1}}>
-                    <BetSlip data={selectedBets}/>
-                </Grid>
+                {/* <Grid margin={2} md={2} spacing={1} sx={{border:1}}>
+                    <BetSlip removeHandler={handle} data={selectedBets}/>
+                </Grid> */}
             </Grid>
         </div>
     )

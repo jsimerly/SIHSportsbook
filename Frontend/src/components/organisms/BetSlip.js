@@ -26,7 +26,7 @@ export default function BetSlip(props){
             >
                 <Grid container sx={{border:1, p:1, mb:1}}>
                     <Grid item xs={10}>
-                       2 -  Betslip
+                       {selectedBets.length} -  Betslip
                     </Grid>
                     <Grid item xs={2}>
                         Parlay

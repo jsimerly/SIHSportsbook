@@ -6,21 +6,36 @@ import {
 } from "@mui/material";
 
 export default function BetTile(props){
-    const [selectedBool, setSelected] = useState(false);
+    const matchupData = props.matchupData
+    const team = props.team;
+    let bet = {
+        matchupData,
+        betData : {
+            betType : props.betType,
+            betValue : props.matchupData.data[props.betType],
+            team: team,
+        }
+    }
 
-    function buttonSelected(e) {
-        setSelected(!selectedBool);
-        const team = e.target.title
-        props.betHandler(props.betType, team)
+    function buttonSelected() {
+        props.betSelectedHandler(bet)
+    }
+
+    function isSelectedBet() {
+        const dupIndex = props.checkDupsIndex(props.selectedBets, bet)
+        if (dupIndex != -1) {
+            return true
+        } else {
+            return false
+        }
     }
 
     function BetButton(text, team) {
         return (<ToggleButton
             fullWidth={true} 
             value={props.data}
-            title={team}
 
-            selected={selectedBool}
+            selected={isSelectedBet()}
             onChange={buttonSelected}
         >
             {text}
@@ -31,22 +46,22 @@ export default function BetTile(props){
         if (props.betType === "over") {
             const text = "O " + props.data
             return (
-                BetButton(text, null)
+                BetButton(text)
             )
         } else if (props.betType === "under") {
             const text = "U " + props.data
             return (
-                BetButton(text, null)
+                BetButton(text)
                 )
         } else if (props.betType === "ml_pos"){
             const text = "+" + props.data
             return (
-                BetButton(text, props.team)
+                BetButton(text)
                 )
         } else {
             const text = props.data
             return (
-                BetButton(text, props.team)
+                BetButton(text)
             )
         }
     }

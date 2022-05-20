@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import { BrowserRouter, Routes, Route, } from 'react-router-dom';
-import NavBar from './organisms/NavBar'
-import Playground from "./pages/playground";
+import NavBar from './organisms/NavBar';
+import Playground from "./playground/playground";
 import HomePage from './pages/HomePage'
 import { 
     Box 
