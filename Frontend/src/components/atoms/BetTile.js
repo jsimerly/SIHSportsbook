@@ -6,14 +6,62 @@ import {
 } from "@mui/material";
 
 export default function BetTile(props){
-    const matchupData = props.matchupData
+    const matchupData = props.matchupData;
     const team = props.team;
+    const betType = props.betType;
+    const betValue = props.matchupData.data[props.betType]
+
+
+
+    function vanityLogic() {
+        if (betType === "sp_pos") {
+            return [
+                team + " " + betValue,
+                "Spread"
+            ]
+        } else if (betType === "over") {
+            return [
+                "Over " + betValue,
+                "Total"
+            ]
+        }  else if (betType === "ml_pos" || betType === "ml_neg") {
+            return [
+                team,
+                "Moneyline"
+            ]
+        } else if (betType === "sp_neg") {
+            return [
+                team + " " + betValue,
+                "Spread"
+            ]
+        } else if (betType === "under") {
+            return [
+                "Under " + betValue,
+                "Total"
+            ]
+        }
+
+        return ["ERROR", "ERROR"]
+    }
+
+    function vanityTeams() {
+        return (props.matchupData.data.team1 + " @ " + props.matchupData.data.team2)
+    }
+
+
+    let [ vanityMain, vanitySecondary ] = vanityLogic()
+
     let bet = {
         matchupData,
         betData : {
-            betType : props.betType,
-            betValue : props.matchupData.data[props.betType],
+            betType : betType,
+            betValue : betValue,
             team: team,
+        },
+        vanity: {
+            main: vanityMain,
+            secondary: vanitySecondary,
+            teams: vanityTeams(),
         }
     }
 

@@ -5,8 +5,6 @@ import {
     TextField,
     IconButton,
 } from "@mui/material";
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-
 
 export default function BetSlipTile(props){
     function handleRemoveBet() {
