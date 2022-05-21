@@ -7,6 +7,8 @@ import {
 } from "@mui/material";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
+import ParlayBet from "../atoms/parlayBet";
+
 
 export default function ParlayTile(props){
     function checkForBets() {
@@ -35,23 +37,10 @@ export default function ParlayTile(props){
                 <Box sx={{mb:1}}>
                     {props.selectedBets.map((bet, index) => {
                         return (
-                            <Box>
-                                <Grid container>
-                                    <Grid item>
-                                            Total Points
-                                        </Grid>
-                                    <Grid item>
-                                            {bet.matchupData.data.team1} 
-                                        </Grid>
-                                    <Grid item>
-                                            {bet.matchupData.data.team2} 
-                                        </Grid>
-                                    <Grid item>
-                                            {bet.betData.betValue} 
-                                        </Grid>
-                                    </Grid>
-                            </Box>
-                      
+                            <ParlayBet
+                                bet={bet}
+                                handleRemoveBet={props.handleRemoveBet}
+                            />
                         )
                     })}
                 </Box>

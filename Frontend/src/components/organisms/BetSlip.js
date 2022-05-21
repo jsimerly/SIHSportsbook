@@ -56,6 +56,7 @@ export default function BetSlip(props){
             return (
                 <ParlayTile 
                     selectedBets={props.selectedBets}
+                    handleRemoveBet={props.handleRemoveBet}
                 />
             )
         } else {
