@@ -85,7 +85,6 @@ export default function App(props){
             newBetArr.push(newBet)
         }
         setSelectedBets([...newBetArr])
-        console.log(selectedBets)
     }
 
     function handleRemoveBet(removedBet) {

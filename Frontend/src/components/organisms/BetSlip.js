@@ -35,7 +35,6 @@ export default function BetSlip(props){
     }
 
     function parlayButton() {
-        console.log(parlayStatus)
         if (parlayStatus) {
             return (
                 <IconButton onClick={handleParlayToggle} sx={{borderRadius: 0}}>

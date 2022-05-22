@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import { 
     Grid,
     Box,
@@ -12,6 +12,10 @@ import ParlayBet from "../atoms/parlayBet";
 
 export default function ParlayTile(props){
     const selectedBets = props.selectedBets
+
+    useEffect(() => {
+        checkForBets()
+    },[props.selectedBets]);
 
     function checkForBets() {
         if (props.selectedBets.length === 0) {
@@ -41,17 +45,23 @@ export default function ParlayTile(props){
                 decimalOdds.push((line/100)+1)
             }    
         })
-        var parlayOdds = decimalOdds.reduce(function(a,b) {
-            return a * b;
-        });    
 
-        if (parlayOdds > 2.00) {
-            return Math.round((parlayOdds-1)*100)
+        if (decimalOdds.length === 0){
+            return 0
         } else {
-            return Math.round((-100) / (parlayOdds-1))
-        }
-    }
+            var parlayOdds = decimalOdds.reduce(function(a,b) {
+                return a * b;
+            });
 
+            if (parlayOdds > 2.00) {
+                return Math.round((parlayOdds-1)*100)
+            } else {
+                return Math.round((-100) / (parlayOdds-1))
+            }
+        }
+
+    }
+    //Need to fix empty array for betting lines
     const parlayLine = calculateParlayLine()
 
     function getVanityParlayLine(){
