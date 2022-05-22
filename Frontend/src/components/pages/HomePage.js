@@ -15,7 +15,7 @@ export default function App(props){
         {   id: 1,
             matchupId: 1,
             payoutDate: "Tues 3:00 AM",
-            vig: 0.05,
+            standardLine: -110,
             data: { 
                 team1: "Sugma",
                 team2: "'Member Berries",
@@ -30,7 +30,7 @@ export default function App(props){
         {   id: 2,
             matchupId: 1,
             payoutDate: "Tues 3:00 AM",
-            vig: 0.05,
+            standardLine: -110,
             data: { 
                 team1: "Team 3",
                 team2: "Team 4",
@@ -45,7 +45,7 @@ export default function App(props){
         {   id: 3,
             matchupId: 1,
             payoutDate: "Tues 3:00 AM",
-            vig: 0.05,
+            standardLine: -110,
             data: { 
                 team1: "Team 5",
                 team2: "Team 6",

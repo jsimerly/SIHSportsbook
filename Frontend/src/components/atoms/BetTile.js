@@ -11,8 +11,6 @@ export default function BetTile(props){
     const betType = props.betType;
     const betValue = props.matchupData.data[props.betType]
 
-
-
     function vanityLogic() {
         if (betType === "sp_pos") {
             return [
@@ -48,8 +46,25 @@ export default function BetTile(props){
         return (props.matchupData.data.team1 + " @ " + props.matchupData.data.team2)
     }
 
-
     let [ vanityMain, vanitySecondary ] = vanityLogic()
+
+    function setLine(){
+        if (betType === "ml_pos" || betType === "ml_neg") {
+            return (betValue)
+        } else {
+            return (matchupData.standardLine)
+        }
+    }
+
+    const line = setLine()
+
+    function setVanityLine(){
+        if (line > 0) {
+            return ("+" + line)
+        } else {
+            return (line)
+        }
+    }
 
     let bet = {
         matchupData,
@@ -57,12 +72,14 @@ export default function BetTile(props){
             betType : betType,
             betValue : betValue,
             team: team,
+            line: setLine()
         },
         vanity: {
             main: vanityMain,
             secondary: vanitySecondary,
             teams: vanityTeams(),
-        }
+            line: setVanityLine()
+        },
     }
 
     function buttonSelected() {

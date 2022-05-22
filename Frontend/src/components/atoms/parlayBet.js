@@ -14,13 +14,13 @@ export default function ParlayBet(props){
 
     return (
         <Box>
-            <Grid container sx={{border:1, p:1}}>
+            <Grid container sx={{p:1}}>
                 <Grid item xs={1}>
                     <IconButton onClick={handleRemoveBet}>
                         <RemoveCircleOutlineIcon sx={{fontSize: 10}}/>
                     </IconButton>
                 </Grid>
-                <Grid item>
+                <Grid item sx={{pl:1}}>
                     <Box>
                         {props.bet.vanity.main}
                     </Box>
@@ -28,7 +28,7 @@ export default function ParlayBet(props){
                         {props.bet.vanity.secondary}
                         
                     </Box>
-                    <Box>
+                    <Box sx={{fontSize:10}}>
                         {props.bet.vanity.teams}
                     </Box>
                 </Grid>

@@ -25,7 +25,7 @@ export default function ParlayTile(props){
 
     function parlayBody() {
         return (
-            <Box sx={{border:1}}>
+            <Box sx={{border:1, p:1}}>
                 <Grid container sx={{mr:1 , ml: 1}}>
                     <Grid item xs={6}>
                         {props.selectedBets.length}-Leg Parlay
@@ -47,10 +47,10 @@ export default function ParlayTile(props){
                 <Box>
                     <Grid container justifyContent={"center"}>
                         <Grid item xs={4} sx={{mr:1, mb:2}}>
-                            <TextField label="WAGER"/>
+                            <TextField size="small" label="WAGER"/>
                         </Grid>
                         <Grid item xs={4} sx={{ml:1, mb:2}}>
-                            <TextField label="TO WIN"/>
+                            <TextField size="small" label="TO WIN"/>
                         </Grid>
                     </Grid>
                 </Box>

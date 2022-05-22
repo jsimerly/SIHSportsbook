@@ -5,6 +5,7 @@ import {
     TextField,
     IconButton,
 } from "@mui/material";
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 export default function BetSlipTile(props){
     function handleRemoveBet() {
@@ -13,7 +14,7 @@ export default function BetSlipTile(props){
 
     return (
         <Box sx={{border:1}}>
-            <Box sx={{mb:1}}>
+            <Box sx={{p:1}}>
                 <Grid container>
                     <Grid item xs={1}>
                         <IconButton onClick={handleRemoveBet}>
@@ -24,16 +25,15 @@ export default function BetSlipTile(props){
                         <Box>
                             <Grid container>
                                 <Grid item xs={9}>
-                                    {props.bet.betData.betValue}
+                                    {props.bet.vanity.main}
                                 </Grid>
                                 <Grid item xs={3}>
-                                    -110
-                                    {/* calculate using vig */}
+                                    {props.bet.vanity.line}
                                 </Grid>
                             </Grid>
                         </Box>
                         <Box>
-                            Total Points
+                            {props.bet.vanity.secondary}
                         </Box>
                         <Box sx={{fontSize:10}}>
                             <Grid container>
@@ -51,10 +51,10 @@ export default function BetSlipTile(props){
             <Box>
                 <Grid container justifyContent={"center"}>
                     <Grid item xs={4} sx={{mr:1, mb:2}}>
-                        <TextField label="WAGER"/>
+                        <TextField size="small" label="WAGER"/>
                     </Grid>
                     <Grid item xs={4} sx={{ml:1, mb:2}}>
-                        <TextField label="TO WIN"/>
+                        <TextField size="small" label="TO WIN"/>
                     </Grid>
                 </Grid>
             </Box>

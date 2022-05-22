@@ -16,7 +16,7 @@ import {
 
 export default function BetSlip(props){
     const [selectedBets, setSelectedBets] = useState(props.selectedBets)
-    const [parlayStatus, setParlayStatus] = useState(true)
+    const [parlayStatus, setParlayStatus] = useState(false)
 
     useEffect(() => {
         setSelectedBets(props.data)
@@ -26,7 +26,7 @@ export default function BetSlip(props){
         if (props.selectedBets.length === 0 ){
             return (<div></div>)
         } else {
-            return (<Button> Submit Bet </Button>)
+            return (<Button> Submit Slip </Button>)
         }
     }
 

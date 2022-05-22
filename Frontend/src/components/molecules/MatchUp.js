@@ -8,6 +8,22 @@ import BetTile from "../atoms/BetTile"
 export default function MatchUp(props){
     const data =  props.matchupData.data
 
+    function BetTileTemplate(betType, betData, team){
+        return (
+            <BetTile
+                betType={betType}
+                data={betData}
+                team={team}
+
+                matchupData={props.matchupData}
+                betSelectedHandler={props.betSelectedHandler}
+                selectedBets={props.selectedBets}
+                checkDupsIndex={props.checkDupsIndex}
+                vig={props.vig}
+            />
+        )
+    }
+
     return (
     <Box sx={{margin:1}}>
         <Grid container columns={20}>
@@ -15,40 +31,13 @@ export default function MatchUp(props){
                 {data.team1}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile 
-                    betType="sp_pos" 
-                    data={data.sp_pos}
-                    team={data.team1} 
-                    matchupData={props.matchupData}
-
-                    betSelectedHandler={props.betSelectedHandler}
-                    selectedBets={props.selectedBets}
-                    checkDupsIndex={props.checkDupsIndex}
-                />
+                {BetTileTemplate("sp_pos", data.sp_pos, data.team1)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile 
-                    betType="over" 
-                    data={data.over} 
-                    team={data.team1}
-                    matchupData={props.matchupData}
-
-                    betSelectedHandler={props.betSelectedHandler}
-                    selectedBets={props.selectedBets}
-                    checkDupsIndex={props.checkDupsIndex}
-                />
+                {BetTileTemplate("over", data.over, data.team1)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile 
-                    betType="ml_pos" 
-                    data={data.ml_pos} 
-                    team={data.team1}
-                    matchupData={props.matchupData}
-
-                    betSelectedHandler={props.betSelectedHandler}
-                    selectedBets={props.selectedBets} 
-                    checkDupsIndex={props.checkDupsIndex}
-                />
+                {BetTileTemplate("ml_pos", data.ml_pos, data.team1)}
             </Grid>
         </Grid>
         <Grid container columns={20}>
@@ -56,40 +45,13 @@ export default function MatchUp(props){
                 {data.team2}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile 
-                    betType="sp_neg" 
-                    data={data.sp_neg}
-                    team={data.team2}
-                    matchupData={props.matchupData}
-
-                    betSelectedHandler={props.betSelectedHandler}
-                    selectedBets={props.selectedBets}
-                    checkDupsIndex={props.checkDupsIndex}
-                />
+                {BetTileTemplate("sp_neg", data.sp_neg, data.team2)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile 
-                    betType="under" 
-                    data={data.under} 
-                    team={data.team2}
-                    matchupData={props.matchupData}
-
-                    betSelectedHandler={props.betSelectedHandler}
-                    selectedBets={props.selectedBets}
-                    checkDupsIndex={props.checkDupsIndex}
-                />
+                {BetTileTemplate("under", data.under, data.team2)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                <BetTile 
-                    betType="ml_neg" 
-                    data={data.ml_neg}
-                    team={data.team2} 
-                    matchupData={props.matchupData}
-
-                    checkDupsIndex={props.checkDupsIndex}
-                    betSelectedHandler={props.betSelectedHandler}
-                    selectedBets={props.selectedBets}
-                />
+                {BetTileTemplate("ml_neg", data.ml_neg, data.team2)}
             </Grid>
         </Grid>
     </Box>
