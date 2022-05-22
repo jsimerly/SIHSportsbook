@@ -11,6 +11,8 @@ import ParlayBet from "../atoms/parlayBet";
 
 
 export default function ParlayTile(props){
+    const selectedBets = props.selectedBets
+
     function checkForBets() {
         if (props.selectedBets.length === 0) {
             return (<div></div>)
@@ -19,9 +21,47 @@ export default function ParlayTile(props){
         }
     }
 
-    function calcParlayLine() {
-        return (-110)
+    function getParlayLines(){
+        let parlayLines = []
+        selectedBets.map((bet, index) => {
+            parlayLines.push(bet.betData.line)
+        })
+        return parlayLines
     }
+
+    const betLines = getParlayLines()
+
+    function calculateParlayLine() {
+        const decimalOdds = []
+
+        betLines.map((line, index) => {
+            if (line < 0) {
+                decimalOdds.push(1-(100/line))
+            } else {
+                decimalOdds.push((line/100)+1)
+            }    
+        })
+        var parlayOdds = decimalOdds.reduce(function(a,b) {
+            return a * b;
+        });    
+
+        if (parlayOdds > 2.00) {
+            return Math.round((parlayOdds-1)*100)
+        } else {
+            return Math.round((-100) / (parlayOdds-1))
+        }
+    }
+
+    const parlayLine = calculateParlayLine()
+
+    function getVanityParlayLine(){
+        if (parlayLine > 0) {
+            return "+" + parlayLine
+        } else {
+            return parlayLine
+        }
+    }
+
 
     function parlayBody() {
         return (
@@ -31,7 +71,7 @@ export default function ParlayTile(props){
                         {props.selectedBets.length}-Leg Parlay
                     </Grid>
                     <Grid container justifyContent={"flex-end"} item xs={5}>
-                        {calcParlayLine()}
+                        {getVanityParlayLine()}
                     </Grid>
                 </Grid>
                 <Box sx={{mb:1}}>
