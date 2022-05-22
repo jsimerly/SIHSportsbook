@@ -410,7 +410,7 @@ class PlaceBet(APIView):
             vig = league.standardVig
             betStatus = 'O'
 
-            Bets.objects.create(
+            MatchupBets.objects.create(
                 bettor=bettorObj,
                 betStatus=betStatus,
                 betType=serializer.data.get('betType'),
