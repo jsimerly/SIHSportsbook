@@ -76,11 +76,11 @@ export default function ParlayTile(props){
     function parlayBody() {
         return (
             <Box sx={{border:1, p:1}}>
-                <Grid container sx={{mr:1 , ml: 1}}>
+                <Grid container sx={{pr:1 , pl: 1}}>
                     <Grid item xs={6}>
                         {props.selectedBets.length}-Leg Parlay
                     </Grid>
-                    <Grid container justifyContent={"flex-end"} item xs={5}>
+                    <Grid container justifyContent={"flex-end"} item xs={6}>
                         {getVanityParlayLine()}
                     </Grid>
                 </Grid>

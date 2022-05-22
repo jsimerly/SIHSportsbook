@@ -11,7 +11,7 @@ import {
  import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
  import CachedIcon from '@mui/icons-material/Cached';
 
- import BetSlipTile from "../molecules/BetSlipTile";
+ import BetSlipTiles from "../molecules/BetSlipTiles";
  import ParlayTile from "../molecules/ParlayTile";
 
 export default function BetSlip(props){
@@ -60,14 +60,10 @@ export default function BetSlip(props){
             )
         } else {
             return (
-                <List>
-                    {props.selectedBets.map((bet, index) =>
-                        <BetSlipTile 
-                            bet={bet}
-                            handleRemoveBet={props.handleRemoveBet}
-                        />
-                    )}
-                </List>
+                <BetSlipTiles
+                    selectedBets={props.selectedBets}
+                    handleRemoveBet={props.handleRemoveBet}
+                />
             )
         }
     }
