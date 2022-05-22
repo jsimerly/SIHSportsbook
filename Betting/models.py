@@ -513,7 +513,6 @@ class Matchup(models.Model):
     t1_ML = models.DecimalField(decimal_places=3, max_digits=8)
     t2_ML = models.DecimalField(decimal_places=3, max_digits=8)
 
-    vig = models.DecimalField(decimal_places=4, max_digits=7)
     standardLine = models.DecimalField(decimal_places=4, max_digits=7)
 
     payoutDate = models.DateTimeField(null=True)
@@ -556,7 +555,7 @@ class Matchup(models.Model):
 
         self.save()
 
-class Bets(models.Model):
+class MatchupBets(models.Model):
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)
     BET_STATUS_CHOCIES = (
         ('O', 'Open'),
@@ -574,10 +573,31 @@ class Bets(models.Model):
     )
     betType = models.CharField(choices=BET_TYPE_CHOICES, max_length=64)
     betAmount = models.DecimalField(decimal_places=2, max_digits=10,)
-    vig = models.DecimalField(decimal_places=4, max_digits=7)
+    line = models.DecimalField(decimal_places=4, max_digits=7)
 
     teamToWin = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='teamToWin')
     matchup = models.ForeignKey(Matchup, on_delete=models.CASCADE)
+
+    payoutDate = models.DateTimeField()
+
+class Parlay(models.Model):
+    bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)
+    bets = models.ManyToManyField(MatchupBets)
+
+    BET_STATUS_CHOCIES = (
+        ('O', 'Open'),
+        ('W', 'Won'),
+        ('L', 'Lost'),
+        ('R', 'Refunded'),
+        ('C', 'Cashed Out')
+    )
+
+    betStatus = models.CharField(choices=BET_STATUS_CHOCIES, max_length=64)
+    line = models.DecimalField(decimal_places=4, max_digits=7)
+
+    payoutDate = models.DateTimeField()
+
+
 
 
 
