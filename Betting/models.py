@@ -513,6 +513,7 @@ class Matchup(models.Model):
     t1_ML = models.DecimalField(decimal_places=3, max_digits=8)
     t2_ML = models.DecimalField(decimal_places=3, max_digits=8)
 
+    vig = models.DecimalField(decimal_places=4, max_digits=7)
     standardLine = models.DecimalField(decimal_places=4, max_digits=7)
 
     payoutDate = models.DateTimeField(null=True)
