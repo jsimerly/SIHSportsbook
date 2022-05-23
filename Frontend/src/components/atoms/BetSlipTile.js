@@ -15,34 +15,20 @@ export default function BetSlipTile(props){
     const [toWin, setToWin] = useState()
     const line = props.bet.betData.line
     
+    const re = /^[1-9]\d*(?:\.\d{0,2})?$/;
         
     function handleWager(e) {
-        const re = /^[1-9][\.\d]*(,\d+)?$/;
-
         if (e.target.value==='' || re.test(e.target.value)) {
-            console.log(e.target.value)
             setWager(e.target.value)
+
+
         }
     }
 
-    const wagerBox = () => {
-        return (
-            <FormControl>
-                <InputLabel htmlFor="outlined-adornment-amount">Wager</InputLabel>
-                <OutlinedInput
-                    size="small"
-                    id="outlined-adornment-amount"
-                    value={wager}
-                    onChange={handleWager}
-                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                    label="Wager"
-                />
-            </FormControl>
-        )
-    }
-
     function handleToWin(e){
-        setToWin(e.target.value)
+        if (e.target.value==='' || re.test(e.target.value)) {
+            setToWin(e.target.value)
+        }
     } 
 
     function handleRemoveBet() {
@@ -81,7 +67,18 @@ export default function BetSlipTile(props){
             <Box>
                 <Grid container justifyContent={"center"}>
                     <Grid item xs={4} sx={{mr:1, mb:2}}>
-                        {wagerBox()}
+                        <FormControl>
+                            <InputLabel htmlFor="outlined-adornment-amount">To Win</InputLabel>
+                            <OutlinedInput
+                                size="small"
+                                inputMode="numberic"
+                                id="outlined-adornment-amount"
+                                value={wager}
+                                onChange={handleWager}
+                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                label="toWin"
+                            />
+                        </FormControl>
                     </Grid>
                     <Grid item xs={4} sx={{ml:1, mb:2}}>
                         <FormControl>
