@@ -2,16 +2,20 @@ import React, { Component, useEffect, useState } from "react";
 import { 
     Grid,
     Box,
-    TextField,
-    IconButton,
+    InputAdornment,
+    FormControl,
+    InputLabel,
+    OutlinedInput,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 import ParlayBet from "../atoms/parlayBet";
 
-
 export default function ParlayTile(props){
     const selectedBets = props.selectedBets
+    const [wager, setWager] = useState()
+    const [toWin, setToWin] = useState()
+    const line = 0
 
     useEffect(() => {
         checkForBets()
@@ -23,6 +27,10 @@ export default function ParlayTile(props){
         } else {
             return (<div> {parlayBody()} </div>)
         }
+    }
+
+    function handleRemoveBet() {
+        props.handleRemoveBet(props.bet)
     }
 
     function getParlayLines(){
@@ -61,7 +69,7 @@ export default function ParlayTile(props){
         }
 
     }
-    //Need to fix empty array for betting lines
+
     const parlayLine = calculateParlayLine()
 
     function getVanityParlayLine(){
@@ -71,6 +79,42 @@ export default function ParlayTile(props){
             return parlayLine
         }
     }
+
+    const re = /^[0-9]\d*(?:\.\d{0,2})?$/;
+
+    function handleWager(e) {
+        if (e.target.value==='' || re.test(e.target.value)) {
+            setWager(e.target.value)
+            
+            let winAmount = 0
+
+            if (parlayLine > 0) {
+               winAmount = parlayLine/100 * e.target.value
+            } else {
+                winAmount = 100/(-1*parlayLine) * e.target.value
+            }
+
+            winAmount = parseFloat(winAmount).toFixed(2)
+            setToWin(winAmount)
+        }
+    }
+
+    function handleToWin(e){
+        if (e.target.value==='' || re.test(e.target.value)) {
+            setToWin(e.target.value)
+        }
+
+            let betAmount = 0
+
+            if (line > 0) {
+               betAmount = (e.target.value * 100)/parlayLine
+            } else {
+                betAmount = (e.target.value * parlayLine * -1)/100
+            }
+
+            betAmount = parseFloat(betAmount).toFixed(2)
+            setWager(betAmount)
+    } 
 
 
     function parlayBody() {
@@ -96,11 +140,33 @@ export default function ParlayTile(props){
                 </Box>
                 <Box>
                     <Grid container justifyContent={"center"}>
-                        <Grid item xs={4} sx={{mr:1, mb:2}}>
-                            <TextField size="small" label="WAGER"/>
+                        <Grid item xs={5} sx={{mr:1, mb:2}}>
+                            <FormControl>
+                                <InputLabel htmlFor="outlined-adornment-wager">Wager</InputLabel>
+                                <OutlinedInput
+                                    size="small"
+                                    inputMode="numberic"
+                                    id="outlined-adornment-wager"
+                                    value={wager}
+                                    onChange={handleWager}
+                                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                    label="wager"
+                                />
+                            </FormControl>
                         </Grid>
-                        <Grid item xs={4} sx={{ml:1, mb:2}}>
-                            <TextField size="small" label="TO WIN"/>
+                        <Grid item xs={5} sx={{ml:1, mb:2}}>
+                            <FormControl>
+                                <InputLabel htmlFor="outlined-adornment-to-win">To Win</InputLabel>
+                                <OutlinedInput
+                                    size="small"
+                                    inputMode="numberic"
+                                    id="outlined-adornment-to-win"
+                                    value={toWin}
+                                    onChange={handleToWin}
+                                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                    label="toWin"
+                                />
+                            </FormControl>
                         </Grid>
                     </Grid>
                 </Box>

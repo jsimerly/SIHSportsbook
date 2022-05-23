@@ -87,7 +87,7 @@ export default function BetSlipTile(props){
             </Grid>
             <Box>
                 <Grid container justifyContent={"center"}>
-                    <Grid item xs={4} sx={{mr:1, mb:2}}>
+                    <Grid item xs={5} sx={{mr:1, mb:2}}>
                         <FormControl>
                             <InputLabel htmlFor="outlined-adornment-wager">Wager</InputLabel>
                             <OutlinedInput
@@ -101,7 +101,7 @@ export default function BetSlipTile(props){
                             />
                         </FormControl>
                     </Grid>
-                    <Grid item xs={4} sx={{ml:1, mb:2}}>
+                    <Grid item xs={5} sx={{ml:1, mb:2}}>
                         <FormControl>
                             <InputLabel htmlFor="outlined-adornment-to-win">To Win</InputLabel>
                             <OutlinedInput
