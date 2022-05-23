@@ -15,12 +15,13 @@ export default function BetSlipTile(props){
     const [toWin, setToWin] = useState()
     const line = props.bet.betData.line
     
-    const re = /^[1-9]\d*(?:\.\d{0,2})?$/;
+    const re = /^[0-9]\d*(?:\.\d{0,2})?$/;
         
     function handleWager(e) {
+        console.log(e.target.value)
         if (e.target.value==='' || re.test(e.target.value)) {
             setWager(e.target.value)
-
+            console.log("made it in")
             let winAmount = 0
 
             if (line > 0) {
