@@ -14,32 +14,31 @@ export default function BetSlipTile(props){
     const [wager, setWager] = useState()
     const [toWin, setToWin] = useState()
     const line = props.bet.betData.line
-
-    useEffect(() => {
-    }, [wager])
-
-    const currencyRegex = /(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/;
-
+    
+        
     function handleWager(e) {
-        // const value = e.target.value
-        // let newWager = 0
-        // console.log(1)
-        // if (Number.isNaN(Number(value))) {
-        //     console.log(2)
-        //     newWager = wager
-        // } else {
-        //     const wagerValue = parseFloat(e.target.value).toFixed(2)
-        //     console.log(3)
-        //     console.log(wagerValue)
-        //     if (currencyRegex.test(wagerValue)){
-        //         console.log(4)
-        //         newWager = wagerValue
-        //     } else {
-        //         console.log(5)
-        //         newWager = wager
-        //     }
-        // }
-        // setWager(...newWager)
+        const re = /^[1-9][\.\d]*(,\d+)?$/;
+
+        if (e.target.value==='' || re.test(e.target.value)) {
+            console.log(e.target.value)
+            setWager(e.target.value)
+        }
+    }
+
+    const wagerBox = () => {
+        return (
+            <FormControl>
+                <InputLabel htmlFor="outlined-adornment-amount">Wager</InputLabel>
+                <OutlinedInput
+                    size="small"
+                    id="outlined-adornment-amount"
+                    value={wager}
+                    onChange={handleWager}
+                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                    label="Wager"
+                />
+            </FormControl>
+        )
     }
 
     function handleToWin(e){
@@ -80,36 +79,26 @@ export default function BetSlipTile(props){
                 </Grid>
             </Grid>
             <Box>
-                    <Grid container justifyContent={"center"}>
-                        <Grid item xs={4} sx={{mr:1, mb:2}}>
-                            <FormControl>
-                                <InputLabel htmlFor="outlined-adornment-amount">Wager</InputLabel>
-                                <OutlinedInput
-                                    size="small"
-                                    id="outlined-adornment-amount"
-                                    value={wager}
-                                    onChange={handleWager}
-                                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                    label="Wager"
-                                />
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={4} sx={{ml:1, mb:2}}>
-                            <FormControl>
-                                <InputLabel htmlFor="outlined-adornment-amount">To Win</InputLabel>
-                                <OutlinedInput
-                                    size="small"
-                                    inputMode="numberic"
-                                    id="outlined-adornment-amount"
-                                    value={toWin}
-                                    onChange={handleToWin}
-                                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                    label="toWin"
-                                />
-                            </FormControl>
-                        </Grid>
+                <Grid container justifyContent={"center"}>
+                    <Grid item xs={4} sx={{mr:1, mb:2}}>
+                        {wagerBox()}
                     </Grid>
-                </Box>
+                    <Grid item xs={4} sx={{ml:1, mb:2}}>
+                        <FormControl>
+                            <InputLabel htmlFor="outlined-adornment-amount">To Win</InputLabel>
+                            <OutlinedInput
+                                size="small"
+                                inputMode="numberic"
+                                id="outlined-adornment-amount"
+                                value={toWin}
+                                onChange={handleToWin}
+                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                label="toWin"
+                            />
+                        </FormControl>
+                    </Grid>
+                </Grid>
+            </Box>
         </Box>
     )
 }
