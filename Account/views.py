@@ -23,6 +23,20 @@ class CreateUser(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class CurrentUser(APIView):
+    def get(self, request, format='json'):
+        json = {}
+        if request.user.is_authenticated:
+            print(request.user)
+            json['email'] = request.user.email
+            json['isLoggedIn'] = True
+
+            return Response(json, status=status.HTTP_200_OK)
+        
+        json['email'] = ''
+        json['isLoggedIn'] = False
+        print('yes')
+
 class LogIn(APIView):
     serializer_class = LogInSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication]
@@ -32,10 +46,7 @@ class LogIn(APIView):
 
         if serializer.is_valid():
             email = serializer.data.get('email')
-            password = serializer.data.get('password')
-
-            tObj = User.objects.get(email=email)
-            hashed_pwd = make_password("123456")            
+            password = serializer.data.get('password')        
 
             user = authenticate(email=email, password=password)
 
@@ -52,7 +63,8 @@ class LogIn(APIView):
     
 
 class Logout(APIView):
-    def post(self, request, format=None):
+    def post(self, request, format='json'):
+        print(request.user)
         logout(request)
         return Response(status=status.HTTP_200_OK)
 

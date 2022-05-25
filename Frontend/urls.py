@@ -5,5 +5,6 @@ from .views import index
 
 urlpatterns = [
     path('', index),
-    path('test/', index)
+    path('test/', index),
+    path('login/', index)
 ]
