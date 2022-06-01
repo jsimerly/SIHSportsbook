@@ -27,7 +27,7 @@ class CurrentUser(APIView):
     def get(self, request, format='json'):
         json = {}
         if request.user.is_authenticated:
-            print(request.user)
+            # print(request.user)
             json['email'] = request.user.email
             json['isLoggedIn'] = True
 
@@ -35,7 +35,8 @@ class CurrentUser(APIView):
         
         json['email'] = ''
         json['isLoggedIn'] = False
-        print('yes')
+        return Response(json, status=status.HTTP_204_NO_CONTENT)
+       
 
 class LogIn(APIView):
     serializer_class = LogInSerializer
@@ -54,7 +55,8 @@ class LogIn(APIView):
                 if user.is_active:
                     login(request, user)
                     json = {
-                        'email' : user.email
+                        'email' : user.email,
+                        'isLoggedIn' : True
                     }
 
                     return Response(json, status=status.HTTP_202_ACCEPTED)
@@ -63,8 +65,8 @@ class LogIn(APIView):
     
 
 class Logout(APIView):
-    def post(self, request, format='json'):
-        print(request.user)
+    def post(self, request, format=None):
+        print(request)
         logout(request)
         return Response(status=status.HTTP_200_OK)
 

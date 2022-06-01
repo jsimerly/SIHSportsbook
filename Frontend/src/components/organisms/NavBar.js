@@ -13,10 +13,7 @@ import {
 
 
 export default function NavBar(props){
-    console.log(props.csrftoken)
-
     function handleLogOutClicked(crsftoken) {
-        console.log('func: ' + crsftoken)
         const requestOptions ={
             method: 'POST',
             headers: {
@@ -27,7 +24,6 @@ export default function NavBar(props){
 
         fetch('/api/account/logout/', requestOptions)
         .then((response) => console.log(response.json()));
-        window.location.reload()
     }
 
     function userCorner() {
