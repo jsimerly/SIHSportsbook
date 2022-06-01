@@ -42,15 +42,12 @@ export default function App(props){
     function getCurrentUser(){
         fetch('/api/account/current-user')
         .then((response) => {
-            if (response.status === 200) {
-                response.json()
-                .then((data) => {
-                    console.log(data)
-                    setUser(data)
-                })
-            } else {
-                setError('No User')
-            }
+            response.json()
+            .then((data) => {
+    
+                setUser({...data})
+            })
+
         })
     }
 
@@ -59,9 +56,8 @@ export default function App(props){
         setCsrftoken(getCookie('csrftoken'))
     }
 
-    function handleLogout() {
-        getCurrentUser();
-        window.location.reload()
+    function handleLogout(userData) {
+        setUser(userData)
     }
     
     function handleLeagueChange(league) {

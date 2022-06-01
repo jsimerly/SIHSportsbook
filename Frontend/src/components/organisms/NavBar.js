@@ -13,6 +13,12 @@ import {
 
 
 export default function NavBar(props){
+    const [user, setUser] = useState(props.user)
+
+    useEffect(() => {
+        console.log(props.user)
+        setUser(props.user)
+    }, [props.user])
 
     function handleLogOutClicked(crsftoken) {
         const requestOptions ={
@@ -24,12 +30,18 @@ export default function NavBar(props){
         };
 
         fetch('/api/account/logout/', requestOptions)
-        .then((response) => console.log(response.json()));
-        props.handleLogout()
+        .then((response) => {
+            if (response.status===200) {
+                response.json()
+                .then((data) => {
+                    props.handleLogout(data)
+                })
+            }
+        });
     }
 
     function userCorner() {
-        if (props.user.isLoggedIn) {
+        if (user.isLoggedIn) {
             return (
                 <Button color='secondary' onClick={() => handleLogOutClicked(props.csrftoken)}> Logout </Button>
             )
@@ -42,6 +54,7 @@ export default function NavBar(props){
  
     return (
         <div>
+            {console.log('rerendered ' + user.isLoggedIn)}
             <AppBar>
                 <Toolbar>
                     <Grid container>

@@ -35,7 +35,7 @@ class CurrentUser(APIView):
         
         json['email'] = ''
         json['isLoggedIn'] = False
-        return Response(json, status=status.HTTP_204_NO_CONTENT)
+        return Response(json, status=status.HTTP_200_OK)
        
 
 class LogIn(APIView):
@@ -66,7 +66,9 @@ class LogIn(APIView):
 
 class Logout(APIView):
     def post(self, request, format=None):
-        print(request)
+        json={}
+        json['email'] = ''
+        json['isLoggedIn'] = False
         logout(request)
-        return Response('User Logged Out', status=status.HTTP_200_OK)
+        return Response(json, status=status.HTTP_200_OK)
 
