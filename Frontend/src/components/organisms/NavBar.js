@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import { 
     AppBar,
@@ -13,6 +13,7 @@ import {
 
 
 export default function NavBar(props){
+
     function handleLogOutClicked(crsftoken) {
         const requestOptions ={
             method: 'POST',
@@ -24,6 +25,7 @@ export default function NavBar(props){
 
         fetch('/api/account/logout/', requestOptions)
         .then((response) => console.log(response.json()));
+        props.handleLogout()
     }
 
     function userCorner() {

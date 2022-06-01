@@ -29,7 +29,6 @@ export default function App(props){
     const [csrftoken, setCsrftoken] = useState(getCookie('csrftoken'));
     const [user, setUser] = useState({
         email: "",
-        name: "",
         isLoggedIn: null,
     });
     const [currentLeague, setCurrentLeague] = useState();
@@ -59,6 +58,11 @@ export default function App(props){
         setUser(userData)
         setCsrftoken(getCookie('csrftoken'))
     }
+
+    function handleLogout() {
+        getCurrentUser();
+        window.location.reload()
+    }
     
     function handleLeagueChange(league) {
         setCurrentLeague(league)
@@ -71,6 +75,7 @@ export default function App(props){
                 <NavBar 
                     user={user}
                     csrftoken={csrftoken}
+                    handleLogout={handleLogout}
                 />
                 <Box sx={{ pt : 7, pl : 0 , maxHeight: '100%'}}>
                     <Routes>
