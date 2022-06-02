@@ -457,12 +457,6 @@ class League(models.Model):
         runtime = t1-t0
         print(f'models.League.updateTeamProjections runtime: {runtime}')
 
-class Bettor(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-
-    balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
-    betsLeft = models.IntegerField(default=2)
-
 class FantasyTeam(models.Model):
     #Team
     players = models.ManyToManyField(Player)
@@ -474,8 +468,6 @@ class FantasyTeam(models.Model):
 
     sleeperName = models.CharField(null=True, max_length=50)
     funName = models.CharField(null=True, max_length=30)
-
-    bettor = models.ForeignKey(Bettor, on_delete=models.PROTECT, null=True)
 
     #Current Week
     currentProj = models.DecimalField(max_digits=9, decimal_places=3, null=True)
@@ -555,6 +547,14 @@ class Matchup(models.Model):
             self.t2_ML = -(100+vig/2)
 
         self.save()
+
+class Bettor(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
+    team = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, null=True)
+
+    balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    betsLeft = models.IntegerField(default=2)
 
 class MatchupBets(models.Model):
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)

@@ -1,14 +1,16 @@
 from django.urls import path
-from . import views
+from . import pViews
+from . import gViews
 
 urlpatterns = [
-    path('create-league/', views.CreateLeague.as_view(), name='create-league'),
-    path('update-player-info/', views.UpdateNflPlayers.as_view(), name='update-player-info'),
-    path('update-all-projections', views.UpdatePlayerProjections.as_view()),
-    path('update-league-projections', views.UpdateLeagueProjections.as_view()),
-    path('update-league-rosters', views.UpdateLeagueRosters.as_view()),
-    path('update-league-state', views.UpdateNflState.as_view()),
-    path('update-league-matchups', views.UpdateLeagueMatchups.as_view()),
-    path('attatch-team-to-user', views.AttachedTeamToBettor.as_view()),
-    path('place-bet', views.PlaceBet.as_view())
+    path('create-league/', pViews.CreateLeague.as_view(), name='create-league'),
+    path('update-player-info/', pViews.UpdateNflPlayers.as_view(), name='update-player-info'),
+    path('update-all-projections', pViews.UpdatePlayerProjections.as_view()),
+    path('update-league-projections', pViews.UpdateLeagueProjections.as_view()),
+    path('update-league-rosters', pViews.UpdateLeagueRosters.as_view()),
+    path('update-league-state', pViews.UpdateNflState.as_view()),
+    path('update-league-matchups', pViews.UpdateLeagueMatchups.as_view()),
+    path('attatch-team-to-user', pViews.AttachedTeamToBettor.as_view()),
+    path('place-bet', pViews.PlaceBet.as_view()),
+    path('get-all-leagues', gViews.GetBettors.as_view())
 ]

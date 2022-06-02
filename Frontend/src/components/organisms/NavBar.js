@@ -16,7 +16,6 @@ export default function NavBar(props){
     const [user, setUser] = useState(props.user)
 
     useEffect(() => {
-        console.log(props.user)
         setUser(props.user)
     }, [props.user])
 
@@ -47,14 +46,20 @@ export default function NavBar(props){
             )
         } else {
             return (
-                <Button color='warning' component={Link} to='login'> Login </Button>
+                <Grid container justifyContent="flex-end">
+                    <Grid item>
+                        <Button color='warning' component={Link} to='login'> Login </Button>
+                    </Grid>
+                    <Grid item>
+                        <Button color='warning' component={Link} to='register'> Register </Button>
+                    </Grid>
+                </Grid>
             )
         }
     }
  
     return (
         <div>
-            {console.log('rerendered ' + user.isLoggedIn)}
             <AppBar>
                 <Toolbar>
                     <Grid container>

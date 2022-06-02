@@ -1,5 +1,4 @@
-import React, { Component, useState } from "react";
-import { render } from "react-dom";
+import React, { useState } from "react";
 import DrawerComp from "../organisms/Drawer";
 import Matchups from "../organisms/Matchups";
 import MatchUp from "../molecules/MatchUp";
@@ -105,7 +104,10 @@ export default function App(props){
             <Grid container>
                 <Grid item>
                     <Box sx={{width: 250, height: '100vh', border:1 }}>
-                        <DrawerComp/>
+                        <DrawerComp
+                            leagues={props.leagues}
+                            currentLeague={props.currentLeague}
+                        />
                     </Box>
                 </Grid>
                 <Grid margin={2} md={7} spacing={1} sx={{border:1}}>

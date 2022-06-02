@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage'
 import { 
     Box 
 } from '@mui/material'
+import RegisterPage from "./pages/RegisterPage";
 
 function getCookie(name) {
     let cookieValue = null;
@@ -31,12 +32,17 @@ export default function App(props){
         email: "",
         isLoggedIn: null,
     });
+    const [leagues, setLeagues] = useState([]);
     const [currentLeague, setCurrentLeague] = useState();
+    const [openBets, setOpenBets] = useState()
+    const [closedBets, setClosedBets] = useState()
     const [error, setError] = useState();
 
     useEffect(() => {
         setCsrftoken(getCookie('csrftoken'))
         getCurrentUser()
+        getLeagues()
+        getBets()
     }, [])
 
     function getCurrentUser(){
@@ -44,10 +50,29 @@ export default function App(props){
         .then((response) => {
             response.json()
             .then((data) => {
-    
                 setUser({...data})
             })
 
+        })
+    }
+
+    function getLeagues() {
+        fetch('/api/SIH/get-all-leagues')
+        .then((response) => {
+            response.json()
+            .then((data) => {
+                setLeagues([...data])
+            })
+        })
+    }
+
+    function getBets(){
+        fetch('/api/SIH/get-league-bet-history?q=' + "1234")
+        .then((response) => {
+            response.json()
+            .then((data) => {
+                console.log(data)
+            })
         })
     }
 
@@ -79,15 +104,24 @@ export default function App(props){
                             exact path='/' 
                             element={<HomePage
                                         csrftoken={csrftoken}
+                                        leagues={leagues}
+                                        currentLeague={currentLeague}
                                     />
-                                    }
+                            }
                         />
                         <Route 
                             path='/login' 
                             element={<LoginPage 
                                         handleLogin={handleLogin}
                                     />
-                                    }
+                            }
+                        />
+                        <Route 
+                            path='/register'
+                            element={<RegisterPage
+                            
+                                    />
+                            }
                         />
                         <Route path='/test' element={<Playground/>}/>
                     </Routes>
