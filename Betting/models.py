@@ -460,10 +460,11 @@ class League(models.Model):
 class FantasyTeam(models.Model):
     #Team
     players = models.ManyToManyField(Player)
-    league = models.ForeignKey(League, on_delete=models.PROTECT, default=0, null=False, related_name='FantasyTeam')
+    league = models.ForeignKey(League, on_delete=models.PROTECT, default=0, null=False, related_name='FantasyTeams')
 
     #Identity
-    sleeperId = models.CharField(max_length=64, null=False, primary_key=True)
+    id = models.UUIDField(primary_key=True)
+    ownerId = models.CharField(max_length=64, null=False)
     rosterId = models.IntegerField(null=True)
 
     sleeperName = models.CharField(null=True, max_length=50)
@@ -488,6 +489,8 @@ class Matchup(models.Model):
     week = models.IntegerField()
     season = models.IntegerField()
 
+    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
+    active = models.BooleanField(default=True)
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchupTeam1')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchupTeam2')
 
@@ -550,8 +553,8 @@ class Matchup(models.Model):
 
 class Bettor(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
-    team = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, null=True)
+    league = models.ForeignKey(League, on_delete=models.PROTECT,)
+    team = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT,)
 
     balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     betsLeft = models.IntegerField(default=2)

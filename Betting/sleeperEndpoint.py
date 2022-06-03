@@ -38,7 +38,7 @@ class SleeperEndpoint():
     #get matchups for specific week
     def getMatchupForLeague(self, leagueId, week=None):
         if week is None:
-            week = NflState.objects.get(pk=1).week
+            week = 15 #NflState.objects.get(pk=1).week
         url = f'https://api.sleeper.app/v1/league/{leagueId}/matchups/{str(week)}'
         return self.jsonFetch(url)
 
