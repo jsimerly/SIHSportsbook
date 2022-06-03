@@ -16,111 +16,113 @@ fantasyProsEndpoint = FprosEndpoint()
 
 # Create your views here.
 class CreateLeague(APIView):
-    serializer_class = LeagueSerializer
+    serializer_class = LeagueOnlySerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format='json'):
-        t0 = time.time()
-        #Data directly sent in the request
-        leagueId = request.data['sleeperId']
-        owner = request.data['owner']
-        token = request.data['csrfmiddlewaretoken']
-        
-        leagueJson = sleeperEndpoint.getLeague(leagueId) #sends get request to sleeper API
-
-        if leagueJson is None:
-            return Response('League Not Found', status=status.HTTP_404_NOT_FOUND)
-
-        data = {}
-        #request data for league Info
-        data['sleeperId'] = leagueId
-        data['owner'] = owner
-        data['csrfmiddlewaretoken'] = token
-
-        #sleeper response settings
-        data['name'] = leagueJson['name']
-        data['status'] = leagueJson['status']
-        data['leagueSize'] = leagueJson['total_rosters']
-        data['playoffSize'] = leagueJson['settings']['playoff_teams']
-        data['ppr'] = leagueJson['scoring_settings']['rec']
-        data['tePremium'] = leagueJson['scoring_settings']['bonus_rec_te']
-
-        #sleeper response roster
-        data['nQB'] = (leagueJson['roster_positions']).count('QB')
-        data['nRB'] = (leagueJson['roster_positions']).count('RB')
-        data['nWR'] = (leagueJson['roster_positions']).count('WR')
-        data['nTE'] = (leagueJson['roster_positions']).count('TE')
-        data['nDST'] = (leagueJson['roster_positions']).count('DEF')
-        data['nK'] = (leagueJson['roster_positions']).count('K')
-        data['nFlexWrRbTe'] = (leagueJson['roster_positions']).count('FLEX')
-        data['nFlexWrRb'] = (leagueJson['roster_positions']).count('') #unknown values
-        data['nFlexWrTe'] = (leagueJson['roster_positions']).count('') #
-        data['nSuperFlex'] = (leagueJson['roster_positions']).count('SUPER_FLEX')
-
-        leagueSerializer = self.serializer_class(data=data)  #assigning new data to the serializer     
-
-        if leagueSerializer.is_valid():
-            newLeague = leagueSerializer.save() #Creating a new League Object in our db
-            print(newLeague)
-        else:
-            return Response(leagueSerializer.errors, status=status.HTTP_201_CREATED)
-
-        #sends GET request to sleeper for rosters and users in the league
-        rosterJson = sleeperEndpoint.getRosters(leagueId)
-        userJson = sleeperEndpoint.getLeagueUsers(leagueId)
-    
-        nameDict = {}
-        for user in userJson:
-            nameDict[user['user_id']] = {}
-            try: #if someone hasn't name there team, no 'team_name' exist
-                nameDict[user['user_id']]['funName'] = user['metadata']['team_name']
-            except: #instead we'll name them their display name
-                nameDict[user['user_id']]['funName'] = user['display_name']
-            nameDict[user['user_id']]['display_name'] = user['display_name']
-
-        #iterate through the rosters
-        for team in rosterJson:
-            #create serialize data
-            rosterData = {} 
-            ownerId = team['owner_id']
-
-            rosterData['sleeperId'] = ownerId
-            rosterData['sleeperName'] = nameDict[ownerId]['display_name']
-            rosterData['funName'] = nameDict[ownerId]['funName']
-            rosterData['rosterId'] = team['roster_id']
-
-            rosterData['wins'] = team['settings']['wins']
-            rosterData['losses'] = team['settings']['losses']
-            rosterData['ties'] = team['settings']['ties']
-            rosterData['fpts'] = team['settings']['fpts']
-
-            rosterData['league'] = newLeague.sleeperId
-
-            fantasyTeamSerializer = FantasyTeamSerializer(data=rosterData)
-
-            if fantasyTeamSerializer.is_valid():
-                #create new FantasyTeam
-                newTeam = fantasyTeamSerializer.save()
-                print(newTeam)
-
-                #Iterate through the team's json to get their players
-                for playerId in team['players']:
-                    try:
-                        #find player and add to team
-                        player = Player.objects.get(pk=playerId)
-                        newTeam.players.add(player)
-                    except:
-                        #this error will mean you need to POST to UpdateNflPlayers below
-                        print('ERROR - missing player ID: {}'.format(playerId))
-                newTeam.save()
-
-            else:
-                return Response(fantasyTeamSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_authenticated:
+            t0 = time.time()
+            #Data directly sent in the request
+            leagueId = request.data['sleeperId']
+            owner = request.user.id
+            token = request.data['csrfmiddlewaretoken']
             
-        t1 = time.time()
-        runTime = t1-t0
-        print('Create League Run Time: ' + str(runTime))
-        return Response(leagueSerializer.data, status=status.HTTP_201_CREATED)
+            leagueJson = sleeperEndpoint.getLeague(leagueId) #sends get request to sleeper API
+
+            if leagueJson is None:
+                return Response('League Not Found', status=status.HTTP_404_NOT_FOUND)
+
+            data = {}
+            #request data for league Info
+            data['sleeperId'] = leagueId
+            data['owner'] = owner
+            data['csrfmiddlewaretoken'] = token
+
+            #sleeper response settings
+            data['name'] = leagueJson['name']
+            data['status'] = leagueJson['status']
+            data['leagueSize'] = leagueJson['total_rosters']
+            data['playoffSize'] = leagueJson['settings']['playoff_teams']
+            data['ppr'] = leagueJson['scoring_settings']['rec']
+            data['tePremium'] = leagueJson['scoring_settings']['bonus_rec_te']
+
+            #sleeper response roster
+            data['nQB'] = (leagueJson['roster_positions']).count('QB')
+            data['nRB'] = (leagueJson['roster_positions']).count('RB')
+            data['nWR'] = (leagueJson['roster_positions']).count('WR')
+            data['nTE'] = (leagueJson['roster_positions']).count('TE')
+            data['nDST'] = (leagueJson['roster_positions']).count('DEF')
+            data['nK'] = (leagueJson['roster_positions']).count('K')
+            data['nFlexWrRbTe'] = (leagueJson['roster_positions']).count('FLEX')
+            data['nFlexWrRb'] = (leagueJson['roster_positions']).count('') #unknown values
+            data['nFlexWrTe'] = (leagueJson['roster_positions']).count('') #
+            data['nSuperFlex'] = (leagueJson['roster_positions']).count('SUPER_FLEX')
+
+            leagueSerializer = LeagueSerializer(data=data)  #assigning new data to the serializer 
+            print(data)   
+
+            if leagueSerializer.is_valid():
+                newLeague = leagueSerializer.save() #Creating a new League Object in our db
+                print(newLeague)
+            else:
+                return Response(leagueSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            #sends GET request to sleeper for rosters and users in the league
+            rosterJson = sleeperEndpoint.getRosters(leagueId)
+            userJson = sleeperEndpoint.getLeagueUsers(leagueId)
+        
+            nameDict = {}
+            for user in userJson:
+                nameDict[user['user_id']] = {}
+                try: #if someone hasn't name there team, no 'team_name' exist
+                    nameDict[user['user_id']]['funName'] = user['metadata']['team_name']
+                except: #instead we'll name them their display name
+                    nameDict[user['user_id']]['funName'] = user['display_name']
+                nameDict[user['user_id']]['display_name'] = user['display_name']
+
+            #iterate through the rosters
+            for team in rosterJson:
+                #create serialize data
+                rosterData = {} 
+                ownerId = team['owner_id']
+
+                rosterData['sleeperId'] = ownerId
+                rosterData['ownerId`'] = nameDict[ownerId]['display_name']
+                rosterData['funName'] = nameDict[ownerId]['funName']
+                rosterData['rosterId'] = team['roster_id']
+
+                rosterData['wins'] = team['settings']['wins']
+                rosterData['losses'] = team['settings']['losses']
+                rosterData['ties'] = team['settings']['ties']
+                rosterData['fpts'] = team['settings']['fpts']
+
+                rosterData['league'] = newLeague.sleeperId
+
+                fantasyTeamSerializer = FantasyTeamSerializer(data=rosterData)
+
+                if fantasyTeamSerializer.is_valid():
+                    #create new FantasyTeam
+                    newTeam = fantasyTeamSerializer.save()
+                    print(newTeam)
+
+                    #Iterate through the team's json to get their players
+                    for playerId in team['players']:
+                        try:
+                            #find player and add to team
+                            player = Player.objects.get(pk=playerId)
+                            newTeam.players.add(player)
+                        except:
+                            #this error will mean you need to POST to UpdateNflPlayers below
+                            print('ERROR - missing player ID: {}'.format(playerId))
+                    newTeam.save()
+
+                else:
+                    return Response(fantasyTeamSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                
+            t1 = time.time()
+            runTime = t1-t0
+            print('Create League Run Time: ' + str(runTime))
+            return Response(leagueSerializer.data, status=status.HTTP_201_CREATED)
 
 class UpdateNflPlayers(APIView):
     permission_classes = [IsAdminUser]
@@ -337,9 +339,16 @@ class UpdateLeagueRosters(APIView):
             pk = serializer.data.get('sleeperId')
             #get updated rosters from sleeper
             leagueRosterData = sleeperEndpoint.getRosters(pk)
+
+            print(leagueRosterData)
+
     
             #find league and update rosters
             league = League.objects.get(pk=pk)
+            
+            if len(leagueRosterData) != len(league.FantasyTeams.all()):
+                for team in leagueRosterData:
+                    team
             league.updateRosters(leagueRosterData)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -359,8 +368,8 @@ class UpdateNflState(APIView):
 
 #needs works just used to create matchup for now
 class UpdateLeagueMatchups(APIView):
-    serializer_class = MatchupSerializer
-    
+    serializer_class = LeagueOnlySerializer
+
     def post(self, request, format='json'):
         serializer = self.serializer_class(data=request.data)
 
