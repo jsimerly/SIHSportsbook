@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth import get_user_model
 
 
-from Betting.serializers import LeagueOnlySerializer, LeagueSerializer
+from Betting.serializers import LeagueOnlySerializer, LeagueCreateSerializer
 
 User = get_user_model()
 

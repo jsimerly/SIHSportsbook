@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 import decimal
 
-from Betting.models import NflState, Bettor
+from Betting.models import *
+from Fantasy.models import *
 
 from .serializers import *
 from .sleeperEndpoint import SleeperEndpoint

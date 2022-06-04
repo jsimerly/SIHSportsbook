@@ -1,11 +1,11 @@
-from dataclasses import field
 from rest_framework import serializers
 
-from .models import FantasyTeam, League, MatchupBets, Player, Matchup
+from Fantasy.models import FantasyTeam, FantasyLeague, Player, Matchup
+from Betting.models import MatchupBets
 
-class LeagueSerializer(serializers.ModelSerializer):
+class LeagueCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = League
+        model = FantasyLeague
         fields = (
             'sleeperId', 'owner',
             'name', 'status', 'leagueSize', 'playoffSize',
@@ -15,11 +15,11 @@ class LeagueSerializer(serializers.ModelSerializer):
         )
 
         def create(self, validated_data):
-            return League(validated_data)
+            return FantasyLeague(validated_data)
 
 class LeagueOnlySerializer(serializers.ModelSerializer):
     class Meta:
-        model = League
+        model = FantasyLeague
         fields = ('sleeperId',)
         extra_kwargs = {
             'sleeperId' : {

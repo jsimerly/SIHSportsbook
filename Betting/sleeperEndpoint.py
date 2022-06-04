@@ -1,4 +1,3 @@
-from .models import NflState
 import requests
 import json
 

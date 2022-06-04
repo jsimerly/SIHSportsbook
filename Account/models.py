@@ -42,6 +42,12 @@ class User(AbstractBaseUser):
         verbose_name='password'
     )
 
+    account_balance = models.DecimalField(
+        max_digits=12, 
+        decimal_places=2,
+        default=0.0
+    )
+
     username = None
     first_name = None
     last_name = None
