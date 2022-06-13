@@ -1,5 +1,3 @@
-from os import stat
-from turtle import pos
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,6 +5,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from decimal import Decimal
 from Fantasy.fprosEndpoint import strip_stats
 from Fantasy.models import NflState, PlayerCurrentStats, PlayerProjections
+from django.db.models import Q
 
 from .sleeperEndpoint import * 
 from .serializers import * 
@@ -415,8 +414,7 @@ class UpdateNflState(APIView):
         nfl_state_json = get_nfl_state()
 
         try:
-
-            NflState.objects.filter(pk=1).update(
+            NflState.objects.filter(pk=1).update_or_create(
                 week = nfl_state_json['leg'],
                 display_week = nfl_state_json['display_week'],
                 season = nfl_state_json['league_season'],
@@ -432,5 +430,55 @@ class UpdateFantasyLeagueMatchups(APIView):
     serializer_class = LeagueSleeperIdSerializer
 
     def put(self, request, format='json'):
-        pass
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            sleeper_id = serializer.data.get('sleeper_id')
+            league = FantasyLeague.objects.get(sleeper_id=sleeper_id)
+            teams = league.FantasyTeams.all()
+
+            matchups_json = get_matchup_for_league(sleeper_id)
+
+            matchups = {}
+            for matchup_json in matchups_json:
+                matchup_id = matchup_json['matchup_id']
+                roster_id = matchup_json['roster_id']
+                
+                if matchup_id in matchups:
+                    matchups[matchup_id].append(roster_id)
+                else:
+                    matchups[matchup_id] = [roster_id]
+
+            nfl_state = NflState.objects.get(pk=1)
+
+            week = nfl_state.week
+            season = nfl_state.season
+            
+            for matchup_id, values in matchups.items():
+                team1_obj = teams.get(roster_id=values[0])
+                team2_obj = teams.get(roster_id=values[1])
+
+                matchup = Matchup.objects.filter(
+                        Q(week=week) | 
+                        Q(season=season) |
+                        Q(team1=team1_obj) | 
+                        Q(team2=team2_obj) 
+                    )
+
+                matchup.update_or_create(
+                    week = week,
+                    season = season,
+                    matchup_id = matchup_id,
+                    league = league,
+                    team1 = team1_obj,
+                    team2 = team2_obj
+                )
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+  
+        return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        
+
+
         
