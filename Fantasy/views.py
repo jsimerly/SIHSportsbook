@@ -243,6 +243,9 @@ class UpdatePlayerProjections(APIView):
             player_proj.fumbles = qb_info['fls']
             player_proj.fp_est = qb_info['fp']
 
+            player.proj_total = qb_info['fp']
+
+            player.save()
             player_proj.save()
 
         def rb_player_update(rb_info, sleeper_id):
@@ -261,6 +264,9 @@ class UpdatePlayerProjections(APIView):
             player_proj.fumbles = rb_info['fls']
             player_proj.fp_est = rb_info['fp']
 
+            player.proj_total = rb_info['fp']
+
+            player.save()
             player_proj.save()
 
         def wr_player_update(wr_info, sleeper_id):
@@ -278,7 +284,9 @@ class UpdatePlayerProjections(APIView):
             player_proj.rush_tds = wr_info['rushTds']
             player_proj.fumbles = wr_info['fls']
             player_proj.fp_est = wr_info['fp']
+            player.proj_total = wr_info['fp']
 
+            player.save()
             player_proj.save()
             
         def te_player_update(te_info, sleeper_id):
@@ -294,7 +302,9 @@ class UpdatePlayerProjections(APIView):
             player_proj.rec_tds = te_info['recTds']
             player_proj.fumbles = te_info['fls']
             player_proj.fp_est = te_info['fp']
-            
+            player.proj_total = te_info['fp']
+
+            player.save()
             player_proj.save()
             
         def k_player_update(k_info, sleeper_id):
@@ -309,7 +319,9 @@ class UpdatePlayerProjections(APIView):
             player_proj.xpt = k_info['xpt']
             player_proj.k_total = k_info['fpts']
             player_proj.fp_est = k_info['fpts']
+            player.proj_total = k_info['fpts']
 
+            player.save()
             player_proj.save()
 
         def dst_player_update(dst_info, sleeper_id):
@@ -330,7 +342,9 @@ class UpdatePlayerProjections(APIView):
             player_proj.def_yds_against = dst_info['ydsAgn']
             player_proj.def_total = dst_info['fpts']
             player_proj.fp_est = dst_info['fpts']
+            player.proj_total = dst_info['fpts']
 
+            player.save()
             player_proj.save()
 
         def update_player_proj(pos):
