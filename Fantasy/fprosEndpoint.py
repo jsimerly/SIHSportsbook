@@ -225,7 +225,7 @@ def get_pos_stats(pos_key, week):
     rows = table.findAll('tr')
     return rows
 
-def strip_stats(pos, week=None):
+def strip_stats(pos, week=18):
     fp_data = get_pos_stats(pos, week)
     
     func_map = {

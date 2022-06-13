@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-import decimal
+from decimal import Decimal
 from Fantasy.fprosEndpoint import strip_stats
 from Fantasy.models import NflState, PlayerCurrentStats, PlayerProjections
 
@@ -55,15 +55,11 @@ class UpdateNflPlayers(APIView):
                     player.nfl_team = player_info['team']
 
             if new_player:
-                print(f'Player Created: {player.name} - {player.pos} - {player.sleeper_id}')
                 player_objs_create.append(player)
                 player_proj_create.append(PlayerProjections(player=player))
                 player_stats_create.append(PlayerCurrentStats(player=player))
             else:
-                print(f'Player Updated: {player.name} - {player.pos} - {player.sleeper_id}')
                 player_objs_update.append(player)
-                player_proj_create.append(PlayerProjections(player=player))
-                player_stats_create.append(PlayerCurrentStats(player=player))
 
         if len(player_objs_update) != 0:
             print('{} player(s) updated'.format(len(player_objs_update)))
@@ -228,65 +224,112 @@ class CreateLeague(APIView):
 
 class UpdatePlayerProjections(APIView):
     def put(self, request, format='json'):
+        
         def qb_player_update(qb_info, sleeper_id):
-            Player.objects.get(sleeper_id=sleeper_id).proj.update_or_create(
-                    pass_yds = qb_info['passYds'],
-                    pass_tds = qb_info['passTds'],
-                    pass_ints = qb_info['ints'],
-                    rush_yds = qb_info['rushYds'],
-                    rush_tds = qb_info['rushTds'],
-                    fumbles = qb_info['fls'],
-                    fp_est = qb_info['fp']
-                )
+            player = Player.objects.get(sleeper_id=sleeper_id)
+            try:
+                player_proj = player.proj
+            except Exception as e:
+                print(e)
+                player_proj = PlayerProjections(player=player)
+
+            player_proj.pass_yds = qb_info['passYds']
+            player_proj.pass_tds = qb_info['passTds']
+            player_proj.pass_ints = qb_info['ints']
+            player_proj.rush_yds = qb_info['rushYds']
+            player_proj.rush_tds = qb_info['rushTds']
+            player_proj.fumbles = qb_info['fls']
+            player_proj.fp_est = qb_info['fp']
+
+            player_proj.save()
+
         def rb_player_update(rb_info, sleeper_id):
-            Player.objects.get(sleeper_id=sleeper_id).proj.update_or_create(
-                    rush_yds = rb_info['rushYds'],
-                    rush_tds = rb_info['rushTds'],
-                    rec_rec = rb_info['rec'],
-                    rec_yd = rb_info['recYds'],
-                    rec_tds = rb_info['recTds'],
-                    fumbles = rb_info['fls'],
-                    fp_est = rb_info['fp']
-                )
+            player = Player.objects.get(sleeper_id=sleeper_id)
+            try:
+                player_proj = player.proj
+            except Exception as e:
+                print(e)
+                player_proj = PlayerProjections(player=player)
+
+            player_proj.rush_yds = rb_info['rushYds']
+            player_proj.rush_tds = rb_info['rushTds']
+            player_proj.rec_rec = rb_info['rec']
+            player_proj.rec_yds = rb_info['recYds']
+            player_proj.rec_tds = rb_info['recTds']
+            player_proj.fumbles = rb_info['fls']
+            player_proj.fp_est = rb_info['fp']
+
+            player_proj.save()
 
         def wr_player_update(wr_info, sleeper_id):
-            Player.objects.get(sleeper_id=sleeper_id).proj.update_or_create(
-                    rec_rec = wr_info['rec'],
-                    rec_yds = wr_info['recYds'],
-                    rec_tds = wr_info['recTds'],
-                    rush_yds = wr_info['rushYds'],
-                    rush_tds = wr_info['rushTds'],
-                    fumbles = wr_info['fls'],
-                    fp_est = wr_info['fp']
-                )
+            player = Player.objects.get(sleeper_id=sleeper_id)
+            try:
+                player_proj = player.proj
+            except Exception as e:
+                print(e)
+                player_proj = PlayerProjections(player=player)
+
+            player_proj.rec_rec = wr_info['rec']
+            player_proj.rec_yds = wr_info['recYds']
+            player_proj.rec_tds = wr_info['recTds']
+            player_proj.rush_yds = wr_info['rushYds']
+            player_proj.rush_tds = wr_info['rushTds']
+            player_proj.fumbles = wr_info['fls']
+            player_proj.fp_est = wr_info['fp']
+
+            player_proj.save()
+            
         def te_player_update(te_info, sleeper_id):
-            Player.objects.get(sleeper_id=sleeper_id).proj.update_or_create(
-                    rec_rec = te_info['rec'],
-                    rec_yds = te_info['recYds'],
-                    rec_tds = te_info['recTds'],
-                    fumbles = te_info['fls'],
-                    fp_est = te_info['fp']
-                )
+            player = Player.objects.get(sleeper_id=sleeper_id)
+            try:
+                player_proj = player.proj
+            except Exception as e:
+                print(e)
+                player_proj = PlayerProjections(player=player)
+
+            player_proj.rec_rec = te_info['rec']
+            player_proj.rec_yds = te_info['recYds']
+            player_proj.rec_tds = te_info['recTds']
+            player_proj.fumbles = te_info['fls']
+            player_proj.fp_est = te_info['fp']
+            
+            player_proj.save()
+            
         def k_player_update(k_info, sleeper_id):
-            Player.objects.get(sleeper_id=sleeper_id).proj.update_or_create(
-                    fg = k_info['fg'],
-                    xpt = k_info['xpt'],
-                    k_total = k_info['fpts'],
-                    fp_est = k_info['fpts'],
-                )
+            player = Player.objects.get(sleeper_id=sleeper_id)
+            try:
+                player_proj = player.proj
+            except Exception as e:
+                print(e)
+                player_proj = PlayerProjections(player=player)
+            
+            player_proj.fg = k_info['fg']
+            player_proj.xpt = k_info['xpt']
+            player_proj.k_total = k_info['fpts']
+            player_proj.fp_est = k_info['fpts']
+
+            player_proj.save()
+
         def dst_player_update(dst_info, sleeper_id):
-            Player.objects.get(sleeper_id=sleeper_id).proj.update_or_create(
-                    def_sack = dst_info['sacks'],
-                    def_int = dst_info['ints'],
-                    def_fum_rec = dst_info['fr'],
-                    def_forced_fum = dst_info['ff'],
-                    def_td = dst_info['tds'],
-                    def_saftey = dst_info['saftey'],
-                    def_pa = dst_info['pa'],
-                    def_yds_against = dst_info['ydsAgn'],
-                    def_total = dst_info['fpts'],
-                    fp_est = dst_info['fpts'],
-                )
+            player = Player.objects.get(sleeper_id=sleeper_id)
+            try:
+                player_proj = player.proj
+            except Exception as e:
+                print(e)
+                player_proj = PlayerProjections(player=player)
+
+            player_proj.def_sack = dst_info['sacks']
+            player_proj.def_int = dst_info['ints']
+            player_proj.def_fum_rec = dst_info['fr']
+            player_proj.def_forced_fum = dst_info['ff']
+            player_proj.def_td = dst_info['tds']
+            player_proj.def_saftey = dst_info['saftey']
+            player_proj.def_pa = dst_info['pa']
+            player_proj.def_yds_against = dst_info['ydsAgn']
+            player_proj.def_total = dst_info['fpts']
+            player_proj.fp_est = dst_info['fpts']
+
+            player_proj.save()
 
         def update_player_proj(pos):
             func_map = {
@@ -303,10 +346,11 @@ class UpdatePlayerProjections(APIView):
 
             for player in pos_data:
                 player_info = pos_data[player]
-                # try:
-                update_func(player_info, player)
-                # except Exception as e:
-                #     print(str(player) + '  | Player Update Error | ' + str(e))
+                try:
+                    update_func(player_info, player)
+                except Exception as e:
+                    print(player_info)
+                    print(str(player) + '  | Player Update Error | ' + str(e))
 
         update_player_proj('qb')
         update_player_proj('rb')
