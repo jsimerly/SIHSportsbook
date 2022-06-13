@@ -203,6 +203,8 @@ class CreateLeague(APIView):
             roster_data['league'] = new_league.id
             owner_id = team['owner_id']
             roster_data['owner_id'] = owner_id
+            roster_data['roster_id'] = team['roster_id']
+
             roster_data['sleeper_name'] = name_map[owner_id]['display_name']
             roster_data['fun_name'] = name_map[owner_id]['fun_name']
 
@@ -387,7 +389,8 @@ class UpdateLeagueRosters(APIView):
             sleeper_id = serializer.data.get('sleeper_id')
 
             league = FantasyLeague.objects.get(sleeper_id=sleeper_id)
-            league.update_all_rosters()
+            roster_data = get_rosters(sleeper_id)
+            league.update_all_rosters(roster_data)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         
