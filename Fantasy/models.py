@@ -5,11 +5,9 @@ from django.utils import timezone
 from django.db.models import Q
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-import decimal
+from decimal import Decimal
 import time
-import numpy as np
-
-from django.db import models
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -106,14 +104,19 @@ class Player(models.Model):
     )
     #Identity
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
-    sleeper_id = models.CharField(max_length=6)
+    sleeper_id = models.CharField(max_length=6, unique=True)
     name = models.CharField(null=False, max_length=80)
 
     #About
     pos = ArrayField(
-        models.CharField(max_length=20, blank=True, choices=POS_CHOICES),
+        models.CharField(
+            max_length=20, 
+            blank=True, 
+            choices=POS_CHOICES, 
+            null=True),
         default=list,
-        blank=True
+        blank=True,
+        null=True
         )
     nfl_team = models.CharField(
         null=True, 
@@ -123,14 +126,22 @@ class Player(models.Model):
 
     age = models.IntegerField(null=True)
 
+    proj_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    current_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+
+    def __str__(self):
+        return 
+
 class PlayerProjections(models.Model):
-    player = models.ForeignKey(
+    player = models.OneToOneField(
         Player, 
         on_delete=models.CASCADE,
-        related_name='proj'
+        related_name='proj',
+        unique=True
         )
 
     total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fp_est = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     
     pass_yds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     pass_tds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
@@ -143,6 +154,8 @@ class PlayerProjections(models.Model):
     rec_yds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     rec_tds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     
+    fumbles = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+
     fg = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     xpt = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     k_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
@@ -177,6 +190,8 @@ class PlayerCurrentStats(models.Model):
     rec_yds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     rec_tds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     
+    fumbles = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+
     fg = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     xpt = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     k_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
@@ -191,10 +206,149 @@ class PlayerCurrentStats(models.Model):
     def_yds_against = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     def_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
+def update_target_team_roster(team_json, team_obj):
+    players = []
+    print(team_json)
+    for player_id in team_json:
+        player_obj = Player.objects.get(sleeper_id=player_id)
+        players.append(player_obj)
+
+    team_obj.players.add(*players)
+    return players
+
+def create_unique_ranked_proj_map(player_qset, league_settings):
+    proj_map = {}
+    for player in player_qset:
+        if player.pos == Player.DST:
+            proj_map[player] = player.def_total
+        elif player.pos == Player.K:
+            proj_map[player] = player.k_total
+        else:
+            proj = 0
+
+            proj += player.proj.pass_yds * league_settings.pass_yard
+            proj += player.proj.pass_tds * league_settings.pass_tds
+            proj += player.proj.pass_ints * league_settings.pass_ints
+            
+            proj += player.proj.rush_yds * league_settings.rush_yds
+            proj += player.proj.rush_tds * league_settings.rush_tds
+
+            proj += player.proj.rec_yds * league_settings.rec_yds
+
+            if player.pos == Player.RB:
+                proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_rb)
+            elif player.pos == Player.WR:
+                proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_wr)
+            elif player.pos == Player.TE:
+                proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_te)
+            else:
+                proj += player.proj.rec_rec * league_settings.ppr
+
+            proj -= player.proj.fumbles * league_settings.fumble_lost
+
+            proj_map[player] = round(proj, 3)
+            
+
+    proj_map = sorted(proj_map.items(), key=lambda x: x[1], reverse=True)
+    return proj_map
+
+def get_top_free_agent(pos, free_agents):
+    if pos is not None:
+        if pos == 'flex':
+            free_agents = free_agents.filter(Q(pos=Player.RB) | Q(pos=Player.WR) | Q(pos=Player.TE))
+        else:
+            free_agents = free_agents.filter(pos=pos)
+
+    top_free_agent = free_agents.order_by('proj_total')[0]
+    return {top_free_agent: top_free_agent.proj_total}
+
+def get_best_players(ranked_players_map, n, free_agents_list, pos=None, free_agent_function=get_top_free_agent):
+    best_players = []
+    for _ in range(n):
+        if not ranked_players_map:
+            top_free_agent = free_agent_function(pos, free_agents_list) #if you create new free agent functions, create **kwargs
+        else:
+            top_player = ranked_players_map[0]
+            if top_player[1] <= Decimal(5):
+                top_free_agent = free_agent_function(pos, free_agents_list)
+                best_players.append(top_free_agent)
+            else:
+                ranked_players_map.pop(0)
+                best_players.append(top_player)
+
+def update_target_team_proj(team_obj, league):
+    team_proj = Decimal(0)
+
+    players_qset = team_obj.players.all()
+
+    qb_qset = players_qset.filter(pos__contains=[Player.QB])
+    rb_qset = players_qset.filter(pos__contains=[Player.RB])
+    wr_qset = players_qset.filter(pos__contains=[Player.WR])
+    te_qset = players_qset.filter(pos__contains=[Player.TE])
+    k_qset = players_qset.filter(pos__contains=[Player.K])
+    dst_qset = players_qset.filter(pos__contains=[Player.DST])
+
+    ranked_qbs = create_unique_ranked_proj_map(qb_qset, league.scoring)
+    ranked_rbs = create_unique_ranked_proj_map(rb_qset,league.scoring)
+    ranked_wrs = create_unique_ranked_proj_map(wr_qset, league.scoring)
+    ranked_tes = create_unique_ranked_proj_map(te_qset, league.scoring)
+    ranked_ks = create_unique_ranked_proj_map(k_qset, league.scoring)
+    ranked_dsts = create_unique_ranked_proj_map(dst_qset, league.scoring)
+
+    starters = []
+
+    starters.extend(get_best_players(ranked_qbs, league.settings.nQB, league.free_agents, Player.QB))
+    starters.extend(get_best_players(ranked_rbs, league.settings.nRB, league.free_agents, Player.RB))
+    starters.extend(get_best_players(ranked_wrs, league.settings.nWR, league.free_agents, Player.WR))
+    starters.extend(get_best_players(ranked_tes, league.settings.nTE, league.free_agents, Player.TE))
+    starters.extend(get_best_players(ranked_ks, league.settings.nK, league.free_agents, Player.K))
+    starters.extend(get_best_players(ranked_dsts, league.settings.nDST, league.free_agents, Player.DST))
+
+    flex_map = ranked_rbs + ranked_wrs + ranked_tes
+    ranked_flex = sorted(flex_map.items(), key=lambda x: x[1], reverse=True)
+    starters.extend(get_best_players(ranked_flex, league.settings.n_flex_wr_rb_te))
+    #do this for wr/rb and wr/te
+
+    super_flex_map = flex_map + ranked_qbs
+    ranked_super_flex = sorted(super_flex_map.items(), key=lambda x: x[1], reverse=True)
+    starters.extend(get_best_players(ranked_super_flex, league.settings.n_super_flex))
+
+    for player in starters:
+        team_proj += player[1]
+
+    team_obj.save()
+    return team_proj
+
+def update_league_all_rosters(team_qset, roster_data_from_sleeper):
+    t0 = time.time()
+
+    non_fa = []
+
+    for team_json in roster_data_from_sleeper:
+        team_obj = team_qset.get(roster_id = team_json['roster_id'])
+        team_obj.players.clear()
+
+        players = update_target_team_roster(team_json, team_obj)
+        non_fa.append(players)
+
+    t1 = time.time()
+    print(f'fantasy manager: update all rosters - runtime: {str(t1-t0)}')
+    return non_fa
+
+def update_league_all_proj(league):
+    t0 = time.time()
+    team_qset = league.FantasyTeams.all()
+
+    for team in team_qset:
+        update_target_team_proj(team, league)
+
+    t1 = time.time()
+    print(f'fantasy manager: update all proj - runtime: {str(t1-t0)}')
+
 class FantasyLeague(models.Model):
     #Identity
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
-    sleeper_id = models.IntegerField(null=False)
+    sleeper_id = models.CharField(max_length=20, null=False, unique=True)
 
     owner = models.ForeignKey(
         User, 
@@ -212,168 +366,14 @@ class FantasyLeague(models.Model):
     status = models.CharField(max_length=60)
     free_agents = models.ManyToManyField(Player)
 
-    #used to update all of the rosters in a league
-    def updateRosters(self,rosterData):
-        t0 = time.time()
+    def update_all_rosters(self, sleeper_data):
+        update_league_all_rosters(self.FantasyTeams.all(), sleeper_data)
 
-        #get all teams in League instance
-        teamObjs = self.FantasyTeams.all()
-        nonFAs = [] #used to keep track of players that are on a team
-
-        #loop through the rosterData obtained from sleeper
-        for teamJson in rosterData:
-            teamObj = teamObjs.get(rosterId = teamJson['roster_id']) #get FantasyTeam object assocaited with rosterId on sleeper
-            teamObj.players.clear() #clear all teams players-fantasyTeam relationships before we add new ones
-
-            #loop through all players from sleepers Json response and find their associate objects
-            players = [] 
-            for playerId in teamJson['players']:
-                playerObj = Player.objects.get(pk=playerId)
-                players.append(playerObj)
-                nonFAs.append(playerObj)
-
-            #add the many to many relationship back
-            teamObj.players.add(*players)
-
-        #set all players to FA then remove the players who are not taken
-        self.freeAgents.set(Player.objects.all()) #this takes .5sec to make quicker might need to record changes rather than reupdate all Players
-        self.freeAgents.remove(*nonFAs)
-
-        t1 = time.time()
-        print(f'models.League.updateRosters runtime: {str(t1-t0)}')
-
-    #playerQset finds a teams players at a specific position
-    def _mapPlayerProj(self, playerQset): 
-            projMap = {}
-            #loop through player set to parse data and calculate a score based on the league settings
-            for player in playerQset:
-                #not currently doing calculations for def scoring differencess
-                if player.pos == Player.DST:
-                    projMap[player] = player.projDtotal
-                #not currently doing calcs for k
-                elif player.pos == Player.K:
-                    projMap[player] = player.projKtotal
-                else:
-                    proj = 0
-                    #passing calculations
-                    proj += player.projPassingYds * self.pp_passing_yard
-                    proj += player.projPassingTds * self.pp_Passing_td
-                    proj += player.projInts * self.pp_passing_int
-                    #rushing calculations
-                    proj += player.projRushingYds * self.pp_rushing_yard
-                    proj += player.projRushingTds * self.pp_rushing_td
-                    proj += player.projFumbles * self.pp_rushing_2pt
-                    #rec calculations
-                    proj += player.projRec * self.ppr
-                    proj += player.projRecYds * self.pp_rec_yard
-                    proj += player.projRecTds * self.pp_rec_td
-
-                    #round and store in a dict {PlayerObject : calcultedProjection}
-                    projMap[player] = round(proj, 3)
-                    
-            #sort the dict so that we can grab the [0] item in the array as the highest scorer
-            projMap = sorted(projMap.items(), key=lambda x: x[1], reverse=True)
-            return projMap
-
-    #used to find the best free agent avaliable if a team doesn't meet the treshhold requirements
-    def _getTopFreeAgent(self, pos):
-        #This will just grab the best overall player
-        if pos is None:
-            freeAgents = self.freeAgents.all()
-        elif pos == 'flex':
-            #Grab a all freeAgents who are either RB, WR, OR TE
-            freeAgents = self.freeAgents.filter(Q(pos=Player.RB) | Q(pos=Player.WR) | Q(pos=Player.TE))
-        else:
-            freeAgents = self.freeAgents.filter(pos=pos)
-        #get to top freeAgent, save their proj, and return a tuple
-        topFreeAgent = freeAgents.order_by('-estProj')[0]
-        topFreeAgentTup = (topFreeAgent, topFreeAgent.estProj)
-        return topFreeAgentTup
-
-    #returns the player with the highest projection or finds the best Free Agent if they have no players to start
-    def _getTopPlayers(self, qSet, n, pos=None):
-        playerList = []
-        #n is the number of this position that they start, this runs that many times
-        for _ in range(n):
-            try:
-                #find highest scoring player
-                topPlayer = qSet[0]
-                #if player is projected no point get a free agent
-                if topPlayer[1] == decimal.Decimal(0):
-                    topFa = self._getTopFreeAgent(pos=pos)
-                    playerList.append(topFa)
-                else:
-                    #remove player from list so they're not reused in team projections
-                    qSet.pop(0)
-                    playerList.append(topPlayer)
-            #most likely error thrown is an empty list 'index out of range', this happens because don't have anyone at the positions
-            except Exception as e:
-                topFa = self._getTopFreeAgent(pos=pos)
-                playerList.append(topFa)
-
-        #return list of tuples (PlayerObj, Projection)
-        return playerList
-
-    #called to update all teams projections 
-    def updateTeamProjections(self):
-        t0 = time.time()
-        teams = self.FantasyTeams.all()
-
-        #run through all of the teams to make updates
-        for team in teams:
-            print(team.funName)
-            currentProj = decimal.Decimal(0) #use Decimal so the type are the same
-            #get all of the player on the team
-            teamQbs = team.players.filter(pos=Player.QB)
-            teamRbs = team.players.filter(pos=Player.RB)
-            teamWrs = team.players.filter(pos=Player.WR)
-            teamTes = team.players.filter(pos=Player.TE)
-            teamKs = team.players.filter(pos=Player.K)
-            teamDst = team.players.filter(pos=Player.DST)
-            #get players that can play multiple positions. This is not currently in use
-            teamQBs2 = team.players.filter(pos2=Player.QB)
-            teamRbs2 = team.players.filter(pos2=Player.RB)
-            teamWrs2 = team.players.filter(pos2=Player.WR)
-            teamTes2 = team.players.filter(pos2=Player.TE)
-            #get all of the players projections
-            qbs = self._mapPlayerProj(teamQbs)
-            rbs = self._mapPlayerProj(teamRbs)
-            wrs = self._mapPlayerProj(teamWrs)
-            tes = self._mapPlayerProj(teamTes)
-            k = self._mapPlayerProj(teamKs)
-            dst = self._mapPlayerProj(teamDst)
-
-            starters = []
-            #find all of the players who would be in a starting line up
-            #Standard Slots
-            starters.extend(self._getTopPlayers(qbs, self.nQB, Player.QB))
-            starters.extend(self._getTopPlayers(rbs, self.nRB, Player.RB))
-            starters.extend(self._getTopPlayers(wrs, self.nWR, Player.WR))
-            starters.extend(self._getTopPlayers(tes, self.nTE, Player.TE))
-            starters.extend(self._getTopPlayers(k, self.nK, Player.K))
-            starters.extend(self._getTopPlayers(dst, self.nDST, Player.DST))
-            #Flex and misc
-            flex = rbs + wrs + tes
-            starters.extend(self._getTopPlayers(flex, self.nFlexWrRbTe, pos='flex'))
-            #Super Flex
-            superFlex = flex + qbs
-            starters.extend(self._getTopPlayers(superFlex, self.nSuperFlex,))
-
-            #update the proj based on assumed starting lineup
-            for playerTup in starters:
-                currentProj += playerTup[1]
-
-            #set teams currentProj
-            team.currentProj = currentProj
-            print(currentProj)
-            team.save()
-          
-        t1 = time.time()
-        runtime = t1-t0
-        print(f'models.League.updateTeamProjections runtime: {runtime}')
+    def update_all_proj(self):
+        update_league_all_proj(self)
 
 class LeagueSettings(models.Model):
-    league = models.ForeignKey(
+    league = models.OneToOneField(
         FantasyLeague, 
         on_delete=models.CASCADE,
         related_name='settings',
@@ -390,7 +390,7 @@ class LeagueSettings(models.Model):
     )
     
     league_size = models.IntegerField(default=12, choices=LEAGUE_SIZE_CHOICE)
-    playoff_oize = models.IntegerField(default=6, choices=PLAYOFF_SIZE_CHOICE)
+    playoff_size = models.IntegerField(default=6, choices=PLAYOFF_SIZE_CHOICE)
 
     #Startable Roster
     nQB = models.IntegerField(default=1)
@@ -407,53 +407,56 @@ class LeagueSettings(models.Model):
     n_bench = models.IntegerField(default=7)
 
 class ScoringSettings(models.Model):
-    league_settings = models.ForeignKey(
-        LeagueSettings, 
+    league = models.OneToOneField(
+        FantasyLeague, 
         on_delete=models.CASCADE,
         related_name='scoring'
         )
 
-    passing_yard = models.DecimalField(decimal_places=3, max_digits=6,)
-    passing_td = models.DecimalField(decimal_places=3, max_digits=6,)
-    passing_int = models.DecimalField(decimal_places=3, max_digits=6,)
-    passing_2pt = models.DecimalField(decimal_places=3, max_digits=6,)
+    pass_yds = models.DecimalField(decimal_places=3, max_digits=6, default=.04)
+    pass_tds = models.DecimalField(decimal_places=3, max_digits=6, default=4)
+    pass_ints = models.DecimalField(decimal_places=3, max_digits=6, default=-2)
+    pass_2pts = models.DecimalField(decimal_places=3, max_digits=6, default=2)
     
-    rushing_yard = models.DecimalField(decimal_places=3, max_digits=6,)
-    rushing_td = models.DecimalField(decimal_places=3, max_digits=6,)
-    rushing_2pt = models.DecimalField(decimal_places=3, max_digits=6,)
+    rush_yds = models.DecimalField(decimal_places=3, max_digits=6, default=.1)
+    rush_tds = models.DecimalField(decimal_places=3, max_digits=6, default=6)
+    rush_2pts = models.DecimalField(decimal_places=3, max_digits=6, default=2)
 
-    ppr = models.DecimalField(decimal_places=3, max_digits=6,) 
-    rec_yard = models.DecimalField(decimal_places=3, max_digits=6,)
-    rec_td = models.DecimalField(decimal_places=3, max_digits=6,)
-    rec_2pt = models.DecimalField(decimal_places=3, max_digits=6,)
+    ppr = models.DecimalField(decimal_places=3, max_digits=6, default=0) 
+    rec_yds = models.DecimalField(decimal_places=3, max_digits=6, default=.1)
+    rec_tds = models.DecimalField(decimal_places=3, max_digits=6, default=6)
+    rec_2pts = models.DecimalField(decimal_places=3, max_digits=6, default=2)
 
-    rec_prem_rb = models.DecimalField(decimal_places=3, max_digits=6,)
-    rec_prem_wr = models.DecimalField(decimal_places=3, max_digits=6,)
-    rec_prem_te = models.DecimalField(decimal_places=3, max_digits=6,)
+    rec_prem_rb = models.DecimalField(decimal_places=3, max_digits=6, default=0)
+    rec_prem_wr = models.DecimalField(decimal_places=3, max_digits=6, default=0)
+    rec_prem_te = models.DecimalField(decimal_places=3, max_digits=6, default=0)
 
-    fumble = models.DecimalField(decimal_places=3, max_digits=6,)
-    fumble_lost = models.DecimalField(decimal_places=3, max_digits=6,)
+    fumble = models.DecimalField(decimal_places=3, max_digits=6, default=-1)
+    fumble_lost = models.DecimalField(decimal_places=3, max_digits=6, default=-2)
 
-    fg_0_19 = models.DecimalField(decimal_places=3, max_digits=6,)
-    fg_20_29 = models.DecimalField(decimal_places=3, max_digits=6,)
-    fg_30_39 = models.DecimalField(decimal_places=3, max_digits=6,)
-    fg_40_49 = models.DecimalField(decimal_places=3, max_digits=6,)
-    fg_50_plus = models.DecimalField(decimal_places=3, max_digits=6,)
+    xp_miss = models.DecimalField(decimal_places=3, max_digits=6, default=-1)
+    fg_miss = models.DecimalField(decimal_places=3, max_digits=6, default=-1)
+    xp_made = models.DecimalField(decimal_places=3, max_digits=6, default=1)
+    fg_0_19 = models.DecimalField(decimal_places=3, max_digits=6, default=3)
+    fg_20_29 = models.DecimalField(decimal_places=3, max_digits=6, default=3)
+    fg_30_39 = models.DecimalField(decimal_places=3, max_digits=6, default=3)
+    fg_40_49 = models.DecimalField(decimal_places=3, max_digits=6, default=4)
+    fg_50_plus = models.DecimalField(decimal_places=3, max_digits=6, default=5)
 
-    def_td = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_sack = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_int = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_fum_rec = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_saftey = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_forced_fum = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_blocked_kick = models.DecimalField(decimal_places=3, max_digits=6,)
+    def_td = models.DecimalField(decimal_places=3, max_digits=6,default=6)
+    def_sack = models.DecimalField(decimal_places=3, max_digits=6, default=1)
+    def_int = models.DecimalField(decimal_places=3, max_digits=6,default=2)
+    def_fum_rec = models.DecimalField(decimal_places=3, max_digits=6, default=2)
+    def_saftey = models.DecimalField(decimal_places=3, max_digits=6, default=2)
+    def_forced_fum = models.DecimalField(decimal_places=3, max_digits=6, default=1)
+    def_blocked_kick = models.DecimalField(decimal_places=3, max_digits=6, default=2)
 
-    def_pa_0 = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_pa_6 = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_pa_13 = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_pa_27 = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_pa_34 = models.DecimalField(decimal_places=3, max_digits=6,)
-    def_pa_35_plus = models.DecimalField(decimal_places=3, max_digits=6,)
+    def_pa_0 = models.DecimalField(decimal_places=3, max_digits=6, default=10)
+    def_pa_6 = models.DecimalField(decimal_places=3, max_digits=6, default=7)
+    def_pa_13 = models.DecimalField(decimal_places=3, max_digits=6, default=4)
+    def_pa_27 = models.DecimalField(decimal_places=3, max_digits=6, default=1)
+    def_pa_34 = models.DecimalField(decimal_places=3, max_digits=6, default=0)
+    def_pa_35_plus = models.DecimalField(decimal_places=3, max_digits=6, default=-1)
 
 class FantasyTeam(models.Model):
     #Team
@@ -462,11 +465,11 @@ class FantasyTeam(models.Model):
 
     #Identity
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
-    ownerId = models.CharField(max_length=64, null=False)
-    rosterId = models.IntegerField(null=True)
+    owner_id = models.CharField(max_length=64, null=False)
+    roster_id = models.IntegerField(null=True)
 
-    sleeperName = models.CharField(null=True, max_length=50)
-    funName = models.CharField(null=True, max_length=30)
+    sleeper_name = models.CharField(null=True, max_length=50)
+    fun_name = models.CharField(null=True, max_length=30)
 
     #Current Week
     week_start_proj = models.DecimalField(max_digits=7, decimal_places=3, null=True)
@@ -485,6 +488,9 @@ class FantasyTeam(models.Model):
     spreadWin = models.IntegerField(default=0)
     spreadLoss = models.IntegerField(default=0)
 
+    def update_roster(self, roster):
+        update_target_team_roster(roster, self)
+
 class Matchup(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
     matchup_id = models.IntegerField()
@@ -500,54 +506,3 @@ class Matchup(models.Model):
         )
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchup_away')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchup_home')
-    
-    over_under = models.DecimalField(decimal_places=3, max_digits=7)
-
-    t1_SP = models.DecimalField(decimal_places=3, max_digits=8)
-    t2_SP = models.DecimalField(decimal_places=3, max_digits=8)
-
-    t1_ML = models.DecimalField(decimal_places=3, max_digits=8)
-    t2_ML = models.DecimalField(decimal_places=3, max_digits=8)
-
-    vig = models.DecimalField(decimal_places=4, max_digits=7)
-    standardLine = models.DecimalField(decimal_places=4, max_digits=7)
-
-    payoutDate = models.DateTimeField(null=True)
-
-    def setLines(self):
-        MAX_SPREAD = .40
-        vig = self.vig
-        #over under
-        self.over_under = abs(self.t1_projection + self.t2_projection)
-        #spread
-        self.t1_SP = -(self.t1_projection - self.t2_projection)
-        self.t2_SP = -(self.t2_projection - self.t1_projection)
-        #money line
-        spread = abs(self.t1_SP)
-        percentSpread = (1/1.75)*np.log(spread*.0175+1)
-
-        if percentSpread > MAX_SPREAD:
-            percentSpread = MAX_SPREAD
-
-        favOdds = .5 + percentSpread
-        undOdds = 1 - percentSpread
-        favOdds += vig/2
-        undOdds += vig/2
-
-        favML = (-1*favOdds/(1-favOdds)*100)
-        if undOdds < .5:
-            undML = ((1-undOdds)/undOdds)*100
-        else:
-            undML = (-1*undOdds/(1-undOdds)*100)
-
-        if self.t1_projection > self.t2_projection:
-            self.t1_ML = favML
-            self.t2_ML = undML
-        elif self.t2_projection > self.t1_projection:
-            self.t2_ML = favML
-            self.t1_ML = undML
-        else:
-            self.t1_ML = -(100+vig/2)
-            self.t2_ML = -(100+vig/2)
-
-        self.save()
