@@ -22,6 +22,9 @@ class NflState(models.Model):
         self.lastPlayerUpdate = timezone.now()
         self.save()
 
+    def __str__(self):
+        return f'Nfl State week: {self.week}'
+
 class Player(models.Model):
     #Static
     QB = 'QB'
@@ -103,7 +106,7 @@ class Player(models.Model):
         (FREE, 'Free Agent'),
     )
     #Identity
-    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
     sleeper_id = models.CharField(max_length=6, unique=True)
     name = models.CharField(null=False, max_length=80)
 
@@ -130,7 +133,7 @@ class Player(models.Model):
     current_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
     def __str__(self):
-        return 
+        return f'Player Obj: {self.name} - {self.sleeper_id}'
 
 class PlayerProjections(models.Model):
     player = models.OneToOneField(
@@ -170,6 +173,10 @@ class PlayerProjections(models.Model):
     def_yds_against = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     def_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
+    def __str__(self):
+        return f'Player Proj Obj: {self.player}'
+    
+
 class PlayerCurrentStats(models.Model):
     player = models.ForeignKey(
         Player, 
@@ -206,10 +213,13 @@ class PlayerCurrentStats(models.Model):
     def_yds_against = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     def_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
+    def __str__(self):
+        return f'Player Current Stats Obj: {self.player}'
+
 def update_target_team_roster(team_json, team_obj):
     players = []
     print(team_json)
-    for player_id in team_json['players']:
+    for player_id in team_json:
         print(player_id)
         player_obj = Player.objects.get(sleeper_id=player_id)
         players.append(player_obj)
@@ -219,13 +229,20 @@ def update_target_team_roster(team_json, team_obj):
 
 def create_unique_ranked_proj_map(player_qset, league_settings):
     proj_map = {}
+
     for player in player_qset:
-        if Player.DST in [player.pos]:
+        if Player.DST in player.pos:
             proj_map[player] = player.def_total
-        elif Player.K in [player.pos]:
+        elif Player.K in player.pos:
             proj_map[player] = player.k_total
         else:
             proj = 0
+
+            try:
+                player_proj = player.proj
+            except Exception as e:
+                print(e)
+                continue
 
             proj += player.proj.pass_yds * league_settings.pass_yds
             proj += player.proj.pass_tds * league_settings.pass_tds
@@ -236,11 +253,11 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
 
             proj += player.proj.rec_yds * league_settings.rec_yds
 
-            if Player.RB in [player.pos]:
+            if Player.RB in player.pos:
                 proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_rb)
-            elif Player.WR in [player.pos]:
+            elif Player.WR in player.pos:
                 proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_wr)
-            elif Player.TE in [player.pos]:
+            elif Player.TE in player.pos:
                 proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_te)
             else:
                 proj += player.proj.rec_rec * league_settings.ppr
@@ -249,7 +266,6 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
 
             proj_map[player] = round(proj, 3)
             
-
     proj_map = sorted(proj_map.items(), key=lambda x: x[1], reverse=True)
     return proj_map
 
@@ -258,8 +274,11 @@ def get_top_free_agent(pos, free_agents):
         if pos == 'flex':
             free_agents = free_agents.filter(Q(pos__contains=[Player.RB]) | Q(pos__contains=[Player.WR]) | Q(pos__contains=[Player.TE]))
         else:
+            print('here')
             free_agents = free_agents.filter(pos__contains=[pos])
+            ## Go update leagues Free Agents
 
+    print('len ' + str(len(free_agents)))
     top_free_agent = free_agents.order_by('proj_total')[0]
     return {top_free_agent: top_free_agent.proj_total}
 
@@ -276,12 +295,12 @@ def get_best_players(ranked_players_map, n, free_agents_list, pos=None, free_age
             else:
                 ranked_players_map.pop(0)
                 best_players.append(top_player)
-                
+
     return best_players
 
 def update_target_team_proj(team_obj, league):
     team_proj = Decimal(0)
-
+    
     players_qset = team_obj.players.all()
 
     qb_qset = players_qset.filter(pos__contains=[Player.QB])
@@ -300,8 +319,6 @@ def update_target_team_proj(team_obj, league):
 
     starters = []
 
-    p = get_best_players(ranked_qbs, league.settings.nQB, league.free_agents, Player.QB)
-    print(p)
     starters.extend(get_best_players(ranked_qbs, league.settings.nQB, league.free_agents, Player.QB))
     starters.extend(get_best_players(ranked_rbs, league.settings.nRB, league.free_agents, Player.RB))
     starters.extend(get_best_players(ranked_wrs, league.settings.nWR, league.free_agents, Player.WR))
@@ -310,13 +327,16 @@ def update_target_team_proj(team_obj, league):
     starters.extend(get_best_players(ranked_dsts, league.settings.nDST, league.free_agents, Player.DST))
 
     flex_map = ranked_rbs + ranked_wrs + ranked_tes
-    ranked_flex = sorted(flex_map.items(), key=lambda x: x[1], reverse=True)
-    starters.extend(get_best_players(ranked_flex, league.settings.n_flex_wr_rb_te))
+
+    print(len(ranked_rbs[0]))
+
+    ranked_flex = sorted(flex_map, key=lambda x: x[1], reverse=True)
+    starters.extend(get_best_players(ranked_flex, league.settings.n_flex_wr_rb_te, league.free_agents))
     #do this for wr/rb and wr/te
 
     super_flex_map = flex_map + ranked_qbs
-    ranked_super_flex = sorted(super_flex_map.items(), key=lambda x: x[1], reverse=True)
-    starters.extend(get_best_players(ranked_super_flex, league.settings.n_super_flex))
+    ranked_super_flex = sorted(super_flex_map, key=lambda x: x[1], reverse=True)
+    starters.extend(get_best_players(ranked_super_flex, league.settings.n_super_flex, league.free_agents))
 
     for player in starters:
         team_proj += player[1]
@@ -327,18 +347,19 @@ def update_target_team_proj(team_obj, league):
 def update_league_all_rosters(team_qset, roster_data_from_sleeper):
     t0 = time.time()
 
-    non_fa = []
+    non_fa_ids = []
 
     for team_json in roster_data_from_sleeper:
         team_obj = team_qset.get(roster_id = team_json['roster_id'])
         team_obj.players.clear()
 
-        players = update_target_team_roster(team_json, team_obj)
-        non_fa.append(players)
+        players = update_target_team_roster(team_json['players'], team_obj)
+        for player in players:
+            non_fa_ids.append(player.id)
 
     t1 = time.time()
     print(f'fantasy manager: update all rosters - runtime: {str(t1-t0)}')
-    return non_fa
+    return non_fa_ids
 
 def update_league_all_proj(league):
     t0 = time.time()
@@ -352,7 +373,7 @@ def update_league_all_proj(league):
 
 class FantasyLeague(models.Model):
     #Identity
-    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
     sleeper_id = models.CharField(max_length=20, null=False, unique=True)
 
     owner = models.ForeignKey(
@@ -372,10 +393,15 @@ class FantasyLeague(models.Model):
     free_agents = models.ManyToManyField(Player)
 
     def update_all_rosters(self, sleeper_data):
-        update_league_all_rosters(self.FantasyTeams.all(), sleeper_data)
+        non_free_agents = update_league_all_rosters(self.FantasyTeams.all(), sleeper_data)
+        free_agents = Player.objects.all().exclude(id__in=non_free_agents)
+        self.free_agents.set(free_agents)
 
     def update_all_proj(self):
         update_league_all_proj(self)
+
+    def __str__(self):
+        return f'League Obj: {self.name}'
 
 class LeagueSettings(models.Model):
     league = models.OneToOneField(
@@ -410,6 +436,9 @@ class LeagueSettings(models.Model):
     n_flex_wr_te = models.IntegerField(default=None)
     n_super_flex = models.IntegerField(default=1)
     n_bench = models.IntegerField(default=7)
+
+    def __str__(self):
+        return f'League Settings Obj: {self.league}'
 
 class ScoringSettings(models.Model):
     league = models.OneToOneField(
@@ -463,13 +492,16 @@ class ScoringSettings(models.Model):
     def_pa_34 = models.DecimalField(decimal_places=3, max_digits=6, default=0)
     def_pa_35_plus = models.DecimalField(decimal_places=3, max_digits=6, default=-1)
 
+    def __str__(self):
+        return f'League Scoring Obj: {self.league}'
+
 class FantasyTeam(models.Model):
     #Team
     players = models.ManyToManyField(Player)
     league = models.ForeignKey(FantasyLeague, on_delete=models.PROTECT, default=0, null=False, related_name='FantasyTeams')
 
     #Identity
-    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
     owner_id = models.CharField(max_length=64, null=False)
     roster_id = models.IntegerField(null=True)
 
@@ -496,8 +528,11 @@ class FantasyTeam(models.Model):
     def update_roster(self, roster):
         update_target_team_roster(roster, self)
 
+    def __str__(self):
+        return f'Fantasy Team Obj: {self.fun_name}'
+
 class Matchup(models.Model):
-    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
     matchup_id = models.IntegerField()
     week = models.IntegerField()
     season = models.IntegerField()
@@ -511,3 +546,6 @@ class Matchup(models.Model):
         )
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchup_away')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchup_home')
+
+    def __str__(self):
+        return f'Matchup Obj: {self.league} - {self.week}.{self.matchup_id}'
