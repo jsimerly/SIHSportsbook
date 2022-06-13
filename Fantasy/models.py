@@ -7,7 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from decimal import Decimal
 import time
-from django.db.models import Q
+
 
 User = get_user_model()
 
@@ -174,8 +174,7 @@ class PlayerProjections(models.Model):
     def_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
     def __str__(self):
-        return f'Player Proj Obj: {self.player}'
-    
+        return f'Player Proj Obj: {self.player}' 
 
 class PlayerCurrentStats(models.Model):
     player = models.ForeignKey(
@@ -274,13 +273,11 @@ def get_top_free_agent(pos, free_agents):
         if pos == 'flex':
             free_agents = free_agents.filter(Q(pos__contains=[Player.RB]) | Q(pos__contains=[Player.WR]) | Q(pos__contains=[Player.TE]))
         else:
-            print('here')
             free_agents = free_agents.filter(pos__contains=[pos])
             ## Go update leagues Free Agents
 
-    print('len ' + str(len(free_agents)))
     top_free_agent = free_agents.order_by('proj_total')[0]
-    return {top_free_agent: top_free_agent.proj_total}
+    return (top_free_agent, top_free_agent.proj_total)
 
 def get_best_players(ranked_players_map, n, free_agents_list, pos=None, free_agent_function=get_top_free_agent):
     best_players = []
@@ -328,8 +325,6 @@ def update_target_team_proj(team_obj, league):
 
     flex_map = ranked_rbs + ranked_wrs + ranked_tes
 
-    print(len(ranked_rbs[0]))
-
     ranked_flex = sorted(flex_map, key=lambda x: x[1], reverse=True)
     starters.extend(get_best_players(ranked_flex, league.settings.n_flex_wr_rb_te, league.free_agents))
     #do this for wr/rb and wr/te
@@ -341,6 +336,7 @@ def update_target_team_proj(team_obj, league):
     for player in starters:
         team_proj += player[1]
 
+    team_obj.current_proj = team_proj
     team_obj.save()
     return team_proj
 
