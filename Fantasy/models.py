@@ -209,7 +209,8 @@ class PlayerCurrentStats(models.Model):
 def update_target_team_roster(team_json, team_obj):
     players = []
     print(team_json)
-    for player_id in team_json:
+    for player_id in team_json['players']:
+        print(player_id)
         player_obj = Player.objects.get(sleeper_id=player_id)
         players.append(player_obj)
 
@@ -219,14 +220,14 @@ def update_target_team_roster(team_json, team_obj):
 def create_unique_ranked_proj_map(player_qset, league_settings):
     proj_map = {}
     for player in player_qset:
-        if player.pos == Player.DST:
+        if Player.DST in [player.pos]:
             proj_map[player] = player.def_total
-        elif player.pos == Player.K:
+        elif Player.K in [player.pos]:
             proj_map[player] = player.k_total
         else:
             proj = 0
 
-            proj += player.proj.pass_yds * league_settings.pass_yard
+            proj += player.proj.pass_yds * league_settings.pass_yds
             proj += player.proj.pass_tds * league_settings.pass_tds
             proj += player.proj.pass_ints * league_settings.pass_ints
             
@@ -235,11 +236,11 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
 
             proj += player.proj.rec_yds * league_settings.rec_yds
 
-            if player.pos == Player.RB:
+            if Player.RB in [player.pos]:
                 proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_rb)
-            elif player.pos == Player.WR:
+            elif Player.WR in [player.pos]:
                 proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_wr)
-            elif player.pos == Player.TE:
+            elif Player.TE in [player.pos]:
                 proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_te)
             else:
                 proj += player.proj.rec_rec * league_settings.ppr
@@ -255,9 +256,9 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
 def get_top_free_agent(pos, free_agents):
     if pos is not None:
         if pos == 'flex':
-            free_agents = free_agents.filter(Q(pos=Player.RB) | Q(pos=Player.WR) | Q(pos=Player.TE))
+            free_agents = free_agents.filter(Q(pos__contains=[Player.RB]) | Q(pos__contains=[Player.WR]) | Q(pos__contains=[Player.TE]))
         else:
-            free_agents = free_agents.filter(pos=pos)
+            free_agents = free_agents.filter(pos__contains=[pos])
 
     top_free_agent = free_agents.order_by('proj_total')[0]
     return {top_free_agent: top_free_agent.proj_total}
@@ -275,6 +276,8 @@ def get_best_players(ranked_players_map, n, free_agents_list, pos=None, free_age
             else:
                 ranked_players_map.pop(0)
                 best_players.append(top_player)
+                
+    return best_players
 
 def update_target_team_proj(team_obj, league):
     team_proj = Decimal(0)
@@ -297,6 +300,8 @@ def update_target_team_proj(team_obj, league):
 
     starters = []
 
+    p = get_best_players(ranked_qbs, league.settings.nQB, league.free_agents, Player.QB)
+    print(p)
     starters.extend(get_best_players(ranked_qbs, league.settings.nQB, league.free_agents, Player.QB))
     starters.extend(get_best_players(ranked_rbs, league.settings.nRB, league.free_agents, Player.RB))
     starters.extend(get_best_players(ranked_wrs, league.settings.nWR, league.free_agents, Player.WR))
