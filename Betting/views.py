@@ -1,3 +1,4 @@
+import time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,7 +9,7 @@ from Betting.models import *
 from Fantasy.models import *
 
 from .serializers import *
-
+# Create your views here.
 
 class AttachedTeamToBettor(APIView):
     serializer_class = FantasyTeamOnlySerializer
