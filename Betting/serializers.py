@@ -3,30 +3,6 @@ from rest_framework import serializers
 from Fantasy.models import FantasyTeam, FantasyLeague, Player, Matchup
 from Betting.models import MatchupBets
 
-class LeagueCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FantasyLeague
-        fields = (
-            'sleeperId', 'owner',
-            'name', 'status', 'leagueSize', 'playoffSize',
-            'ppr', 'tePremium',
-            'nQB', 'nRB', 'nWR', 'nTE', 'nK', 'nDST',
-            'nFlexWrRbTe', 'nFlexWrRb', 'nFlexWrTe', 'nSuperFlex'
-        )
-
-        def create(self, validated_data):
-            return FantasyLeague(validated_data)
-
-class LeagueOnlySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FantasyLeague
-        fields = ('sleeperId',)
-        extra_kwargs = {
-            'sleeperId' : {
-                'read_only': False,
-                'validators' : [],
-            },
-        }
 
 class FantasyTeamSerializer(serializers.ModelSerializer):
     class Meta:
