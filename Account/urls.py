@@ -7,5 +7,6 @@ urlpatterns = [
     path('authentication/', views.LogIn.as_view(), name='api-token-auth'),
     path('logout/', views.Logout.as_view(), name='logout'),
     path('login/', views.LogIn.as_view(), name='login'),
-    path('current-user', views.CurrentUser.as_view(), name='current-user')
+    path('current-user', views.CurrentUser.as_view(), name='current-user'),
+    path('activate-user', views.activate_uesr.as_view(), name='activate')
 ]
