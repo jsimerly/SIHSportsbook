@@ -106,7 +106,7 @@ class Player(models.Model):
         (FREE, 'Free Agent'),
     )
     #Identity
-    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
     sleeper_id = models.CharField(max_length=6, unique=True)
     name = models.CharField(null=False, max_length=80)
 
@@ -369,7 +369,7 @@ def update_league_all_proj(league):
 
 class FantasyLeague(models.Model):
     #Identity
-    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
     sleeper_id = models.CharField(max_length=20, null=False, unique=True)
 
     owner = models.ForeignKey(
@@ -497,7 +497,7 @@ class FantasyTeam(models.Model):
     league = models.ForeignKey(FantasyLeague, on_delete=models.PROTECT, default=0, null=False, related_name='FantasyTeams')
 
     #Identity
-    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
     owner_id = models.CharField(max_length=64, null=False)
     roster_id = models.IntegerField(null=True)
 
@@ -528,7 +528,7 @@ class FantasyTeam(models.Model):
         return f'Fantasy Team Obj: {self.fun_name}'
 
 class Matchup(models.Model):
-    id = models.UUIDField(default=lambda: str(uuid4()), primary_key=True, unique=True, editable=False)
+    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
     matchup_id = models.IntegerField()
     week = models.IntegerField()
     season = models.IntegerField()

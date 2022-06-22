@@ -1,3 +1,4 @@
+from pyexpat import model
 from uuid import uuid4
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, AbstractUser
@@ -52,6 +53,7 @@ class User(AbstractBaseUser):
     first_name = None
     last_name = None
 
+    is_email_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     EMAIL_FIELD = 'email'

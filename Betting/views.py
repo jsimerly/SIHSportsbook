@@ -11,8 +11,28 @@ from Fantasy.models import *
 from .serializers import *
 # Create your views here.
 
+class CreateBettingLeague(APIView):
+    serializer_class = BettingLeagueSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format='josn'):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            league = FantasyLeague.objects.get(id=serializer.data.get('fantasy_league'))
+            bookie = request.user
+
+            BettingLeague.objects.create(
+                fantasy_league = league,
+                bookie = bookie
+            )
+
+            return Response(status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+## rework this to require email confirmation
 class AttachedTeamToBettor(APIView):
-    serializer_class = FantasyTeamOnlySerializer
+    serializer_class = BetSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format='json'):
@@ -67,6 +87,5 @@ class PlaceBet(APIView):
             bettorObj.save()
 
             return Response(status=status.HTTP_200_OK)
-
+            
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
