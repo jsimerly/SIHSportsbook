@@ -29,6 +29,7 @@ class CreateBettingLeague(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AttachedTeamToBettor(APIView):
+    #add permissions to only be able to do this as a Betting League Owner
     def post(self, request, format='json'):
         betting_league = request.data['betting_league_id']
         teams_info = request.data['teams_info']
@@ -64,7 +65,6 @@ class AttachedTeamToBettor(APIView):
                 return Response('User does not exist', status=status.HTTP_404_NOT_FOUND)
 
         return Response(status=status.HTTP_200_OK)
-
 
 class PlaceBet(APIView):
     serializer_class = BetSerializer
@@ -108,25 +108,30 @@ class PlaceBet(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# class GetBettors(APIView):
-    
-#     def get(self, request, format='json'):
-#         if request.user.is_authenticated:
-#             user = User.objects.get(id=request.user.id)
-#             bettorsQset = user.bettor_set.all()
+class GetBettors(APIView):
+    def get(self, request, format='json'):
+        if request.user.is_authenticated:
+            print(request.user.email)
+            user = User.objects.get(id=request.user.id)
+            bettors_qset = user.bettor_set.all()
 
-#             json = []
-#             for bettor in bettorsQset:
-#                 leagueInfo = {
-#                     'leagueId' : bettor.league.sleeperId,
-#                     'leagueName' : bettor.league.name,
-#                     'team' : bettor.team.funName
-#                 } 
-#                 json.append(leagueInfo)
+            print(user)
+            print(bettors_qset)
+
+            json = []
+            for bettor in bettors_qset:
+                leagueInfo = {
+                    'league_id' : bettor.league.id,
+                    'league_name' : bettor.league.fantasy_league.name,
+                    'team' : bettor.team.fun_name
+                } 
+                json.append(leagueInfo)
+
             
-#             return Response(json, status=status.HTTP_200_OK)
-#         else:
-#             return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
+            
+            return Response(json, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
 
 # class GetBetHistory(APIView):
 #     def get(self, request, format='json'):

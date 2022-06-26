@@ -57,17 +57,18 @@ export default function App(props){
     }
 
     function getLeagues() {
-        fetch('/api/SIH/get-all-leagues')
+        fetch('/api/betting/get-all-leagues')
         .then((response) => {
             response.json()
             .then((data) => {
-                setLeagues([...data])
+                setLeagues([...data]),
+                console.log(data)
             })
         })
     }
 
     function getBets(){
-        fetch('/api/SIH/get-league-bet-history?q=' + "1234")
+        fetch('/api/betting/get-league-bet-history?q=' + "1234")
         .then((response) => {
             response.json()
             .then((data) => {

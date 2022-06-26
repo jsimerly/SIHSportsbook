@@ -106,6 +106,8 @@ class Logout(APIView):
         json['email'] = ''
         json['isLoggedIn'] = False
         logout(request)
+        request.session.flush()
+
         return Response(json, status=status.HTTP_200_OK)
 
 class Activate_User(APIView):
