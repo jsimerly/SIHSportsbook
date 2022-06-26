@@ -14,7 +14,7 @@ from django.conf import settings
 from .utils import generate_token
 
 #Functions
-def send_action_email(user, request):
+def send_ver_email(user, request):
     current_site = get_current_site(request)
     email_subject = 'Activate Your Account'
     email_body = render_to_string(
@@ -33,9 +33,6 @@ def send_action_email(user, request):
         from_email=settings.EMAIL_FROM_USER,
         to=[user.email],
     )
-
-    
-
     email.send()
 
 # Create your views here.
@@ -52,7 +49,7 @@ class CreateUser(APIView):
             userObj = User.objects.create_user(email=email, password=password)
             userObj.save()
 
-            send_action_email(userObj, request)
+            send_ver_email(userObj, request)
 
             return Response(status=status.HTTP_201_CREATED)
 
@@ -111,7 +108,7 @@ class Logout(APIView):
         logout(request)
         return Response(json, status=status.HTTP_200_OK)
 
-class activate_uesr(APIView):
+class Activate_User(APIView):
     def post(self, request, uidb64, token):
         try:
             uid=force_str(urlsafe_base64_decode(uidb64))

@@ -1,4 +1,3 @@
-import time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,7 +8,6 @@ from Betting.models import *
 from Fantasy.models import *
 
 from .serializers import *
-# Create your views here.
 
 class CreateBettingLeague(APIView):
     serializer_class = BettingLeagueSerializer
@@ -30,23 +28,43 @@ class CreateBettingLeague(APIView):
             return Response(status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-## rework this to require email confirmation
 class AttachedTeamToBettor(APIView):
-    serializer_class = BetSerializer
-    permission_classes = [IsAuthenticated]
-
     def post(self, request, format='json'):
-        serializer = self.serializer_class(data=request.data)
+        betting_league = request.data['betting_league_id']
+        teams_info = request.data['teams_info']
 
-        if serializer.is_valid():
-            sleeperName = serializer.data.get('sleeperName')
-            teamObj = FantasyTeam.objects.get(sleeperName=sleeperName)
-            bettorObj = Bettor.objects.get_or_create(user=request.user)
-            teamObj.bettor = bettorObj[0]
+        league = BettingLeague.objects.get(pk=betting_league)
+        print(league)
+        all_bettors = league.bettor_set.all()
+        print(all_bettors)
 
-            teamObj.save()
-            return Response(status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        for team_info in teams_info:
+            team_id = FantasyTeam.objects.get(id=team_info['id'])
+            bettor_qset = all_bettors.filter(
+                Q(league=league) | 
+                Q(team=team_id)
+            )
+            
+            try:
+                user = User.objects.get(email=team_info['user_email'])
+
+              
+                if len(bettor_qset) == 0:
+                    Bettor.objects.create(
+                        user = user,
+                        league = league,
+                        team = team_id,
+                    )
+                else:
+                    bettor = bettor_qset.first()
+                    bettor.user = user
+                    bettor.save()
+            except Exception as e:
+                print(e)
+                return Response('User does not exist', status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_200_OK)
+
 
 class PlaceBet(APIView):
     serializer_class = BetSerializer
@@ -87,5 +105,42 @@ class PlaceBet(APIView):
             bettorObj.save()
 
             return Response(status=status.HTTP_200_OK)
-            
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class GetBettors(APIView):
+    
+#     def get(self, request, format='json'):
+#         if request.user.is_authenticated:
+#             user = User.objects.get(id=request.user.id)
+#             bettorsQset = user.bettor_set.all()
+
+#             json = []
+#             for bettor in bettorsQset:
+#                 leagueInfo = {
+#                     'leagueId' : bettor.league.sleeperId,
+#                     'leagueName' : bettor.league.name,
+#                     'team' : bettor.team.funName
+#                 } 
+#                 json.append(leagueInfo)
+            
+#             return Response(json, status=status.HTTP_200_OK)
+#         else:
+#             return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
+
+# class GetBetHistory(APIView):
+#     def get(self, request, format='json'):
+#         print(request)
+#         if request.user.is_authenticated:
+#             user = User.objects.get(id=request.user.id)
+#             return Response(user, status=status.HTTP_200_OK)
+
+
+# class GetLeagueInfo(APIView):
+#     serializer_class = LeagueOnlySerializer
+#     lookup_url_kwarg = 'league'
+
+#     def get(self, request, format='json'):
+#         leagueId = request.GET.get(self.lookup_url_kwarg)
+#         if leagueId != None:
+#             pass

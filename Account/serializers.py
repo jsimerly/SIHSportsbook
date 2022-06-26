@@ -29,3 +29,4 @@ class LogInSerializer(serializers.Serializer):
             data['user'] = user_obj
 
         return data
+
