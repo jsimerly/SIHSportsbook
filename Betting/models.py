@@ -49,11 +49,10 @@ class Bettor(models.Model):
         on_delete=models.PROTECT
     )
 
-    is_email_verified = models.BooleanField(default=False)
-
     league = models.ForeignKey(
         BettingLeague, 
         on_delete=models.PROTECT,
+        related_name="bettor"
     )
 
     team = models.ForeignKey(

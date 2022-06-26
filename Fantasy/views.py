@@ -80,7 +80,6 @@ class CreateLeague(APIView):
     def post(self, request, format='json'):
         league_id = request.data['sleeper_id']
         owner = request.user.id
-        # token = request.data['csrfmiddlewaretoken']
 
         league_json = get_league(league_id)
 
