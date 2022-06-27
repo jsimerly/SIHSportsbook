@@ -424,7 +424,6 @@ class UpdateNflState(APIView):
         except:
             return Response('error: Internal Error', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-#
 class UpdateFantasyLeagueMatchups(APIView):
     serializer_class = LeagueSleeperIdSerializer
 
