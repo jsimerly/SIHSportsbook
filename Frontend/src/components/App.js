@@ -1,14 +1,16 @@
 import React, { Component, useState, useEffect } from "react";
 import { render } from "react-dom";
 import { BrowserRouter, Routes, Route, } from 'react-router-dom';
-import NavBar from './organisms/NavBar';
-import LoginPage from "./pages/LoginPage";
-import Playground from "./playground/playground";
-import HomePage from './pages/HomePage'
 import { 
     Box 
 } from '@mui/material'
+
+import NavBar from './organisms/NavBar';
+import HomePage from './pages/HomePage'
+import LoginPage from "./pages/LoginPage";
+import Playground from "./playground/playground";
 import RegisterPage from "./pages/RegisterPage";
+import NewLeaguePage from "./pages/NewLeaguePage";
 
 function getCookie(name) {
     let cookieValue = null;
@@ -103,25 +105,36 @@ export default function App(props){
                     <Routes>
                         <Route 
                             exact path='/' 
-                            element={<HomePage
-                                        csrftoken={csrftoken}
-                                        leagues={leagues}
-                                        currentLeague={currentLeague}
-                                    />
+                            element={
+                                <HomePage
+                                    csrftoken={csrftoken}
+                                    leagues={leagues}
+                                    currentLeague={currentLeague}
+                                />
                             }
                         />
                         <Route 
                             path='/login' 
-                            element={<LoginPage 
-                                        handleLogin={handleLogin}
-                                    />
+                            element={
+                                <LoginPage 
+                                    handleLogin={handleLogin}
+                                />
                             }
                         />
                         <Route 
                             path='/register'
-                            element={<RegisterPage
+                            element={
+                                <RegisterPage
                             
-                                    />
+                                />
+                            }
+                        />
+                        <Route
+                            path='/new-league'
+                            element={
+                                <NewLeaguePage
+
+                                />
                             }
                         />
                         <Route path='/test' element={<Playground/>}/>

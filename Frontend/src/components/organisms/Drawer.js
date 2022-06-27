@@ -5,6 +5,7 @@ import { Divider } from "@mui/material";
 import { List } from "@mui/material";
 
 import LeagueButton from "../atoms/LeagueButton";
+import LeagueHeader from "../molecules/LeagueHeader";
 
 const drawerWidth = 240;
 
@@ -13,7 +14,7 @@ export default function DrawerComp(props){
 
     const drawer = (
         <div>
-            
+            <LeagueHeader/>
                 {props.leagues.map((league, index) => {
                     return (
                         <LeagueButton 
