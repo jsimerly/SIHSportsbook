@@ -67,25 +67,30 @@ class Bettor(models.Model):
 
 class MatchupBets(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
-    fantasy_matchup = models.ForeignKey(Matchup, on_delete=models.PROTECT)
+    active = models.BooleanField(default=True)
+    
+    fantasy_matchup = models.ForeignKey(Matchup, on_delete=models.PROTECT, related_name='betting_matchups')
 
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='bet_matchup_away')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='bet_matchup_home')
 
     ml_team1 = models.DecimalField(decimal_places=3, max_digits=9,)
     ml_team2 = models.DecimalField(decimal_places=3, max_digits=9,)
+    ml_edited = models.BooleanField(default=False)
 
     over = models.DecimalField(decimal_places=3, max_digits=9,)
-    over_line = models.DecimalField(decimal_places=3, max_digits=9,)
+    over_odds = models.DecimalField(decimal_places=3, max_digits=9,)
     under = models.DecimalField(decimal_places=3, max_digits=9,)
-    under_line= models.DecimalField(decimal_places=3, max_digits=9,)
+    under_odds= models.DecimalField(decimal_places=3, max_digits=9,)
+    o_u_edited = models.BooleanField(default=False)
 
     spread_team1 = models.DecimalField(decimal_places=3, max_digits=9,)
-    spread_team1_line = models.DecimalField(decimal_places=3, max_digits=9,)
+    spread_team1_odds = models.DecimalField(decimal_places=3, max_digits=9,)
     spread_team2 = models.DecimalField(decimal_places=3, max_digits=9,)
-    spread_team2_line = models.DecimalField(decimal_places=3, max_digits=9,)
+    spread_team2_odds = models.DecimalField(decimal_places=3, max_digits=9,)
+    spread_edited = models.BooleanField(default=False)
 
-class PlacedBet(models.Model):
+class BasePlacedBet(models.Model):
     BET_STATUS_CHOCIES = (
         ('O', 'Open'),
         ('W', 'Won'),
@@ -105,7 +110,7 @@ class PlacedBet(models.Model):
     payout_date = models.DateTimeField()
 
 
-class PlacedMatchupBet(PlacedBet):
+class PlacedMatchupBet(BasePlacedBet):
     id_placed = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
     mathcup = models.ForeignKey(MatchupBets, on_delete=models.PROTECT)
 

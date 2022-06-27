@@ -544,4 +544,4 @@ class Matchup(models.Model):
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchup_home')
 
     def __str__(self):
-        return f'Matchup Obj: {self.league} - {self.week}.{self.matchup_id}'
+        return f'Matchup Obj: {self.league} - {self.week}.{self.matchup_id} {self.season}'

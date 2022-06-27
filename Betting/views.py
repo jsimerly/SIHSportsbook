@@ -7,10 +7,11 @@ import decimal
 from Betting.models import *
 from Fantasy.models import *
 
+from .oddsmaker import Oddsmaker
 from .serializers import *
 
 class CreateBettingLeague(APIView):
-    serializer_class = BettingLeagueSerializer
+    serializer_class = CreateBettingLeagueSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format='josn'):
@@ -66,47 +67,77 @@ class AttachedTeamToBettor(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
-class PlaceBet(APIView):
-    serializer_class = BetSerializer
-    permission_classes = [IsAuthenticated]
-
+class CreateMatchupBets(APIView):
     def post(self, request, format='json'):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            #get bet info from front end
-            bettorId = serializer.data.get('bettor')
-            matchupId = serializer.data.get('matchup')
-            teamToWinId = serializer.data.get('teamToWin')
-            betAmount = serializer.data.get('betAmount')
+        
+        league_id = request.data.get('id')
+        betting_league = BettingLeague.objects.get(id=league_id)
+        fantasty_league_matchups = betting_league.fantasy_league.matchup_set.all()
 
-            #get objects needed for bet model
-            teamToWinObj = FantasyTeam.objects.get(pk=teamToWinId)
-            matchupObj = Matchup.objects.get(pk=matchupId)
-            bettorObj = Bettor.objects.get(pk=bettorId)
+        vig = betting_league.std_vig
 
-            fantasyTeam = bettorObj.fantasyteam_set.first()
-            league = fantasyTeam.league
+        for matchup in fantasty_league_matchups:
+            ou_dict = Oddsmaker.create_over_under(matchup.team1, matchup.team2, vig)
+            ml_dict = Oddsmaker.create_moneylines(matchup.team1, matchup.team2, vig)
+            spread_dict = Oddsmaker.create_spreads(matchup.team1, matchup.team2, vig)
+            print(ou_dict)
+            print(ml_dict)
+            print(spread_dict)
+            print('-----')
+
+        # try:
+        #     active_matchups_qset = betting_league.betting_matchups.filter(active=True)
+        #     print('active matchups found')
+        # except Exception as e:
+        #     #error kicks out because no matchups exist yet
             
-            vig = league.standardVig
-            betStatus = 'O'
 
-            MatchupBets.objects.create(
-                bettor=bettorObj,
-                betStatus=betStatus,
-                betType=serializer.data.get('betType'),
-                betAmount=betAmount,
-                vig=vig,
-                teamToWin=teamToWinObj,
-                matchup=matchupObj,
-            )
 
-            bettorObj.betsLeft -= 1
-            bettorObj.balance -= decimal.Decimal(betAmount)
-            bettorObj.save()
 
-            return Response(status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response('resp')
+
+# class PlaceBet(APIView):
+#     serializer_class = BetSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request, format='json'):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             #get bet info from front end
+#             bettorId = serializer.data.get('bettor')
+#             matchupId = serializer.data.get('matchup')
+#             teamToWinId = serializer.data.get('teamToWin')
+#             betAmount = serializer.data.get('betAmount')
+
+#             #get objects needed for bet model
+#             teamToWinObj = FantasyTeam.objects.get(pk=teamToWinId)
+#             matchupObj = Matchup.objects.get(pk=matchupId)
+#             bettorObj = Bettor.objects.get(pk=bettorId)
+
+#             fantasyTeam = bettorObj.fantasyteam_set.first()
+#             league = fantasyTeam.league
+            
+#             vig = league.standardVig
+#             betStatus = 'O'
+
+#             MatchupBets.objects.create(
+#                 bettor=bettorObj,
+#                 betStatus=betStatus,
+#                 betType=serializer.data.get('betType'),
+#                 betAmount=betAmount,
+#                 vig=vig,
+#                 teamToWin=teamToWinObj,
+#                 matchup=matchupObj,
+#             )
+
+#             bettorObj.betsLeft -= 1
+#             bettorObj.balance -= decimal.Decimal(betAmount)
+#             bettorObj.save()
+
+#             return Response(status=status.HTTP_200_OK)
+
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class GetBettors(APIView):
     def get(self, request, format='json'):

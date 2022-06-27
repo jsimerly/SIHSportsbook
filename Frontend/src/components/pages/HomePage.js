@@ -10,6 +10,8 @@ import {
 
 
 export default function App(props){
+
+
     const matchupsJson = [
         {   id: 1,
             matchupId: 1,
@@ -58,7 +60,12 @@ export default function App(props){
         },
     ]
 
+    const [matchupJson, setMatchupJson] = useState([]);
     const [selectedBets, setSelectedBets] = useState([]);
+
+    function getMatchups(){
+        fetch('api/betting/')
+    }
 
     function checkDupsIndex(betArray, newBet) {
         for (var i=0; i < betArray.length; i++) {
