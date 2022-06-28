@@ -18,8 +18,8 @@ export default function DrawerComp(props){
                 {props.leagues.map((league, index) => {
                     return (
                         <LeagueButton 
-                            leagueName={league.leagueName}
-                            teamName={league.team}
+                            league={league}
+                            setLeague={props.setLeague}
                         />
                     )
                 })}

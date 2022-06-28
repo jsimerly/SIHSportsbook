@@ -1,6 +1,6 @@
 import React, { Component, useState, useEffect } from "react";
 import { render } from "react-dom";
-import { BrowserRouter, Routes, Route, } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import { 
     Box 
 } from '@mui/material'
@@ -11,6 +11,7 @@ import LoginPage from "./pages/LoginPage";
 import Playground from "./playground/playground";
 import RegisterPage from "./pages/RegisterPage";
 import NewLeaguePage from "./pages/NewLeaguePage";
+import LeagueRouter from "./routers/leagueRouter"
 
 function getCookie(name) {
     let cookieValue = null;
@@ -35,7 +36,9 @@ export default function App(props){
         isLoggedIn: null,
     });
     const [leagues, setLeagues] = useState([]);
-    const [currentLeague, setCurrentLeague] = useState();
+    const [currentLeague, setCurrentLeague] = useState(
+        JSON.parse(localStorage.getItem('currentLeague')) || null
+    );
     const [openBets, setOpenBets] = useState()
     const [closedBets, setClosedBets] = useState()
     const [error, setError] = useState();
@@ -44,7 +47,7 @@ export default function App(props){
         setCsrftoken(getCookie('csrftoken'))
         getCurrentUser()
         getLeagues()
-        getBets()
+        // getBets()
     }, [])
 
     function getCurrentUser(){
@@ -90,6 +93,7 @@ export default function App(props){
     
     function handleLeagueChange(league) {
         setCurrentLeague(league)
+        localStorage.setItem('currentLeague', JSON.stringify(league))
     }
 
     
@@ -104,10 +108,19 @@ export default function App(props){
                 <Box sx={{ pt : 7, pl : 0 , maxHeight: '100%'}}>
                     <Routes>
                         <Route 
-                            exact path='/' 
+                            exact path='' 
+                            element={
+                                <LeagueRouter
+                                    leagues={leagues}
+                                    currentLeague={currentLeague}
+                                />
+                            }
+                        />
+                        <Route
+                            exact path='/league' 
                             element={
                                 <HomePage
-                                    csrftoken={csrftoken}
+                                    setLeague={handleLeagueChange}
                                     leagues={leagues}
                                     currentLeague={currentLeague}
                                 />

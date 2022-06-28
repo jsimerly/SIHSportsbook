@@ -8,6 +8,6 @@ urlpatterns = [
     path('test/', index),
     path('login/', index),
     path('register/',index),
-    path('new-league', index),
-    path('league/<str:leagueCode>', index)
+    path('new-league/', index),
+    path('league/', index)
 ]

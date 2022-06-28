@@ -112,6 +112,7 @@ export default function App(props){
                 <Grid item>
                     <Box sx={{width: 250, height: '100vh', border:1 }}>
                         <DrawerComp
+                            setLeague={props.setLeague}
                             leagues={props.leagues}
                             currentLeague={props.currentLeague}
                         />

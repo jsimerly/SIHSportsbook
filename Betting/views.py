@@ -1,3 +1,4 @@
+from multiprocessing.dummy import active_children
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -37,7 +38,7 @@ class AttachedTeamToBettor(APIView):
 
         league = BettingLeague.objects.get(pk=betting_league)
         print(league)
-        all_bettors = league.bettor_set.all()
+        all_bettors = league.bettor.all()
         print(all_bettors)
 
         for team_info in teams_info:
@@ -72,7 +73,7 @@ class CreateMatchupBets(APIView):
         
         league_id = request.data.get('id')
         betting_league = BettingLeague.objects.get(id=league_id)
-        fantasty_league_matchups = betting_league.fantasy_league.matchup_set.all()
+        fantasty_league_matchups = betting_league.fantasy_league.matchup_set.filter(active=True)
 
         vig = betting_league.std_vig
 
@@ -80,22 +81,65 @@ class CreateMatchupBets(APIView):
             ou_dict = Oddsmaker.create_over_under(matchup.team1, matchup.team2, vig)
             ml_dict = Oddsmaker.create_moneylines(matchup.team1, matchup.team2, vig)
             spread_dict = Oddsmaker.create_spreads(matchup.team1, matchup.team2, vig)
-            print(ou_dict)
-            print(ml_dict)
-            print(spread_dict)
-            print('-----')
 
-        # try:
-        #     active_matchups_qset = betting_league.betting_matchups.filter(active=True)
-        #     print('active matchups found')
-        # except Exception as e:
-        #     #error kicks out because no matchups exist yet
+            matchup_bet =  MatchupBets.objects.filter(fantasy_matchup=matchup)
             
+            if not matchup_bet:
+                MatchupBets.objects.create(
+                    team1 = matchup.team1,
+                    team2 = matchup.team2,
+                    fantasy_matchup = matchup,
 
+                    ml_team1 = ml_dict['odds']['team1'],
+                    ml_team2 = ml_dict['odds']['team2'],
 
+                    over = ou_dict['values']['over'],
+                    over_odds = ou_dict['odds']['over'],
+                    under = ou_dict['values']['under'],
+                    under_odds = ou_dict['odds']['under'],
 
+                    spread_team1 = spread_dict['values']['team1'],
+                    spread_team1_odds =  spread_dict['odds']['team1'],
+                    spread_team2 = spread_dict['values']['team2'],
+                    spread_team2_odds = spread_dict['odds']['team2'],
+                )  
+            else:
+                matchup_bet.update(
+                    team1 = matchup.team1,
+                    team2 = matchup.team2,
+                    fantasy_matchup = matchup,
 
-        return Response('resp')
+                    ml_team1 = ml_dict['odds']['team1'],
+                    ml_team2 = ml_dict['odds']['team2'],
+
+                    over = ou_dict['values']['over'],
+                    over_odds = ou_dict['odds']['over'],
+                    under = ou_dict['values']['under'],
+                    under_odds = ou_dict['odds']['under'],
+
+                    spread_team1 = spread_dict['values']['team1'],
+                    spread_team1_odds =  spread_dict['odds']['team1'],
+                    spread_team2 = spread_dict['values']['team2'],
+                    spread_team2_odds = spread_dict['odds']['team2'],
+                )          
+
+        return Response(status=status.HTTP_200_OK)
+
+class GetMathcupBets(APIView):
+    serializer_class = MatchupBets
+    lookup_url_kwarg = 'leagueId'
+
+    def get(self, request, format='json'):
+        league_id = request.GET.get(self.lookup_url_kwarg)
+        print(league_id)
+        
+        if league_id != None:
+            betting_league = BettingLeague.objects.filter(league_id).first()
+            if len(betting_league) > 0:
+                matchup_bets = betting_league.betting_matchups.filter(active=True)
+                data = matchup_bets
+
+        return Response(data)
 
 # class PlaceBet(APIView):
 #     serializer_class = BetSerializer
@@ -142,13 +186,10 @@ class CreateMatchupBets(APIView):
 class GetBettors(APIView):
     def get(self, request, format='json'):
         if request.user.is_authenticated:
-            print(request.user.email)
             user = User.objects.get(id=request.user.id)
             bettors_qset = user.bettor_set.all()
 
-            print(user)
-            print(bettors_qset)
-
+          
             json = []
             for bettor in bettors_qset:
                 leagueInfo = {
