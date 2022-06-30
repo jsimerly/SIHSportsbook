@@ -5,6 +5,8 @@ import {
     ToggleButton
 } from "@mui/material";
 
+import impliedOddsToAmerican from "../../util/oddHandler";
+
 export default function BetTile(props){
     const matchupData = props.matchupData;
     const team = props.team;
@@ -12,73 +14,62 @@ export default function BetTile(props){
     const betValue = props.matchupData.data[props.betType]
 
     function vanityLogic() {
-        if (betType === "sp_pos") {
+        if (betType === "spread_team1" || betType === "spread_team2") {
+            let vValue = null
+            if (props.data > 0) {
+                return [
+                    team + " " + betValue,
+                    "Spread",
+                    "+" + props.data,
+                ]
+            } 
             return [
                 team + " " + betValue,
-                "Spread"
+                "Spread",
+                props.data,
             ]
+    
         } else if (betType === "over") {
             return [
                 "Over " + betValue,
-                "Total"
+                "Total",
+                "O " + props.data,
             ]
-        }  else if (betType === "ml_pos" || betType === "ml_neg") {
+        }  else if (betType === "ml_team1" || betType === "ml_team2") {
             return [
                 team,
-                "Moneyline"
-            ]
-        } else if (betType === "sp_neg") {
-            return [
-                team + " " + betValue,
-                "Spread"
+                "Moneyline",
+                impliedOddsToAmerican(props.data),
             ]
         } else if (betType === "under") {
             return [
                 "Under " + betValue,
-                "Total"
+                "Total",
+                "U " + props.data
             ]
         }
 
-        return ["ERROR", "ERROR"]
+        return ["ERROR", "ERROR", "ERROR"]
     }
+    
+    const vanityTeams = (props.matchupData.data.team1 + " @ " + props.matchupData.data.team2)
+    const [ vanityMain, vanitySecondary, vanityValue] = vanityLogic()
+    const americanOdds = impliedOddsToAmerican(props.betOdds)  
 
-    function vanityTeams() {
-        return (props.matchupData.data.team1 + " @ " + props.matchupData.data.team2)
-    }
-
-    let [ vanityMain, vanitySecondary ] = vanityLogic()
-
-    function setLine(){
-        if (betType === "ml_pos" || betType === "ml_neg") {
-            return (betValue)
-        } else {
-            return (matchupData.standardLine)
-        }
-    }
-
-    const line = setLine()
-
-    function setVanityLine(){
-        if (line > 0) {
-            return ("+" + line)
-        } else {
-            return (line)
-        }
-    }
-
-    let bet = {
+    const bet = {
         matchupData,
         betData : {
             betType : betType,
             betValue : betValue,
             team: team,
-            line: setLine()
+            odds: props.betOdds
         },
         vanity: {
             main: vanityMain,
             secondary: vanitySecondary,
-            teams: vanityTeams(),
-            line: setVanityLine()
+            teams: vanityTeams,
+            value: vanityValue,
+            line: americanOdds,
         },
     }
 
@@ -95,7 +86,7 @@ export default function BetTile(props){
         }
     }
 
-    function BetButton(text, team) {
+    function BetButton() {
         return (<ToggleButton
             fullWidth={true} 
             value={props.data}
@@ -103,35 +94,11 @@ export default function BetTile(props){
             selected={isSelectedBet()}
             onChange={buttonSelected}
         >
-            {text}
+            {vanityValue}
         </ToggleButton>)
     }
 
-    function ifButton() {
-        if (props.betType === "over") {
-            const text = "O " + props.data
-            return (
-                BetButton(text)
-            )
-        } else if (props.betType === "under") {
-            const text = "U " + props.data
-            return (
-                BetButton(text)
-                )
-        } else if (props.betType === "ml_pos"){
-            const text = "+" + props.data
-            return (
-                BetButton(text)
-                )
-        } else {
-            const text = props.data
-            return (
-                BetButton(text)
-            )
-        }
-    }
-
     return (
-        ifButton()
+        BetButton()
     )
 }

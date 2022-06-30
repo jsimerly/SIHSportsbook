@@ -9,5 +9,5 @@ urlpatterns = [
     path('login/', index),
     path('register/',index),
     path('new-league/', index),
-    path('league/', index)
+    path('sportsbook/<str:leagueId>', index)
 ]

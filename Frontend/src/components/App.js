@@ -6,7 +6,7 @@ import {
 } from '@mui/material'
 
 import NavBar from './organisms/NavBar';
-import HomePage from './pages/HomePage'
+import LeagueBettingPage from './pages/LeagueBettingPage'
 import LoginPage from "./pages/LoginPage";
 import Playground from "./playground/playground";
 import RegisterPage from "./pages/RegisterPage";
@@ -117,12 +117,11 @@ export default function App(props){
                             }
                         />
                         <Route
-                            exact path='/league' 
+                            path='/sportsbook/:leagueId' 
                             element={
-                                <HomePage
+                                <LeagueBettingPage
                                     setLeague={handleLeagueChange}
                                     leagues={leagues}
-                                    currentLeague={currentLeague}
                                 />
                             }
                         />

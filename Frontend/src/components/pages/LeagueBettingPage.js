@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import DrawerComp from "../organisms/Drawer";
 import Matchups from "../organisms/Matchups";
 import MatchUp from "../molecules/MatchUp";
@@ -9,8 +11,13 @@ import {
 } from '@mui/material'
 
 
-export default function App(props){
+export default function LeagueBettingPage(props){
+    const { leagueId } = useParams()
 
+    useEffect(() => {
+        getMatchups()
+        console.log('userEff')
+    }, [])
 
     const matchupsJson = [
         {   id: 1,
@@ -64,7 +71,17 @@ export default function App(props){
     const [selectedBets, setSelectedBets] = useState([]);
 
     function getMatchups(){
-        fetch('api/betting/')
+        fetch('/api/betting/get-matchups' + "?league-id=" + leagueId)
+        .then((response) => {
+            if (!response.ok) {
+                console.log('error')
+            }
+            return response.json()
+        })
+        .then((data) => {
+            setMatchupJson(data)
+            console.log(data)
+        })
     }
 
     function checkDupsIndex(betArray, newBet) {
@@ -120,7 +137,7 @@ export default function App(props){
                 </Grid>
                 <Grid margin={2} md={7} spacing={1} sx={{border:1}}>
                     <Matchups 
-                        data={matchupsJson} 
+                        data={matchupJson} 
                         betSelectedHandler={betSelectedHandler}
                         selectedBets={selectedBets}
                         checkDupsIndex={checkDupsIndex}

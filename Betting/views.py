@@ -1,4 +1,6 @@
 from multiprocessing.dummy import active_children
+from turtle import st
+from numpy import mat
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -88,6 +90,8 @@ class CreateMatchupBets(APIView):
                 MatchupBets.objects.create(
                     team1 = matchup.team1,
                     team2 = matchup.team2,
+
+                    betting_league = betting_league,
                     fantasy_matchup = matchup,
 
                     ml_team1 = ml_dict['odds']['team1'],
@@ -107,7 +111,6 @@ class CreateMatchupBets(APIView):
                 matchup_bet.update(
                     team1 = matchup.team1,
                     team2 = matchup.team2,
-                    fantasy_matchup = matchup,
 
                     ml_team1 = ml_dict['odds']['team1'],
                     ml_team2 = ml_dict['odds']['team2'],
@@ -127,19 +130,46 @@ class CreateMatchupBets(APIView):
 
 class GetMathcupBets(APIView):
     serializer_class = MatchupBets
-    lookup_url_kwarg = 'leagueId'
+    lookup_url_kwarg = 'league-id'
 
     def get(self, request, format='json'):
         league_id = request.GET.get(self.lookup_url_kwarg)
-        print(league_id)
-        
-        if league_id != None:
-            betting_league = BettingLeague.objects.filter(league_id).first()
-            if len(betting_league) > 0:
-                matchup_bets = betting_league.betting_matchups.filter(active=True)
-                data = matchup_bets
 
-        return Response(data)
+        if league_id != None:
+            betting_league = BettingLeague.objects.filter(id=league_id).first()
+            if betting_league:
+                matchup_bets = betting_league.matchups.filter(active=True)
+
+                json = []
+                i=0
+                for matchup_bet in matchup_bets:
+                    i+= 1
+                    matchup_info = { 
+                        "id" : i,
+                        "matchupId" : matchup_bet.id,
+                        "payoutDate" : matchup_bet.payout_date,
+                        "data" : {
+                            "team1" : matchup_bet.team1.fun_name,
+                            "team2" : matchup_bet.team2.fun_name,
+
+                            "ml_team1" : matchup_bet.ml_team1,
+                            "ml_team2" : matchup_bet.ml_team2,
+
+                            "over" : matchup_bet.over,
+                            "over_odds" : matchup_bet.over_odds,
+                            "under" : matchup_bet.under,
+                            "under_odds" : matchup_bet.under_odds,
+
+                            "spread_team1" : matchup_bet.spread_team1,
+                            "spread_team2" : matchup_bet.spread_team2,
+                            "spread_team1_odds" : matchup_bet.spread_team1_odds,
+                            "spread_team2_odds" : matchup_bet.spread_team2_odds,
+                        }
+                    }
+
+                    json.append(matchup_info)
+            return Response(json, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # class PlaceBet(APIView):
 #     serializer_class = BetSerializer

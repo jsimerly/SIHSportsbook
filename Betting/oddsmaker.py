@@ -7,14 +7,18 @@ class Oddsmaker:
         over = team1.current_proj + team2.current_proj
         under = team2.current_proj + team1.current_proj
 
+        over_rounded = decimal.Decimal(.5 * round(float(over)/.5))
+        under_rounded = decimal.Decimal(.5 * round((float(under)/.5)))
+
+
         total_odds = 1+vig
         over_odds = total_odds/2
         under_odds = total_odds/2
 
         o_u_dict = {
             'values' : {
-                'over' : over,
-                'under' : under
+                'over' : over_rounded,
+                'under' : under_rounded
             },
             'odds' : {
                 'over' : over_odds,
@@ -59,14 +63,14 @@ class Oddsmaker:
 
     @staticmethod
     def create_spreads(team1, team2, vig):
-        spread = abs(team1.current_proj - team2.current_proj)
+        team1_spread = team1.current_proj - team2.current_proj
 
         total_odds = 1+vig
 
         spread_dict = {
             'values' : {
-                'team1' : spread,
-                'team2' : spread,
+                'team1' : round(team1_spread, 1),
+                'team2' : round(-team1_spread, 1)
             },
             'odds' : {
                 'team1' : total_odds/2,

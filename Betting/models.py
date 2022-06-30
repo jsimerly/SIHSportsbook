@@ -1,7 +1,10 @@
-from re import L
 from uuid import uuid4
+import datetime
+import pytz
+
 from django.contrib.auth import get_user_model
 from django.db import models
+
 
 
 
@@ -69,7 +72,8 @@ class MatchupBets(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
     active = models.BooleanField(default=True)
     
-    fantasy_matchup = models.ForeignKey(Matchup, on_delete=models.PROTECT, related_name='betting_matchups')
+    betting_league = models.ForeignKey(BettingLeague, on_delete=models.CASCADE, related_name='matchups')
+    fantasy_matchup = models.ForeignKey(Matchup, on_delete=models.CASCADE, related_name='betting_matchups')
 
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='bet_matchup_away')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='bet_matchup_home')
@@ -89,6 +93,17 @@ class MatchupBets(models.Model):
     spread_team2 = models.DecimalField(decimal_places=3, max_digits=9,)
     spread_team2_odds = models.DecimalField(decimal_places=3, max_digits=9,)
     spread_edited = models.BooleanField(default=False)
+
+    def next_tuesday_3AM():
+        today = datetime.date.today()
+        tuesday = today + datetime.timedelta((1-today.weekday())%7)
+        tuesday_at_3_naive = datetime.datetime.combine(tuesday, datetime.time(hour=3))
+
+        timezone = pytz.timezone('US/Eastern')
+        tuesday_at_3 = timezone.localize(tuesday_at_3_naive)
+        return tuesday_at_3
+
+    payout_date = models.DateTimeField(default=next_tuesday_3AM())
 
 class BasePlacedBet(models.Model):
     BET_STATUS_CHOCIES = (

@@ -31,6 +31,6 @@ class MatchupBetSerializer(serializers.ModelSerializer):
         fields = (
             'fantasy_matchup', 'team1', 'team2', 
             'ml_team1', 'ml_team2',
-            'over', 'over_line', 'under', 'under_line',
-            'spread_team1', 'spread_team1_line', 'spread_team2', 'spread_team2_line'
+            'over', 'over_odds', 'under', 'under_odds',
+            'spread_team1', 'spread_team1_odds', 'spread_team2', 'spread_team2_odds'
         )

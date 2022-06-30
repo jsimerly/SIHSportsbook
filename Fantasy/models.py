@@ -540,6 +540,7 @@ class Matchup(models.Model):
         on_delete=models.PROTECT, 
         null=True
         )
+
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchup_away')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='matchup_home')
 

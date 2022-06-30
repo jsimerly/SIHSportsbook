@@ -8,11 +8,12 @@ import BetTile from "../atoms/BetTile"
 export default function MatchUp(props){
     const data =  props.matchupData.data
 
-    function BetTileTemplate(betType, betData, team){
+    function BetTileTemplate(betType, betData, betOdds, team){
         return (
             <BetTile
                 betType={betType}
                 data={betData}
+                betOdds={betOdds}
                 team={team}
 
                 matchupData={props.matchupData}
@@ -31,13 +32,13 @@ export default function MatchUp(props){
                 {data.team1}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                {BetTileTemplate("sp_pos", data.sp_pos, data.team1)}
+                {BetTileTemplate("spread_team1", data.spread_team1, data.spread_team1_odds, data.team1)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                {BetTileTemplate("over", data.over, data.team1)}
+                {BetTileTemplate("over", data.over, data.over_odds, data.team1)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                {BetTileTemplate("ml_pos", data.ml_pos, data.team1)}
+                {BetTileTemplate("ml_team1", data.ml_team1, data.ml_team1, data.team1)}
             </Grid>
         </Grid>
         <Grid container columns={20}>
@@ -45,13 +46,13 @@ export default function MatchUp(props){
                 {data.team2}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                {BetTileTemplate("sp_neg", data.sp_neg, data.team2)}
+                {BetTileTemplate("spread_team2", data.spread_team2, data.spread_team2_odds, data.team2)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                {BetTileTemplate("under", data.under, data.team2)}
+                {BetTileTemplate("under", data.under, data.under_odds, data.team2)}
             </Grid>
             <Grid item md={4} sx={{border:1}}>
-                {BetTileTemplate("ml_neg", data.ml_neg, data.team2)}
+                {BetTileTemplate("ml_team2", data.ml_team2, data.ml_team2, data.team2)}
             </Grid>
         </Grid>
     </Box>

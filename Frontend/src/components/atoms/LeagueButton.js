@@ -2,15 +2,15 @@ import React, {useState, useEffect} from "react";
 import {
     Grid,
     Box,
+    Button,
 } from "@mui/material";
 
 export default function LeagueButton(props){
     return (
-        <Box 
+        <Button 
             sx={{m:1, p:1, border:1}}
             onClick={()=>{
                 props.setLeague(props.league);
-                console.log("CLICK")
             }}
         >
             <Box>
@@ -19,6 +19,6 @@ export default function LeagueButton(props){
             <Box sx={{fontSize:12}}>
                 {props.league.team}
             </Box>
-        </Box>
+        </Button>
     )
 }
