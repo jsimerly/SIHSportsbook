@@ -13,7 +13,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 export default function BetSlipTile(props){ 
     const [wager, setWager] = useState()
     const [toWin, setToWin] = useState()
-    const line = props.bet.betData.line
+    const line = props.bet.vanity.line
     
     const re = /^[0-9]\d*(?:\.\d{0,2})?$/;
         

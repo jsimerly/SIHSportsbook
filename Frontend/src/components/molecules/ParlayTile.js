@@ -36,7 +36,7 @@ export default function ParlayTile(props){
     function getParlayLines(){
         let parlayLines = []
         selectedBets.map((bet, index) => {
-            parlayLines.push(bet.betData.line)
+            parlayLines.push(bet.vanity.line)
         })
         return parlayLines
     }
