@@ -117,7 +117,6 @@ class BasePlacedBet(models.Model):
     betStatus = models.CharField(choices=BET_STATUS_CHOCIES, max_length=64)
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)
 
-    implied_odds = models.DecimalField(decimal_places=3, max_digits=9,)
     line = models.DecimalField(decimal_places=3, max_digits=9,)
 
     bet_amount = models.DecimalField(decimal_places=2, max_digits=10,)

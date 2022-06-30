@@ -1,6 +1,6 @@
 import React, { Component, useState, useEffect } from "react";
 import { render } from "react-dom";
-import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate} from 'react-router-dom';
 import { 
     Box 
 } from '@mui/material'
@@ -50,6 +50,7 @@ export default function App(props){
         // getBets()
     }, [])
 
+
     function getCurrentUser(){
         fetch('/api/account/current-user')
         .then((response) => {
@@ -67,7 +68,6 @@ export default function App(props){
             response.json()
             .then((data) => {
                 setLeagues([...data]),
-                console.log(data)
             })
         })
     }
@@ -77,7 +77,6 @@ export default function App(props){
         .then((response) => {
             response.json()
             .then((data) => {
-                console.log(data)
             })
         })
     }
@@ -122,6 +121,7 @@ export default function App(props){
                                 <LeagueBettingPage
                                     setLeague={handleLeagueChange}
                                     leagues={leagues}
+                                    currentLeague={currentLeague}
                                 />
                             }
                         />

@@ -231,9 +231,9 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
 
     for player in player_qset:
         if Player.DST in player.pos:
-            proj_map[player] = player.def_total
+            proj_map[player] = player.proj.def_total
         elif Player.K in player.pos:
-            proj_map[player] = player.k_total
+            proj_map[player] = player.proj.k_total
         else:
             proj = 0
 
