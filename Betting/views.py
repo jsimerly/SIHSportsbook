@@ -1,6 +1,4 @@
-from multiprocessing.dummy import active_children
-from turtle import st
-from numpy import mat
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -171,47 +169,62 @@ class GetMathcupBets(APIView):
             return Response(json, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# class PlaceBet(APIView):
-#     serializer_class = BetSerializer
-#     permission_classes = [IsAuthenticated]
+class PlaceMatchupBet(APIView):
+    permission_classes = [IsAuthenticated]
 
-#     def post(self, request, format='json'):
-#         serializer = self.serializer_class(data=request.data)
-#         if serializer.is_valid():
-#             #get bet info from front end
-#             bettorId = serializer.data.get('bettor')
-#             matchupId = serializer.data.get('matchup')
-#             teamToWinId = serializer.data.get('teamToWin')
-#             betAmount = serializer.data.get('betAmount')
+    def post(self, request, format='json'):
+      
+        #get bet info from front end
+        bettor_id = request.data.get('bettorId')
+        bettor = Bettor.objects.get(id=bettor_id)
 
-#             #get objects needed for bet model
-#             teamToWinObj = FantasyTeam.objects.get(pk=teamToWinId)
-#             matchupObj = Matchup.objects.get(pk=matchupId)
-#             bettorObj = Bettor.objects.get(pk=bettorId)
+        if bettor.user == request.user:
 
-#             fantasyTeam = bettorObj.fantasyteam_set.first()
-#             league = fantasyTeam.league
+            matchup_id = request.data.get('matchupId')
             
-#             vig = league.standardVig
-#             betStatus = 'O'
+            bet_amount = request.data.get('betAmount')
 
-#             MatchupBets.objects.create(
-#                 bettor=bettorObj,
-#                 betStatus=betStatus,
-#                 betType=serializer.data.get('betType'),
-#                 betAmount=betAmount,
-#                 vig=vig,
-#                 teamToWin=teamToWinObj,
-#                 matchup=matchupObj,
-#             )
+            time_placed = timezone.now()
 
-#             bettorObj.betsLeft -= 1
-#             bettorObj.balance -= decimal.Decimal(betAmount)
-#             bettorObj.save()
+            #Matchup Related
+            bet_type = request.data.get('betType')
 
-#             return Response(status=status.HTTP_200_OK)
+            matchup_bet = MatchupBets.objects.get(id=matchup_id)
+            payout_date = matchup_bet.payout_date
+            
+            
+            bet_type_map = {
+                'spread_team1' : ('S1', matchup_bet.spread_team1_odds, matchup_bet.spread_team1),
+                'spread_team2' : ('S2', matchup_bet.spread_team2_odds, matchup_bet.spread_team2),
+                'ml_team1' : ('M1', matchup_bet.ml_team1, matchup_bet.ml_team1),
+                'ml_team2' : ('M2', matchup_bet.ml_team2, matchup_bet.ml_team1),
+                'over' : ('O', matchup_bet.over_odds, matchup_bet.over),
+                'under' : ('U', matchup_bet.under_odds, matchup_bet.under),
+            }
+        
+            bet_type, odds, bet_value = bet_type_map[bet_type]
+            line = Oddsmaker.implied_odds_to_american(odds)
+            payout_amount = Oddsmaker.calculate_payout_from_american(bet_amount, line)
 
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            PlacedMatchupBet.objects.create(
+                line = line,
+                bet_amount = bet_amount,
+                payout_amount = payout_amount,
+                payout_date = payout_date,
+                time_placed = time_placed,
+                bet_type = bet_type,
+                bet_value = bet_value,
+                bettor = bettor,
+                matchup_id = matchup_bet.id
+            )
+
+            # bettorObj.betsLeft -= 1
+            # bettorObj.balance -= decimal.Decimal(betAmount)
+            bettor.save()
+
+            return Response(status=status.HTTP_200_OK)
+
+        return Response({"not authoirzed"}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetBettors(APIView):
     def get(self, request, format='json'):
@@ -232,8 +245,8 @@ class GetBettors(APIView):
             
             
             return Response(json, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
+       
+        return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
 
 # class GetBetHistory(APIView):
 #     def get(self, request, format='json'):

@@ -66,8 +66,8 @@ class Bettor(models.Model):
 
     balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
 
-    allowance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
-    bets_left = models.IntegerField(default=10)
+    allowance = models.DecimalField(decimal_places=2, max_digits=10, default=10)
+    bets_left = models.IntegerField(default=2)
 
 class MatchupBets(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
@@ -114,7 +114,7 @@ class BasePlacedBet(models.Model):
         ('R', 'Refunded'),
         ('C', 'Cashed Out')
     )
-    betStatus = models.CharField(choices=BET_STATUS_CHOCIES, max_length=64)
+    betStatus = models.CharField(choices=BET_STATUS_CHOCIES, default= 'O',max_length=64)
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)
 
     line = models.DecimalField(decimal_places=3, max_digits=9,)
@@ -125,15 +125,20 @@ class BasePlacedBet(models.Model):
     time_placed = models.DateTimeField()
     payout_date = models.DateTimeField()
 
+    parlayed = models.BooleanField(default=False)
 
-class PlacedMatchupBet(BasePlacedBet):
-    id_placed = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
-    mathcup = models.ForeignKey(MatchupBets, on_delete=models.PROTECT)
+    class Meta:
+        abstract = True
+
+
+class PlacedMatchupBet(BasePlacedBet, models.Model):
+    id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
+    matchup = models.ForeignKey(MatchupBets, on_delete=models.PROTECT)
 
     BET_TYPE_CHOICES = (
         ('O', 'Over'), ('U', 'Under'),
-        ('MF', 'Favorite'), ('MD', 'Underdog'),
-        ('SF', 'Favorite Spread'), ('SD', 'Underdog Spread'),
+        ('M1', 'Moneyline Team1'), ('M2', 'Moneyline Team2'),
+        ('S1', 'Spread Team1'), ('S2', 'Spread Team2'),
     )
     bet_type = models.CharField(choices=BET_TYPE_CHOICES, max_length=20)  
     bet_value = models.DecimalField(decimal_places=3, max_digits=9,)        

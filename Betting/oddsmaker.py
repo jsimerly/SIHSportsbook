@@ -78,3 +78,27 @@ class Oddsmaker:
             }
         }
         return spread_dict
+
+    @staticmethod
+    def implied_odds_to_american(odds):
+        odds = float(odds)
+        if odds < .5:
+            american_odds = ((1-odds)/(odds))*100
+            american_odds = round(decimal.Decimal(american_odds),0)
+            return american_odds
+        else:
+            american_odds = -100*((odds)/(1-odds))
+            american_odds = round(decimal.Decimal(american_odds),0)
+            return american_odds
+
+    @staticmethod
+    def calculate_payout_from_american(bet, line):
+        line = float(line)
+        bet = float(bet)
+        if line > 0:
+            payout = line/100 * bet
+
+        payout = 100/(-1*line) * bet
+
+        payout = round(decimal.Decimal(payout),2)
+        return payout

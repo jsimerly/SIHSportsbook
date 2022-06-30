@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 
 import DrawerComp from "../organisms/Drawer";
 import Matchups from "../organisms/Matchups";
-import MatchUp from "../molecules/MatchUp";
 import BetSlip from "../organisms/BetSlip";
 import {
     Box,
@@ -27,12 +26,15 @@ export default function LeagueBettingPage(props){
             if (!response.ok) {
                 console.log('error')
             }
+            return response.json()
         })
         .then((data) => {
-            setMatchupJson(data)
-
+            setMatchupJson(data);
+            
         })
     }
+
+   
 
     function checkDupsIndex(betArray, newBet) {
         for (var i=0; i < betArray.length; i++) {

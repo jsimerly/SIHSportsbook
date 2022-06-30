@@ -11,7 +11,8 @@ export default function LeagueButton(props){
 
     return (
         <Button 
-            sx={{m:1, p:1, border:1}}
+            sx={{mt:.5, p:1, border:1}}
+            fullWidth
             onClick={()=>{
                 
                 props.setLeague(props.league);
@@ -19,10 +20,12 @@ export default function LeagueButton(props){
             }}
         >
             <Box>
-                {props.league.league_name}
-            </Box>
-            <Box sx={{fontSize:12}}>
-                {props.league.team}
+                <Box sx={{fontSize:16, align:'left'}}>
+                    {props.league.league_name}
+                </Box>
+                <Box sx={{fontSize:10}}>
+                    {props.league.team}
+                </Box>
             </Box>
         </Button>
     )

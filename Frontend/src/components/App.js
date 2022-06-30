@@ -67,7 +67,7 @@ export default function App(props){
         .then((response) => {
             response.json()
             .then((data) => {
-                setLeagues([...data]),
+                setLeagues([...data])
             })
         })
     }
@@ -107,7 +107,7 @@ export default function App(props){
                 <Box sx={{ pt : 7, pl : 0 , maxHeight: '100%'}}>
                     <Routes>
                         <Route 
-                            exact path='' 
+                            path='' 
                             element={
                                 <LeagueRouter
                                     leagues={leagues}
