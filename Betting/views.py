@@ -39,9 +39,7 @@ class AttachedTeamToBettor(APIView):
         teams_info = request.data['teams_info']
 
         league = BettingLeague.objects.get(pk=betting_league)
-        print(league)
         all_bettors = league.bettor.all()
-        print(all_bettors)
 
         for team_info in teams_info:
             team_id = FantasyTeam.objects.get(id=team_info['id'])
@@ -87,6 +85,7 @@ class CreateMatchupBets(APIView):
             matchup_bet =  MatchupBets.objects.filter(fantasy_matchup=matchup)
             
             if not matchup_bet:
+
                 MatchupBets.objects.create(
                     team1 = matchup.team1,
                     team2 = matchup.team2,
@@ -108,6 +107,7 @@ class CreateMatchupBets(APIView):
                     spread_team2_odds = spread_dict['odds']['team2'],
                 )  
             else:
+
                 matchup_bet.update(
                     team1 = matchup.team1,
                     team2 = matchup.team2,

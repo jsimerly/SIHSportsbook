@@ -16,56 +16,7 @@ export default function LeagueBettingPage(props){
 
     useEffect(() => {
         getMatchups()
-        console.log('userEff')
-    }, [])
-
-    const matchupsJson = [
-        {   id: 1,
-            matchupId: 1,
-            payoutDate: "Tues 3:00 AM",
-            standardLine: -110,
-            data: { 
-                team1: "Sugma",
-                team2: "'Member Berries",
-                over: "220",
-                under: "220",
-                sp_pos: "+3.5",
-                sp_neg: "-3.5",
-                ml_pos: +210,
-                ml_neg: -180
-            },
-        },
-        {   id: 2,
-            matchupId: 1,
-            payoutDate: "Tues 3:00 AM",
-            standardLine: -110,
-            data: { 
-                team1: "Team 3",
-                team2: "Team 4",
-                over: "120",
-                under: "120",
-                sp_pos: "+5.5",
-                sp_neg: "-5.5",
-                ml_pos: 115,
-                ml_neg: -129,
-            }
-        },
-        {   id: 3,
-            matchupId: 1,
-            payoutDate: "Tues 3:00 AM",
-            standardLine: -110,
-            data: { 
-                team1: "Team 5",
-                team2: "Team 6",
-                over: "120",
-                under: "120",
-                sp_pos: "+5.5",
-                sp_neg: "-5.5",
-                ml_pos: 115,
-                ml_neg: -129
-            }
-        },
-    ]
+    }, [props.currentLeague])
 
     const [matchupJson, setMatchupJson] = useState([]);
     const [selectedBets, setSelectedBets] = useState([]);
@@ -76,11 +27,10 @@ export default function LeagueBettingPage(props){
             if (!response.ok) {
                 console.log('error')
             }
-            return response.json()
         })
         .then((data) => {
             setMatchupJson(data)
-            console.log(data)
+
         })
     }
 

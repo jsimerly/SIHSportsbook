@@ -17,6 +17,7 @@ export default function ParlayBet(props){
             <Grid container sx={{p:1}}>
                 <Grid item xs={1}>
                     <IconButton onClick={handleRemoveBet}>
+                    
                         <RemoveCircleOutlineIcon sx={{fontSize: 10}}/>
                     </IconButton>
                 </Grid>
