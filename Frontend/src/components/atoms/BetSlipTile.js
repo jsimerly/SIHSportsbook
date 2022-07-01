@@ -16,7 +16,9 @@ export default function BetSlipTile(props){
     const line = props.bet.vanity.line
     
     const re = /^[0-9]\d*(?:\.\d{0,2})?$/;
-        
+
+    
+
     function handleWager(e) {
         if (e.target.value==='' || re.test(e.target.value)) {
             setWager(e.target.value)
@@ -30,6 +32,7 @@ export default function BetSlipTile(props){
 
             winAmount = parseFloat(winAmount).toFixed(2)
             setToWin(winAmount)
+            props.handleWager(e.target.value, props.bet)
         }
     }
 
@@ -48,6 +51,7 @@ export default function BetSlipTile(props){
 
             betAmount = parseFloat(betAmount).toFixed(2)
             setWager(betAmount)
+            props.handleWager(betAmount)
     } 
 
     function handleRemoveBet() {

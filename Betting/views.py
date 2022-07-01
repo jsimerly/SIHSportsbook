@@ -175,54 +175,62 @@ class PlaceMatchupBet(APIView):
     def post(self, request, format='json'):
       
         #get bet info from front end
-        bettor_id = request.data.get('bettorId')
-        bettor = Bettor.objects.get(id=bettor_id)
+        data = request.data
+        betting_data=data['bets']
+        print(betting_data)
 
-        if bettor.user == request.user:
+        parlay_status = data['parlay']
+        if parlay_status:
+            pass
+        else:
+            for bet_info in betting_data:
+                bettor_id = bet_info['bettorId']
+                bettor = Bettor.objects.get(id=bettor_id)
+                print(bettor)
 
-            matchup_id = request.data.get('matchupId')
-            
-            bet_amount = request.data.get('betAmount')
+                if bettor.user == request.user:
+                    matchup_id = bet_info['matchupId']
+                    matchup_bet = MatchupBets.objects.get(id=matchup_id)
+                    
+                    bet_amount = bet_info['betAmount']
 
-            time_placed = timezone.now()
+                    time_placed = timezone.now()
 
-            #Matchup Related
-            bet_type = request.data.get('betType')
+                    #Matchup Related
+                    bet_type = bet_info['betType']
+     
+                    payout_date = matchup_bet.payout_date
+                    
+                    bet_type_map = {
+                        'spread_team1' : ('S1', matchup_bet.spread_team1_odds, matchup_bet.spread_team1),
+                        'spread_team2' : ('S2', matchup_bet.spread_team2_odds, matchup_bet.spread_team2),
+                        'ml_team1' : ('M1', matchup_bet.ml_team1, matchup_bet.ml_team1),
+                        'ml_team2' : ('M2', matchup_bet.ml_team2, matchup_bet.ml_team1),
+                        'over' : ('O', matchup_bet.over_odds, matchup_bet.over),
+                        'under' : ('U', matchup_bet.under_odds, matchup_bet.under),
+                    }
+                
+                    bet_type, odds, bet_value = bet_type_map[bet_type]
+                    line = Oddsmaker.implied_odds_to_american(odds)
+                    payout_amount = Oddsmaker.calculate_payout_from_american(bet_amount, line)
 
-            matchup_bet = MatchupBets.objects.get(id=matchup_id)
-            payout_date = matchup_bet.payout_date
-            
-            
-            bet_type_map = {
-                'spread_team1' : ('S1', matchup_bet.spread_team1_odds, matchup_bet.spread_team1),
-                'spread_team2' : ('S2', matchup_bet.spread_team2_odds, matchup_bet.spread_team2),
-                'ml_team1' : ('M1', matchup_bet.ml_team1, matchup_bet.ml_team1),
-                'ml_team2' : ('M2', matchup_bet.ml_team2, matchup_bet.ml_team1),
-                'over' : ('O', matchup_bet.over_odds, matchup_bet.over),
-                'under' : ('U', matchup_bet.under_odds, matchup_bet.under),
-            }
-        
-            bet_type, odds, bet_value = bet_type_map[bet_type]
-            line = Oddsmaker.implied_odds_to_american(odds)
-            payout_amount = Oddsmaker.calculate_payout_from_american(bet_amount, line)
+                    PlacedMatchupBet.objects.create(
+                        line = line,
+                        bet_amount = bet_amount,
+                        payout_amount = payout_amount,
+                        payout_date = payout_date,
+                        time_placed = time_placed,
+                        bet_type = bet_type,
+                        bet_value = bet_value,
+                        bettor = bettor,
+                        matchup_id = matchup_bet.id
+                    )
 
-            PlacedMatchupBet.objects.create(
-                line = line,
-                bet_amount = bet_amount,
-                payout_amount = payout_amount,
-                payout_date = payout_date,
-                time_placed = time_placed,
-                bet_type = bet_type,
-                bet_value = bet_value,
-                bettor = bettor,
-                matchup_id = matchup_bet.id
-            )
+                    # bettorObj.betsLeft -= 1
+                    # bettorObj.balance -= decimal.Decimal(betAmount)
+                    bettor.save()
 
-            # bettorObj.betsLeft -= 1
-            # bettorObj.balance -= decimal.Decimal(betAmount)
-            bettor.save()
-
-            return Response(status=status.HTTP_200_OK)
+                return Response(status=status.HTTP_200_OK)
 
         return Response({"not authoirzed"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -238,12 +246,11 @@ class GetBettors(APIView):
                 leagueInfo = {
                     'league_id' : bettor.league.id,
                     'league_name' : bettor.league.fantasy_league.name,
-                    'team' : bettor.team.fun_name
+                    'team' : bettor.team.fun_name,
+                    'bettor_id' : bettor.id
                 } 
                 json.append(leagueInfo)
 
-            
-            
             return Response(json, status=status.HTTP_200_OK)
        
         return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)

@@ -15,7 +15,6 @@ export default function BetTile(props){
 
     function vanityLogic() {
         if (betType === "spread_team1" || betType === "spread_team2") {
-            let vValue = null
             if (props.data > 0) {
                 return [
                     team + " " + betValue,
@@ -62,7 +61,8 @@ export default function BetTile(props){
             betType : betType,
             betValue : betValue,
             team: team,
-            odds: props.betOdds
+            odds: props.betOdds,
+            wager: 0,
         },
         vanity: {
             main: vanityMain,

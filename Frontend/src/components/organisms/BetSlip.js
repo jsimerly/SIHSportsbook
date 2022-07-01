@@ -13,25 +13,24 @@ import {
 
  import BetSlipTiles from "../molecules/BetSlipTiles";
  import ParlayTile from "../molecules/ParlayTile";
+ import SubmitBetButton from "../molecules/SubmitBetButton";
 
 export default function BetSlip(props){
-    const [selectedBets, setSelectedBets] = useState(props.selectedBets)
     const [parlayStatus, setParlayStatus] = useState(false)
+    const [currentWager, setCurrentWager] = useState()
 
-    useEffect(() => {
-        setSelectedBets(props.data)
-    }, [props.data])
-
-    function submitButton() {
+    function submitButtonIf() {
         if (props.selectedBets.length === 0 ){
             return (<div></div>)
         } else {
-            return (<Button> Submit Slip </Button>)
+            return (<SubmitBetButton handleButtonClicked={props.handleSubmitBets}/>)
         }
     }
 
     function handleParlayToggle() {
         setParlayStatus(!parlayStatus)
+        props.handleParlayStatus(!parlayStatus)
+        props.handleWager(0)
     }
 
     function parlayButton() {
@@ -56,6 +55,7 @@ export default function BetSlip(props){
                 <ParlayTile 
                     selectedBets={props.selectedBets}
                     handleRemoveBet={props.handleRemoveBet}
+                    handleWager={props.handleWager}
                 />
             )
         } else {
@@ -63,6 +63,7 @@ export default function BetSlip(props){
                 <BetSlipTiles
                     selectedBets={props.selectedBets}
                     handleRemoveBet={props.handleRemoveBet}
+                    handleWager={props.handleWager}
                 />
             )
         }
@@ -87,7 +88,7 @@ export default function BetSlip(props){
                     </Grid>
                 </Grid>
                 {parlayToggleComponent()}
-                {submitButton()}
+                {submitButtonIf()}
             </Box>
     )
 }

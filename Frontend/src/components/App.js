@@ -67,7 +67,7 @@ export default function App(props){
         .then((response) => {
             response.json()
             .then((data) => {
-                setLeagues([...data])
+                setLeagues([...data]);
             })
         })
     }
@@ -95,7 +95,6 @@ export default function App(props){
         localStorage.setItem('currentLeague', JSON.stringify(league))
     }
 
-    
     return (
         <div>
             <BrowserRouter>
@@ -122,6 +121,7 @@ export default function App(props){
                                     setLeague={handleLeagueChange}
                                     leagues={leagues}
                                     currentLeague={currentLeague}
+                                    getCookie={getCookie}
                                 />
                             }
                         />

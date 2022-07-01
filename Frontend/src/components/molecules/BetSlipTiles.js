@@ -17,7 +17,8 @@ export default function BetSlipTiles(props){
                     <BetSlipTile
                         bet={bet}
                         handleRemoveBet={props.handleRemoveBet}
-                    />
+                        handleWager={props.handleWager}
+                    /> 
                 )
             })}
         </Box>
