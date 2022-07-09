@@ -102,3 +102,7 @@ class Oddsmaker:
 
         payout = round(decimal.Decimal(payout),2)
         return payout
+
+    @staticmethod
+    def calculate_parlay():
+        pass

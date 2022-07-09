@@ -85,6 +85,7 @@ export default function ParlayTile(props){
     function handleWager(e) {
         if (e.target.value==='' || re.test(e.target.value)) {
             setWager(e.target.value)
+            props.handleWager(e.target.value)
             
             let winAmount = 0
 

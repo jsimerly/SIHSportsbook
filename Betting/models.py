@@ -1,6 +1,8 @@
 from pyexpat import model
+from secrets import choice
 from uuid import uuid4
 import datetime
+from django.forms import CharField
 import pytz
 
 from django.contrib.auth import get_user_model
@@ -131,14 +133,21 @@ class BasePlacedBet(models.Model):
         abstract = True
 
 
-class PlacedMatchupBet(BasePlacedBet, models.Model):
+class PlacedBet(BasePlacedBet, models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)
-    matchup = models.ForeignKey(MatchupBets, on_delete=models.PROTECT)
+    matchup_bet = models.ForeignKey(MatchupBets, on_delete=models.PROTECT, null=True)
+
+    SUBTYPE_CHOICES = (
+        ('FFM', 'Fantasy Football Matchup'),
+    )
+
+    subtype = models.CharField(choices=SUBTYPE_CHOICES, max_length=64)
 
     BET_TYPE_CHOICES = (
-        ('O', 'Over'), ('U', 'Under'),
-        ('M1', 'Moneyline Team1'), ('M2', 'Moneyline Team2'),
-        ('S1', 'Spread Team1'), ('S2', 'Spread Team2'),
+        #matchup options
+        ('M_O', 'Over'), ('M_U', 'Under'),
+        ('M_M1', 'Moneyline Team1'), ('M_M2', 'Moneyline Team2'),
+        ('M_S1', 'Spread Team1'), ('M_S2', 'Spread Team2'),
     )
     bet_type = models.CharField(choices=BET_TYPE_CHOICES, max_length=20)  
     bet_value = models.DecimalField(decimal_places=3, max_digits=9,)        
@@ -159,8 +168,9 @@ class PlacedParlay(models.Model):
         ('R', 'Refunded'),
         ('C', 'Cashed Out')
     )
-
-    betStatus = models.CharField(choices=BET_STATUS_CHOCIES, max_length=64)
+    
+    placed_bets = models.ManyToManyField(PlacedBet)
+    betStatus = models.CharField(choices=BET_STATUS_CHOCIES, max_length=64, default='O')
     line = models.DecimalField(decimal_places=4, max_digits=7)
 
     payoutDate = models.DateTimeField()

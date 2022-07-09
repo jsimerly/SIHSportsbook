@@ -30,10 +30,11 @@ export default function BetSlip(props){
     function handleParlayToggle() {
         setParlayStatus(!parlayStatus)
         props.handleParlayStatus(!parlayStatus)
-        props.handleWager(0)
+        props.handleParlayToggle(!parlayStatus);
     }
 
     function parlayButton() {
+        
         if (parlayStatus) {
             return (
                 <IconButton onClick={handleParlayToggle} sx={{borderRadius: 0}}>
@@ -55,7 +56,7 @@ export default function BetSlip(props){
                 <ParlayTile 
                     selectedBets={props.selectedBets}
                     handleRemoveBet={props.handleRemoveBet}
-                    handleWager={props.handleWager}
+                    handleWager={props.handleParlayWager}     
                 />
             )
         } else {

@@ -21,6 +21,7 @@ export default function LeagueBettingPage(props){
     const [selectedBets, setSelectedBets] = useState([]);
     const [parlayStatus, setParlayStatus] = useState(false);
     const [readyBets, setReadyBets] = useState([]);
+    const [parlayWager, setParlayWager] = useState(0);
     const csrftoken = props.getCookie('csrftoken')
 
     function getMatchups(){
@@ -78,6 +79,28 @@ export default function LeagueBettingPage(props){
             newBetArr.splice(dupIndex,1)
         }
         setReadyBets([...newBetArr])
+        console.log(readyBets)
+    }
+
+    function handleParlayToggle(parlayStatus){
+        let newReadyBets = [];
+        if (parlayStatus){
+            console.log(parlayWager)  
+            if (parlayWager != 0 || parlayWager != ''){
+                newReadyBets = selectedBets
+            } 
+        } else {
+            selectedBets.map((bet, index) => {
+                console.log('non par')
+                console.log(bet.betData.wager)
+                if (bet.betData.wager != 0 || bet.betData.wager != '' || bet.betData.wager != "0"){
+                    console.log('push')
+                    newReadyBets.push(bet)
+                }
+            })
+        }
+        console.log(newReadyBets)
+        setReadyBets([...newReadyBets])
     }
 
     function handleRemoveBet(removedBet) {
@@ -94,6 +117,7 @@ export default function LeagueBettingPage(props){
 
     function createBetsMap(bets){
         let bets_info = []
+        
         bets.map((bet, index) => {
 
             let info_map = {
@@ -108,14 +132,14 @@ export default function LeagueBettingPage(props){
 
         let post_data = {
             "parlay" : parlayStatus,
+            "parlay_wager" : parlayWager,
             "bets" : bets_info
         }
 
         return post_data
     }
-    console.log(csrftoken)
 
-    function handleSubmitBets(){
+    function handleSubmitBets(){     
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -123,7 +147,7 @@ export default function LeagueBettingPage(props){
                 'X-CSRFTOKEN' : csrftoken,
             },
             body: JSON.stringify(
-                createBetsMap(readyBets, parlayStatus)
+                createBetsMap(readyBets)
                 
             )
         }
@@ -134,11 +158,13 @@ export default function LeagueBettingPage(props){
         })
     }
 
-    
 
     function handleParlayStatus(status){
-        console.log(status)
         setParlayStatus(status)
+    }
+
+    function handleParlayWager(wager){
+        setParlayWager(wager)
     }
 
     return (
@@ -169,6 +195,8 @@ export default function LeagueBettingPage(props){
                         handleSubmitBets={handleSubmitBets}
                         selectedBets={selectedBets}
                         handleWager={betReadyHandler}
+                        handleParlayToggle={handleParlayToggle}
+                        handleParlayWager={handleParlayWager}
                         handleParlayStatus={handleParlayStatus}
                     />
                 </Grid>
