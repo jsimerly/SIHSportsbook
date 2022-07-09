@@ -11,7 +11,14 @@ import {
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 export default function BetSlipTile(props){ 
-    const [wager, setWager] = useState()
+    function setInitialWager(wager){
+        if (wager == 0){
+            return ''
+        } 
+        return wager
+    }
+
+    const [wager, setWager] = useState(setInitialWager(props.bet.betData.wager))
     const [toWin, setToWin] = useState()
     const line = props.bet.vanity.line
     

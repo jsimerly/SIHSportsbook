@@ -13,7 +13,13 @@ import ParlayBet from "../atoms/parlayBet";
 
 export default function ParlayTile(props){
     const selectedBets = props.selectedBets
-    const [wager, setWager] = useState()
+    function setInitialWager(wager){
+        if (wager == 0){
+            return ''
+        }
+        return wager
+    }
+    const [wager, setWager] = useState(setInitialWager(props.parlayWager))
     const [toWin, setToWin] = useState()
     const line = 0
 

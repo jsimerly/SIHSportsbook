@@ -85,16 +85,12 @@ export default function LeagueBettingPage(props){
     function handleParlayToggle(parlayStatus){
         let newReadyBets = [];
         if (parlayStatus){
-            console.log(parlayWager)  
             if (parlayWager != 0 || parlayWager != ''){
                 newReadyBets = selectedBets
             } 
         } else {
             selectedBets.map((bet, index) => {
-                console.log('non par')
-                console.log(bet.betData.wager)
                 if (bet.betData.wager != 0 || bet.betData.wager != '' || bet.betData.wager != "0"){
-                    console.log('push')
                     newReadyBets.push(bet)
                 }
             })
@@ -195,6 +191,7 @@ export default function LeagueBettingPage(props){
                         handleSubmitBets={handleSubmitBets}
                         selectedBets={selectedBets}
                         handleWager={betReadyHandler}
+                        parlayWager={parlayWager}
                         handleParlayToggle={handleParlayToggle}
                         handleParlayWager={handleParlayWager}
                         handleParlayStatus={handleParlayStatus}
