@@ -47,6 +47,7 @@ export default function App(props){
         setCsrftoken(getCookie('csrftoken'))
         getCurrentUser()
         getLeagues()
+        console.log(currentLeague)
         // getBets()
     }, [])
 

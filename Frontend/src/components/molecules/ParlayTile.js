@@ -10,7 +10,7 @@ import {
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 import ParlayBet from "../atoms/parlayBet";
-import impliedOddsToAmerican from "../../util/oddHandler";
+import { impliedOddsToAmerican, getParlayOdds } from "../../util/oddHandler";
 
 export default function ParlayTile(props){
     const selectedBets = props.selectedBets
@@ -24,36 +24,8 @@ export default function ParlayTile(props){
     const betLines = getParlayLines()
 
     function calculateParlayLine() {
-        const decimalOdds = []
-        let betOdds = 1
-        selectedBets.map((bet, index) =>{
-            betOdds *= bet.betData.odds
-        })
-
+        const betOdds = getParlayOdds(selectedBets, props.parlayVig)
         return impliedOddsToAmerican(betOdds)
-
-        betLines.map((line, index) => {
-            if (line < 0) {
-                decimalOdds.push(1-(100/line))
-            } else {
-                decimalOdds.push((line/100)+1)
-            }    
-        })
-
-        if (decimalOdds.length === 0){
-            return 0
-        } else {
-            var parlayOdds = decimalOdds.reduce(function(a,b) {
-                return a * b;
-            });
-
-            if (parlayOdds > 2.00) {
-                return Math.round((parlayOdds-1)*100)
-            } else {
-                return Math.round((-100) / (parlayOdds-1))
-            }
-        }
-
     }
 
     const parlayLine = calculateParlayLine()

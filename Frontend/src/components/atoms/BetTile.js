@@ -5,7 +5,7 @@ import {
     ToggleButton
 } from "@mui/material";
 
-import impliedOddsToAmerican from "../../util/oddHandler";
+import { impliedOddsToAmerican } from "../../util/oddHandler";
 
 export default function BetTile(props){
     const matchupData = props.matchupData;

@@ -17,7 +17,6 @@ import {
 
 export default function BetSlip(props){
     const [parlayStatus, setParlayStatus] = useState(false)
-    const [currentWager, setCurrentWager] = useState()
 
     function submitButtonIf() {
         if (props.selectedBets.length === 0 ){
@@ -57,7 +56,8 @@ export default function BetSlip(props){
                     selectedBets={props.selectedBets}
                     handleRemoveBet={props.handleRemoveBet}
                     handleWager={props.handleParlayWager}
-                    handleParlayReady={props.handleParlayReady}     
+                    handleParlayReady={props.handleParlayReady}    
+                    parlayVig = {props.parlayVig} 
                 />
             )
         } else {

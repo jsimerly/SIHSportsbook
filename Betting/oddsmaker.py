@@ -110,6 +110,7 @@ class Oddsmaker:
         final_odds = 1
         for prob in input_odds:
             final_odds *= prob
+        final_odds += parlay_vig
 
         odds = float(final_odds)
         if odds < .5:

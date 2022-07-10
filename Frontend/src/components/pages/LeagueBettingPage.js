@@ -201,6 +201,7 @@ export default function LeagueBettingPage(props){
                         handleParlayWager={handleParlayWager}
                         handleParlayStatus={handleParlayStatus}
                         handleParlayReady={parlayReadyBets}
+                        parlayVig = {props.currentLeague.parlay_vig}
                     />
                 </Grid>
             </Grid>
