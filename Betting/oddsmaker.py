@@ -106,7 +106,7 @@ class Oddsmaker:
         return payout
 
     @staticmethod
-    def calculate_parlay_line(input_odds):
+    def calculate_parlay_line(input_odds, parlay_vig):
         final_odds = 1
         for prob in input_odds:
             final_odds *= prob

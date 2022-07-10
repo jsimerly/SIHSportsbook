@@ -29,12 +29,17 @@ class BettingLeague(models.Model):
         decimal_places=4, 
         max_digits=7, 
         default=0.0476
-        )
+    )
+    parlay_vig = models.DecimalField(
+        decimal_places=4, 
+        max_digits=7, 
+        default=0.01
+    )
 
     bookie = models.ForeignKey(
         User, 
         on_delete=models.PROTECT,
-        )
+    )
 
     weekly_allowance = models.DecimalField(decimal_places=2, max_digits=10, default=10)
     weekly_n_bets = models.IntegerField(default=10)
