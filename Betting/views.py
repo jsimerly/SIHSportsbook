@@ -242,9 +242,9 @@ class PlaceMatchupBet(APIView):
         if parlay_status:
             if parlay_wager > 0:
                 payout_date = max(parlay_map['payout_date']) + datetime.timedelta(hours=6)
-                line = Oddsmaker.calculate_parlay_line(parlay_map['odds'])
+                parlay_vig = matchup_bet.betting_league.parlay_vig
+                line = Oddsmaker.calculate_parlay_line(parlay_map['odds'], parlay_vig)
                 payout_amount = Oddsmaker.calculate_payout_from_american(parlay_wager, line)
-                        
 
                 parlayBet = PlacedParlay.objects.create(
                     bettor=bettor,
@@ -277,7 +277,8 @@ class GetBettors(APIView):
                     'league_id' : bettor.league.id,
                     'league_name' : bettor.league.fantasy_league.name,
                     'team' : bettor.team.fun_name,
-                    'bettor_id' : bettor.id
+                    'bettor_id' : bettor.id,
+                    'parlay_vig' : bettor.league.parlay_vig
                 } 
                 json.append(leagueInfo)
 
