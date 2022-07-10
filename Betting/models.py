@@ -121,7 +121,7 @@ class BasePlacedBet(models.Model):
         ('R', 'Refunded'),
         ('C', 'Cashed Out')
     )
-    betStatus = models.CharField(choices=BET_STATUS_CHOCIES, default= 'O',max_length=64)
+    bet_status = models.CharField(choices=BET_STATUS_CHOCIES, default= 'O',max_length=64)
     bettor = models.ForeignKey(Bettor, on_delete=models.CASCADE)
 
     line = models.DecimalField(decimal_places=3, max_digits=9,)

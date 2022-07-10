@@ -1,11 +1,8 @@
 import React, { Component, useState, useEffect } from "react";
 import {
     Grid,
-    List,
-    Button,
     Box,
     IconButton,
-    Icon,
     Typography
  } from '@mui/material';
  import DeleteForeverIcon from '@mui/icons-material/DeleteForever';

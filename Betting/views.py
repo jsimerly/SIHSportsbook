@@ -286,6 +286,42 @@ class GetBettors(APIView):
        
         return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
 
+class GetOpenBetsForSingleLeague(APIView):
+    lookup_url_kwarg = 'bettor-id'
+
+    def get(self, request, format='json'):
+        if request.user.is_authenticated:
+            bettor_id = request.GET.get(self.lookup_url_kwarg)
+            open_bet_qset = PlacedBet.objects.filter(Q(bettor_id=bettor_id) & Q(bet_status='O') & Q(parlayed=False))
+            
+            json = []
+            for open_bet_obj in open_bet_qset:
+                if open_bet_obj.subtype == 'FFM':
+                    matchup = MatchupBets.objects.get(id=open_bet_obj.matchup_bet_id)
+                    subtype_info = {
+                        'team1' : matchup.team1.fun_name,
+                        'team2' : matchup.team2.fun_name,
+                    }
+                bet_info = {
+                    'subtype_info' : subtype_info,
+                    'type' : open_bet_obj.subtype,
+                    'wager' : open_bet_obj.bet_amount,
+                    'payout_amount' : open_bet_obj.payout_amount,
+                    'payou_date' : open_bet_obj.payout_date,
+                    'status' : "O",
+                    'bet_type' : open_bet_obj.bet_type,
+                    'bet_value' : open_bet_obj.bet_value,
+                    'line' : open_bet_obj.line
+                }
+
+                json.append(bet_info)
+
+
+        return Response(json)
+
+         
+           
+
 # class GetBetHistory(APIView):
 #     def get(self, request, format='json'):
 #         print(request)
