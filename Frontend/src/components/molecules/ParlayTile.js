@@ -10,47 +10,27 @@ import {
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 import ParlayBet from "../atoms/parlayBet";
+import impliedOddsToAmerican from "../../util/oddHandler";
 
 export default function ParlayTile(props){
     const selectedBets = props.selectedBets
-    function setInitialWager(wager){
+    function cleanWager(wager){
         if (wager == 0){
             return ''
         }
         return wager
-    }
-    const [wager, setWager] = useState(setInitialWager(props.parlayWager))
-    const [toWin, setToWin] = useState()
-    const line = 0
-
-    useEffect(() => {
-        checkForBets()
-    },[props.selectedBets]);
-
-    function checkForBets() {
-        if (props.selectedBets.length === 0) {
-            return (<div></div>)
-        } else {
-            return (<div> {parlayBody()} </div>)
-        }
-    }
-
-    function handleRemoveBet() {
-        props.handleRemoveBet(props.bet)
-    }
-
-    function getParlayLines(){
-        let parlayLines = []
-        selectedBets.map((bet, index) => {
-            parlayLines.push(bet.vanity.line)
-        })
-        return parlayLines
     }
 
     const betLines = getParlayLines()
 
     function calculateParlayLine() {
         const decimalOdds = []
+        let betOdds = 1
+        selectedBets.map((bet, index) =>{
+            betOdds *= bet.betData.odds
+        })
+
+        return impliedOddsToAmerican(betOdds)
 
         betLines.map((line, index) => {
             if (line < 0) {
@@ -78,6 +58,36 @@ export default function ParlayTile(props){
 
     const parlayLine = calculateParlayLine()
 
+    const [wager, setWager] = useState(cleanWager(props.parlayWager))
+    const [toWin, setToWin] = useState(cleanWager(calculateToWin(props.parlayWager)))  
+    const line = 0
+
+    useEffect(() => {
+        checkForBets()
+    },[props.selectedBets]);
+
+    function checkForBets() {
+        if (props.selectedBets.length === 0) {
+            return (<div></div>)
+        } else {
+            return (<div> {parlayBody()} </div>)
+        }
+    }
+
+    function handleRemoveBet() {
+        props.handleRemoveBet(props.bet)
+    }
+
+    function getParlayLines(){
+        let parlayLines = []
+        selectedBets.map((bet, index) => {
+            parlayLines.push(bet.vanity.line)
+        })
+        return parlayLines
+    }
+
+    
+
     function getVanityParlayLine(){
         if (parlayLine > 0) {
             return "+" + parlayLine
@@ -88,22 +98,41 @@ export default function ParlayTile(props){
 
     const re = /^[0-9]\d*(?:\.\d{0,2})?$/;
 
+    function calculateToWin(wager){
+        let winAmount = 0
+        if (parlayLine > 0) {
+            winAmount = parlayLine/100 * wager
+         } else {
+             winAmount = 100/(-1*parlayLine) * wager
+         }
+
+         winAmount = parseFloat(winAmount).toFixed(2)
+         return winAmount
+    }
+
     function handleWager(e) {
         if (e.target.value==='' || re.test(e.target.value)) {
             setWager(e.target.value)
             props.handleWager(e.target.value)
             
-            let winAmount = 0
+            
+            const winAmount = calculateToWin(e.target.value)
 
-            if (parlayLine > 0) {
-               winAmount = parlayLine/100 * e.target.value
-            } else {
-                winAmount = 100/(-1*parlayLine) * e.target.value
-            }
-
-            winAmount = parseFloat(winAmount).toFixed(2)
-            setToWin(winAmount)
+            setToWin(cleanWager(winAmount))
+            // props.handleWager(e.target.value)
         }
+    }
+
+    function calculateWager(toWinValue){
+        let betAmount = 0
+        if (parlayLine > 0) {
+            betAmount = (toWinValue * 100)/parlayLine
+         } else {
+             betAmount = (toWinValue * parlayLine * -1)/100
+         }
+
+         betAmount = parseFloat(betAmount).toFixed(2)
+         return betAmount
     }
 
     function handleToWin(e){
@@ -111,16 +140,10 @@ export default function ParlayTile(props){
             setToWin(e.target.value)
         }
 
-            let betAmount = 0
+            const wager = calculateWager(e.target.value)
 
-            if (line > 0) {
-               betAmount = (e.target.value * 100)/parlayLine
-            } else {
-                betAmount = (e.target.value * parlayLine * -1)/100
-            }
-
-            betAmount = parseFloat(betAmount).toFixed(2)
-            setWager(betAmount)
+            setWager(cleanWager(wager))
+            // props.handleWager(betAmount)
     } 
 
 
@@ -132,7 +155,7 @@ export default function ParlayTile(props){
                         {props.selectedBets.length}-Leg Parlay
                     </Grid>
                     <Grid container justifyContent={"flex-end"} item xs={6}>
-                        {getVanityParlayLine()}
+                        {parlayLine}
                     </Grid>
                 </Grid>
                 <Box sx={{mb:1}}>
