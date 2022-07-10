@@ -171,9 +171,12 @@ class PlacedParlay(models.Model):
     
     placed_bets = models.ManyToManyField(PlacedBet)
     betStatus = models.CharField(choices=BET_STATUS_CHOCIES, max_length=64, default='O')
-    line = models.DecimalField(decimal_places=4, max_digits=7)
 
-    payoutDate = models.DateTimeField()
+    line = models.DecimalField(decimal_places=4, max_digits=7)
+    wager = models.DecimalField(decimal_places=2, max_digits=10)
+    payout_amount = models.DecimalField(decimal_places=2, max_digits=10,)
+
+    payout_date = models.DateTimeField()
 
 
 

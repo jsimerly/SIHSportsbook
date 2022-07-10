@@ -176,9 +176,8 @@ class PlaceMatchupBet(APIView):
         #get bet info from front end
         data = request.data
         betting_data=data['bets']
-        print(data)
-        parlay_wager = data['parlay_wager']
-        parlay_status = data['parlay']
+        parlay_wager = decimal.Decimal(data['parlay_wager'])
+        parlay_status = data['parlay'] and len(betting_data) > 1
 
         if parlay_status:
             parlay_map = {
@@ -241,20 +240,28 @@ class PlaceMatchupBet(APIView):
                     parlay_map['payout_date'].append(payout_date)
 
         if parlay_status:
-            print(parlay_map)
-            print(parlay_wager)
-            # PlacedParlay.objects.create(
-            #     bettor=bettor,
-                
-            # )
+            if parlay_wager > 0:
+                payout_date = max(parlay_map['payout_date']) + datetime.timedelta(hours=6)
+                line = Oddsmaker.calculate_parlay_line(parlay_map['odds'])
+                payout_amount = Oddsmaker.calculate_payout_from_american(parlay_wager, line)
+                        
 
+                parlayBet = PlacedParlay.objects.create(
+                    bettor=bettor,
+                    wager = parlay_wager,
+                    payout_date = payout_date,
+                    line = line,
+                    payout_amount = payout_amount,
+                )
+
+                parlayBet.placed_bets.add(*parlay_map['placed_bets'])
             
 
             # bettorObj.betsLeft -= 1
             # bettorObj.balance -= decimal.Decimal(betAmount)
             bettor.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({'data':'data1'},status=status.HTTP_200_OK)
 
 
 class GetBettors(APIView):

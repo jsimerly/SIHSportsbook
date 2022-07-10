@@ -11,36 +11,52 @@ import {
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 export default function BetSlipTile(props){ 
-    function setInitialWager(wager){
+    function cleanWager(wager){
         if (wager == 0){
             return ''
         } 
         return wager
     }
 
-    const [wager, setWager] = useState(setInitialWager(props.bet.betData.wager))
-    const [toWin, setToWin] = useState()
     const line = props.bet.vanity.line
+    const [wager, setWager] = useState(cleanWager(props.bet.betData.wager))
+    const [toWin, setToWin] = useState(cleanWager(calculateWager(props.bet.betData.wager)))
+    
     
     const re = /^[0-9]\d*(?:\.\d{0,2})?$/;
 
-    
+    function calculateToWin(wager){
+        let winAmount = 0
+        if (line > 0) {
+            winAmount = line/100 * wager
+         } else {
+             winAmount = 100/(-1*line) * wager
+         }
+
+         winAmount = parseFloat(winAmount).toFixed(2)
+         return winAmount
+    }
 
     function handleWager(e) {
         if (e.target.value==='' || re.test(e.target.value)) {
             setWager(e.target.value)
-            let winAmount = 0
 
-            if (line > 0) {
-               winAmount = line/100 * e.target.value
-            } else {
-                winAmount = 100/(-1*line) * e.target.value
-            }
-
-            winAmount = parseFloat(winAmount).toFixed(2)
-            setToWin(winAmount)
+            const winAmount = calculateToWin(e.target.value)
+          
+            setToWin(cleanWager(winAmount))
             props.handleWager(e.target.value, props.bet)
         }
+    }
+
+    function calculateWager(toWinValue){
+        let betAmount = 0
+        if (line > 0) {
+            betAmount = (toWinValue * 100)/line
+         } else {
+             betAmount = (toWinValue * line * -1)/100
+         }
+         betAmount = parseFloat(betAmount).toFixed(2)
+         return betAmount
     }
 
     function handleToWin(e){
@@ -48,17 +64,9 @@ export default function BetSlipTile(props){
             setToWin(e.target.value)
         }
 
-            let betAmount = 0
-
-            if (line > 0) {
-               betAmount = (e.target.value * 100)/line
-            } else {
-                betAmount = (e.target.value * line * -1)/100
-            }
-
-            betAmount = parseFloat(betAmount).toFixed(2)
-            setWager(betAmount)
-            props.handleWager(betAmount)
+            const wager = calculateWager(e.target.value)
+            setWager(cleanWager(wager))
+            props.handleWager(wager)
     } 
 
     function handleRemoveBet() {

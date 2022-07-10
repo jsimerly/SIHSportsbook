@@ -87,7 +87,8 @@ export default function BetTile(props){
     }
 
     function BetButton() {
-        return (<ToggleButton
+        return (
+        <ToggleButton
             fullWidth={true} 
             value={props.data}
 
@@ -95,7 +96,8 @@ export default function BetTile(props){
             onChange={buttonSelected}
         >
             {vanityValue}
-        </ToggleButton>)
+        </ToggleButton>
+        )
     }
 
     return (

@@ -65,21 +65,18 @@ export default function LeagueBettingPage(props){
     }
 
     function betReadyHandler(wager, bet) {
-        let newBetArr = readyBets;
+        let newBetArr = selectedBets
         const dupIndex = checkDupsIndex(newBetArr, bet)
 
-        if (wager != 0 || wager != ''){
-            if (dupIndex != -1){
-                newBetArr[dupIndex].betData.wager = wager
-            } else {
-                bet.betData.wager = wager
-                newBetArr.push(bet)
-            }
-        } else {
-            newBetArr.splice(dupIndex,1)
-        }
-        setReadyBets([...newBetArr])
-        console.log(readyBets)
+        newBetArr[dupIndex].betData.wager = wager
+
+        setSelectedBets([...newBetArr])
+    }
+
+    function parlayReadyBets(){
+        if (parlayWager != 0 || parlayWager != ''){
+            setReadyBets([...selectedBets])
+        } 
     }
 
     function handleParlayToggle(parlayStatus){
@@ -89,14 +86,16 @@ export default function LeagueBettingPage(props){
                 newReadyBets = selectedBets
             } 
         } else {
-            selectedBets.map((bet, index) => {
+            readyBets.map((bet, index) => {
                 if (bet.betData.wager != 0 || bet.betData.wager != '' || bet.betData.wager != "0"){
                     newReadyBets.push(bet)
                 }
             })
         }
-        console.log(newReadyBets)
+        
         setReadyBets([...newReadyBets])
+        console.log(readyBets)
+        console.log('handleParlayToggle')
     }
 
     function handleRemoveBet(removedBet) {
@@ -113,17 +112,21 @@ export default function LeagueBettingPage(props){
 
     function createBetsMap(bets){
         let bets_info = []
-        
+        console.log('bets')
+        console.log(bets)
         bets.map((bet, index) => {
+            if (bet.betData.wager != 0 || parlayStatus){
+                let info_map = {
+                    bettorId : props.currentLeague.bettor_id,
+                    matchupId : bet.matchupData.matchupId,
+                    betAmount : bet.betData.wager,
+                    betType : bet.betData.betType,
+                }
+    
+                bets_info.push(info_map)
 
-            let info_map = {
-                bettorId : props.currentLeague.bettor_id,
-                matchupId : bet.matchupData.matchupId,
-                betAmount : bet.betData.wager,
-                betType : bet.betData.betType,
             }
-
-            bets_info.push(info_map)
+            
         })
 
         let post_data = {
@@ -143,10 +146,12 @@ export default function LeagueBettingPage(props){
                 'X-CSRFTOKEN' : csrftoken,
             },
             body: JSON.stringify(
-                createBetsMap(readyBets)
+                createBetsMap(selectedBets)
                 
             )
         }
+        
+        console.log(requestOptions.body)
 
         fetch('/api/betting/place-bet-matchup', requestOptions)
         .then((response) => {
@@ -195,6 +200,7 @@ export default function LeagueBettingPage(props){
                         handleParlayToggle={handleParlayToggle}
                         handleParlayWager={handleParlayWager}
                         handleParlayStatus={handleParlayStatus}
+                        handleParlayReady={parlayReadyBets}
                     />
                 </Grid>
             </Grid>

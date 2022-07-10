@@ -78,6 +78,7 @@ class Oddsmaker:
             }
         }
         return spread_dict
+        
 
     @staticmethod
     def implied_odds_to_american(odds):
@@ -90,6 +91,7 @@ class Oddsmaker:
             american_odds = -100*((odds)/(1-odds))
             american_odds = round(decimal.Decimal(american_odds),0)
             return american_odds
+
 
     @staticmethod
     def calculate_payout_from_american(bet, line):
@@ -104,5 +106,17 @@ class Oddsmaker:
         return payout
 
     @staticmethod
-    def calculate_parlay():
-        pass
+    def calculate_parlay_line(input_odds):
+        final_odds = 1
+        for prob in input_odds:
+            final_odds *= prob
+
+        odds = float(final_odds)
+        if odds < .5:
+            american_odds = ((1-odds)/(odds))*100
+            american_odds = round(decimal.Decimal(american_odds),0)
+            return american_odds
+        else:
+            american_odds = -100*((odds)/(1-odds))
+            american_odds = round(decimal.Decimal(american_odds),0)
+            return american_odds
