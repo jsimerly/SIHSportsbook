@@ -39,16 +39,15 @@ export default function App(props){
     const [currentLeague, setCurrentLeague] = useState(
         JSON.parse(localStorage.getItem('currentLeague')) || null
     );
-    const [openBets, setOpenBets] = useState()
-    const [closedBets, setClosedBets] = useState()
+    const [openBets, setOpenBets] = useState([])
+    const [closedBets, setClosedBets] = useState([])
     const [error, setError] = useState();
 
     useEffect(() => {
         setCsrftoken(getCookie('csrftoken'))
         getCurrentUser()
         getLeagues()
-        console.log(currentLeague)
-        // getBets()
+        getBets()
     }, [])
 
 
@@ -74,10 +73,13 @@ export default function App(props){
     }
 
     function getBets(){
-        fetch('/api/betting/get-league-bet-history?q=' + "1234")
+        console.log('bets')
+        fetch('/api/betting/get-league-bet-history' + '?bettor-id=' + currentLeague.bettor_id)
         .then((response) => {
             response.json()
-            .then((data) => {
+            .then((json)=>{
+                setOpenBets(json.open)
+                setClosedBets(json.closed)
             })
         })
     }
@@ -123,6 +125,8 @@ export default function App(props){
                                     leagues={leagues}
                                     currentLeague={currentLeague}
                                     getCookie={getCookie}
+                                    openBets={openBets}
+                                    closedBets={closedBets}
                                 />
                             }
                         />

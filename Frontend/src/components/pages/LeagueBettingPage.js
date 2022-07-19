@@ -178,6 +178,8 @@ export default function LeagueBettingPage(props){
                             setLeague={props.setLeague}
                             leagues={props.leagues}
                             currentLeague={props.currentLeague}
+                            openBets={props.openBets}
+                            closedBets={props.closedBets}
                         />
                     </Box>
                 </Grid>

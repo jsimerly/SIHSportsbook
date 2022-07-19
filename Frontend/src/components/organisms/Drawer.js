@@ -1,17 +1,17 @@
 import { Drawer, ListItem } from "@mui/material";
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import { Box } from "@mui/system";
 import { Divider } from "@mui/material";
 import { List } from "@mui/material";
 
 import LeagueButton from "../atoms/LeagueButton";
 import LeagueHeader from "../molecules/LeagueHeader";
+import PlacedBets from "../molecules/PlacedBets";
 
 const drawerWidth = 240;
 
 export default function DrawerComp(props){
-    
-
+    console.log(props.openBets)
     const drawer = (
         <div>
             <LeagueHeader/>
@@ -26,15 +26,13 @@ export default function DrawerComp(props){
           
             <Divider/>
             <List>
-                {['Open Bet 1', 'Open Bet 2', 'Open Bet 3', 'Open Bet 4'].map((bet, index) => 
-                    <ListItem>
-                        {bet}
-                    </ListItem>
+                {props.openBets.map((bet, index) => 
+                    <PlacedBets bet={bet}/>
                 )}
             </List>
             <Divider/>
             <List>
-                {['Won Bet', 'Lost Bet', 'Won Bet', 'Won Bet'].map((bet, index) => 
+                {props.closedBets.map((bet, index) => 
                     <ListItem>
                         {bet}
                     </ListItem>
