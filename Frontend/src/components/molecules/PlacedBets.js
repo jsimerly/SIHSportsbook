@@ -5,11 +5,8 @@ import {
     TextField,
     IconButton,
 } from "@mui/material";
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import BetSlipTile from "../atoms/BetSlipTile";
 
 export default function PlacedBets(props){
-
     function getCorrectBet(bet){
         if (bet.bet_type === "M1" || bet.bet_type === "M2"){
             return (
@@ -27,7 +24,9 @@ export default function PlacedBets(props){
         } else {
             return (
                 <Box>
-                    
+                   <Grid container sx={{border:1}}>
+                     123
+                   </Grid>
                 </Box>
             )
         }
