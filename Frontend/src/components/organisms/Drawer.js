@@ -7,6 +7,7 @@ import { List } from "@mui/material";
 import LeagueButton from "../atoms/LeagueButton";
 import LeagueHeader from "../molecules/LeagueHeader";
 import PlacedBets from "../molecules/PlacedBets";
+import ParlayedPlacedBets from "../molecules/ParlayedPlacedBet";
 
 const drawerWidth = 240;
 
@@ -26,9 +27,13 @@ export default function DrawerComp(props){
           
             <Divider/>
             <List>
-                {props.openBets.map((bet, index) => 
-                    <PlacedBets bet={bet}/>
-                )}
+                {props.openBets.map((bet, index) => {
+                    console.log(bet.parlayed)
+                    if (bet.parlayed){
+                        return <ParlayedPlacedBets bet={bet}/>
+                    }
+                    return <PlacedBets bet={bet}/>
+                })}
             </List>
             <Divider/>
             <List>

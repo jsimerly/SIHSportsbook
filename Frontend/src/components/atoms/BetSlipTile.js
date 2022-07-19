@@ -102,7 +102,7 @@ export default function BetSlipTile(props){
                     </Box>
                 </Grid>
             </Grid>
-            <Box>
+        <Box>
                 <Grid container justifyContent={"center"}>
                     <Grid item xs={5} sx={{mr:1, mb:2}}>
                         <FormControl>
