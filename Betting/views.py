@@ -190,9 +190,10 @@ class PlaceMatchupBet(APIView):
            
             bettor_id = bet_info['bettorId']
             bettor = Bettor.objects.get(id=bettor_id)
-
+             
             if bettor.user == request.user:
                 matchup_id = bet_info['matchupId']
+
                 matchup_bet = MatchupBets.objects.get(id=matchup_id)
                 
                 bet_amount = bet_info['betAmount']
@@ -207,8 +208,8 @@ class PlaceMatchupBet(APIView):
                 bet_type_map = {
                     'spread_team1' : ('S1', matchup_bet.spread_team1_odds, matchup_bet.spread_team1),
                     'spread_team2' : ('S2', matchup_bet.spread_team2_odds, matchup_bet.spread_team2),
-                    'ml_team1' : ('M1', matchup_bet.ml_team1, matchup_bet.ml_team1),
-                    'ml_team2' : ('M2', matchup_bet.ml_team2, matchup_bet.ml_team1),
+                    'ml_team1' : ('M1', matchup_bet.ml_team1, 1),
+                    'ml_team2' : ('M2', matchup_bet.ml_team2, 2),
                     'over' : ('O', matchup_bet.over_odds, matchup_bet.over),
                     'under' : ('U', matchup_bet.under_odds, matchup_bet.under),
                 }
@@ -263,7 +264,6 @@ class PlaceMatchupBet(APIView):
 
         return Response({'data':'data1'},status=status.HTTP_200_OK)
 
-
 class GetBettors(APIView):
     def get(self, request, format='json'):
         if request.user.is_authenticated:
@@ -286,36 +286,71 @@ class GetBettors(APIView):
        
         return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
 
-class GetOpenBetsForSingleLeague(APIView):
+class GetAllBetsForSingleLeague(APIView):
     lookup_url_kwarg = 'bettor-id'
+
+    def getBetInfo(self, bet_obj, parlayed=False):
+        if bet_obj.subtype == 'FFM':
+            matchup = MatchupBets.objects.get(id=bet_obj.matchup_bet_id)
+            subtype_info = {
+                'team1' : matchup.team1.fun_name,
+                'team2' : matchup.team2.fun_name,
+            }                    
+        
+        bet_info = {
+            'parlayed' : parlayed,
+            'subtype_info' : subtype_info,
+            'type' : bet_obj.subtype,
+            'wager' : bet_obj.bet_amount,
+            'payout_amount' : bet_obj.payout_amount,
+            'payout_date' : bet_obj.payout_date,
+            'status' : bet_obj.bet_status,
+            'bet_type' : bet_obj.bet_type,
+            'bet_value' : bet_obj.bet_value,
+            'line' : bet_obj.line, 
+        }
+
+        return bet_info
 
     def get(self, request, format='json'):
         if request.user.is_authenticated:
             bettor_id = request.GET.get(self.lookup_url_kwarg)
-            open_bet_qset = PlacedBet.objects.filter(Q(bettor_id=bettor_id) & Q(bet_status='O') & Q(parlayed=False))
+            bet_qset = PlacedBet.objects.filter(Q(bettor_id=bettor_id) & Q(parlayed=False))
+            parlayed_qset = PlacedParlay.objects.filter(bettor_id=bettor_id)
+
             
-            json = []
-            for open_bet_obj in open_bet_qset:
-                if open_bet_obj.subtype == 'FFM':
-                    matchup = MatchupBets.objects.get(id=open_bet_obj.matchup_bet_id)
-                    subtype_info = {
-                        'team1' : matchup.team1.fun_name,
-                        'team2' : matchup.team2.fun_name,
-                    }
-                bet_info = {
-                    'subtype_info' : subtype_info,
-                    'type' : open_bet_obj.subtype,
-                    'wager' : open_bet_obj.bet_amount,
-                    'payout_amount' : open_bet_obj.payout_amount,
-                    'payou_date' : open_bet_obj.payout_date,
-                    'status' : "O",
-                    'bet_type' : open_bet_obj.bet_type,
-                    'bet_value' : open_bet_obj.bet_value,
-                    'line' : open_bet_obj.line
+            json = {
+                'open' : [],
+                'closed' : [],
+            }
+            for bet_obj in bet_qset:
+ 
+                bet_info = self.getBetInfo(bet_obj)
+
+                if bet_info['status'] == 'O':
+                    json['open'].append(bet_info)
+                else:
+                    json['closed'].append(bet_info)
+
+
+            for bet_obj in parlayed_qset:
+                parlay_info = {
+                    'parlayed' : True,
+                    'payout_date' : bet_obj.payout_date,
+                    'status' : bet_obj.bet_status,
+                    'bets' : [],
                 }
+            
+                attached_bets = bet_obj.placed_bets.all()
 
-                json.append(bet_info)
+                for bet_obj in attached_bets:
+                    bet_info = self.getBetInfo(bet_obj, parlayed=True)
+                    parlay_info['bets'].append(bet_info)
 
+                if parlay_info['status'] == 'O':
+                    json['open'].append(parlay_info)
+                else:
+                    json['closed'].append(parlay_info)
 
         return Response(json)
 
