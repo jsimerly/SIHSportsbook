@@ -2,13 +2,51 @@ import React, { Component, useState } from "react";
 import { 
     Grid,
     Box,
-    TextField,
-    IconButton,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
 } from "@mui/material";
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import BetSlipTile from "../atoms/BetSlipTile";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 
 export default function ParlayedPlacedBets(props){
+    function betSlipTemplate(betValue, betType, wager, status, result, line, payoutDate){
+        return(
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon/>}
+                >
+                    <Box>
+                        <Grid container>
+                            <Grid item>
+                                <Box>
+                                    Parlay (3-leg)
+                                </Box>
+                                <Box>
+                                    {betType}
+                                </Box>
+                                <Box>
+                                    {wager}
+                                </Box>
+                            </Grid>
+                          
+                        </Grid>
+                    </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Grid container>
+                        <Grid item xs={10}>
+                            1
+                        </Grid>
+                        <Grid item xs={2}>
+                            2
+                        </Grid>
+                    </Grid>
+                </AccordionDetails>
+            </Accordion>
+            
+        )
+    }
 
     function getCorrectBet(bet){
         if (bet.bet_type === "M1" || bet.bet_type === "M2"){
@@ -50,6 +88,6 @@ export default function ParlayedPlacedBets(props){
         }
     }
     return (
-       getCorrectBet(props.bet)
+       betSlipTemplate('Jared Cannonier', 'MONEYLINE', 'Wager: $100', 'OPEN', '5:5')
     )
  }

@@ -171,9 +171,9 @@ export default function LeagueBettingPage(props){
     return (
         
         <div>
-            <Grid container>
-                <Grid item>
-                    <Box sx={{width: 250, height: '100vh', border:1 }}>
+            <Grid container justifyContent={'center'}>
+                <Grid item xs={2}>
+                    <Box sx={{height: '100vh', border:1 }}>
                         <DrawerComp
                             setLeague={props.setLeague}
                             leagues={props.leagues}
@@ -183,7 +183,7 @@ export default function LeagueBettingPage(props){
                         />
                     </Box>
                 </Grid>
-                <Grid margin={2} md={7} spacing={1} sx={{border:1}}>
+                <Grid item xs={6} margin={2} md={7} spacing={1} sx={{border:1}}>
                     <Matchups 
                         data={matchupJson} 
                         betSelectedHandler={betSelectedHandler}
@@ -191,7 +191,7 @@ export default function LeagueBettingPage(props){
                         checkDupsIndex={checkDupsIndex}
                     />
                 </Grid>
-                <Grid margin={2} md={2} spacing={1} sx={{border:1}}>
+                <Grid item xs={3}margin={2} md={2} spacing={1} sx={{border:1}}>
                     <BetSlip 
                         handleRemoveBet={handleRemoveBet} 
                         handleRemoveAllBets={handleRemoveAllBets}

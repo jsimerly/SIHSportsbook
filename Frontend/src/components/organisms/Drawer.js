@@ -9,8 +9,6 @@ import LeagueHeader from "../molecules/LeagueHeader";
 import PlacedBets from "../molecules/PlacedBets";
 import ParlayedPlacedBets from "../molecules/ParlayedPlacedBet";
 
-const drawerWidth = 240;
-
 export default function DrawerComp(props){
     console.log(props.openBets)
     const drawer = (
