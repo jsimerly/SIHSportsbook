@@ -5,6 +5,7 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
+    Divider,
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CircleTwoToneIcon from '@mui/icons-material/CircleTwoTone';
@@ -40,6 +41,7 @@ export default function RegBetSlipOpen(props){
                     </Grid>
                 </AccordionSummary>
                 <AccordionDetails>
+                    <Divider sx={{mb:1}}/>
                     <Grid container>
                         <Grid item xs={10}>
                             <Box>
