@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from rest_framework.views import APIView
 from rest_framework.authentication import  SessionAuthentication, BasicAuthentication
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.shortcuts import redirect
 
 from .utils import generate_token
 
@@ -67,7 +69,8 @@ class CurrentUser(APIView):
         
         json['email'] = ''
         json['isLoggedIn'] = False
-        return Response(json, status=status.HTTP_200_OK)
+        print('here')
+        return redirect('/login/')
        
 
 class LogIn(APIView):

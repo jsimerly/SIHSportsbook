@@ -94,8 +94,6 @@ export default function LeagueBettingPage(props){
         }
         
         setReadyBets([...newReadyBets])
-        console.log(readyBets)
-        console.log('handleParlayToggle')
     }
 
     function handleRemoveBet(removedBet) {
@@ -112,8 +110,7 @@ export default function LeagueBettingPage(props){
 
     function createBetsMap(bets){
         let bets_info = []
-        console.log('bets')
-        console.log(bets)
+  
         bets.map((bet, index) => {
             if (bet.betData.wager != 0 || parlayStatus){
                 let info_map = {
@@ -151,8 +148,6 @@ export default function LeagueBettingPage(props){
             )
         }
         
-        console.log(requestOptions.body)
-
         fetch('/api/betting/place-bet-matchup', requestOptions)
         .then((response) => {
             console.log(response.json())

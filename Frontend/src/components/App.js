@@ -1,6 +1,6 @@
 import React, { Component, useState, useEffect } from "react";
 import { render } from "react-dom";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate} from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate,} from 'react-router-dom';
 import { 
     Box 
 } from '@mui/material'
@@ -35,6 +35,8 @@ export default function App(props){
         email: "",
         isLoggedIn: null,
     });
+
+    
     const [leagues, setLeagues] = useState([]);
     const [currentLeague, setCurrentLeague] = useState(
         JSON.parse(localStorage.getItem('currentLeague')) || null
@@ -47,7 +49,7 @@ export default function App(props){
         setCsrftoken(getCookie('csrftoken'))
         getCurrentUser()
         getLeagues()
-        getBets()
+        getBets()   
     }, [])
 
 
@@ -57,8 +59,10 @@ export default function App(props){
             response.json()
             .then((data) => {
                 setUser({...data})
+                if (data.isLoggedIn == false){
+                    <Navigate to='/login'/>
+                }
             })
-
         })
     }
 
@@ -73,7 +77,6 @@ export default function App(props){
     }
 
     function getBets(){
-        console.log('bets')
         fetch('/api/betting/get-league-bet-history' + '?bettor-id=' + currentLeague.bettor_id)
         .then((response) => {
             response.json()
@@ -114,6 +117,7 @@ export default function App(props){
                                 <LeagueRouter
                                     leagues={leagues}
                                     currentLeague={currentLeague}
+                                    user={user}
                                 />
                             }
                         />

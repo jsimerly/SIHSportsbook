@@ -112,6 +112,9 @@ import {
                         Register
                     </Button>
                 </Grid>
+                <Grid item xs={12} align="center">
+                    <a href='/login'> Login </a>
+                </Grid>
             </Grid>
         </Box>
     )

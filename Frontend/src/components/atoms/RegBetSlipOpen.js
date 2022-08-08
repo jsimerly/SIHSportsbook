@@ -11,8 +11,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CircleTwoToneIcon from '@mui/icons-material/CircleTwoTone';
 
 export default function RegBetSlipOpen(props){
-    console.log('++++++++++++')
-    console.log(props.bet)
     return (
         <Accordion>
                 <AccordionSummary

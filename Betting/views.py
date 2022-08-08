@@ -352,7 +352,8 @@ class GetAllBetsForSingleLeague(APIView):
                 else:
                     json['closed'].append(parlay_info)
 
-        return Response(json)
+            return Response(json)
+        return Response('NA')
 
          
            

@@ -3,7 +3,10 @@ import {Navigate} from 'react-router-dom';
 
 
 export default function LeagueRouter(props){
-    if (props.currentLeague != '') {
+    console.log(props.user)
+    console.log('here')
+    
+    if (props.currentLeague != '' && props.user.isLoggedIn == true) {
         return <Navigate to={'/sportsbook/' + props.currentLeague.league_id} />  
     }
 

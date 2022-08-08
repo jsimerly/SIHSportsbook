@@ -91,6 +91,9 @@ export default function LoginPage(props){
                         Log-In
                     </Button>
                 </Grid>
+                <Grid item xs={12} align="center">
+                    <a href='/register'> Register </a>
+                </Grid>
             </Grid>
         </Box>
     )
