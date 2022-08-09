@@ -34,7 +34,6 @@ export default function RegBetSlipOpen(props){
                             <Box>
                                 To Win: ${props.bet.payout_amount.toFixed(2)}
                             </Box>
-                            
                         </Grid>
                     </Grid>
                 </AccordionSummary>
@@ -42,9 +41,6 @@ export default function RegBetSlipOpen(props){
                     <Divider sx={{mb:1}}/>
                     <Grid container>
                         <Grid item xs={10}>
-                            <Box>
-                                {props.status}
-                            </Box>
                             <Box>
                                 {props.event}
                             </Box>

@@ -334,8 +334,11 @@ class GetAllBetsForSingleLeague(APIView):
 
 
             for bet_obj in parlayed_qset:
+                print(bet_obj)
                 parlay_info = {
                     'parlayed' : True,
+                    'wager': bet_obj.wager,
+                    'to_win': bet_obj.payout_amount,
                     'payout_date' : bet_obj.payout_date,
                     'status' : bet_obj.bet_status,
                     'bets' : [],

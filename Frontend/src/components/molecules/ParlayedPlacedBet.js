@@ -5,89 +5,51 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
+    Divider,
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ParlayDetails from "../atoms/parlayDetails";
+import CircleTwoToneIcon from '@mui/icons-material/CircleTwoTone';
 
 
 export default function ParlayedPlacedBets(props){
-    function betSlipTemplate(betValue, betType, wager, status, result, line, payoutDate){
         return(
             <Accordion>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon/>}
-                >
-                    <Box>
+                >             
                         <Grid container>
-                            <Grid item>
+                            <Grid item xs={1}>
+                                <CircleTwoToneIcon sx={{color : props.statusColor, fontSize : 10}}/>
+                            </Grid>
+                            <Grid item xs={11}>
                                 <Box>
-                                    Parlay (3-leg)
+                                    Parlay ({props.bet.bets.length}-leg)
                                 </Box>
                                 <Box>
-                                    {betType}
+                                    Wager: ${props.bet.wager}
                                 </Box>
                                 <Box>
-                                    {wager}
+                                    To Win: ${props.bet.to_win}
                                 </Box>
                             </Grid>
                           
                         </Grid>
-                    </Box>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <Grid container>
-                        <Grid item xs={10}>
-                            1
-                        </Grid>
-                        <Grid item xs={2}>
-                            2
-                        </Grid>
+                    <Divider sx={{mb:1}}/>
+                    <Grid>
+                        {props.bet.bets.map((bet, index) => 
+                            <ParlayDetails
+                                bet={bet}
+                            />
+                        )}
+                        <Box>
+                            4
+                        </Box>
                     </Grid>
                 </AccordionDetails>
             </Accordion>
             
-        )
-    }
-
-    function getCorrectBet(bet){
-        if (bet.bet_type === "M1" || bet.bet_type === "M2"){
-            return (
-                <Box>
-                    {bet.subtype_info.team1} - {bet.subtype_info.team2}
-                    1
-                </Box>
-            )
-        } else if (bet.bet_type === "O"){
-            return (
-                <Box>
-                    OPEN
-                    2
-                    {bet.subtype_info.team1} - {bet.subtype_info.team2}
-                </Box>
-            )
-        } else {
-            return (
-                <Box>
-                    <Grid container sx={{border:1, p:1}}>
-                        <Grid item xs={10}>
-                            <Box>
-                                Jared Cannonier
-                            </Box>
-                            <Box>
-                                MONEYLINE
-                            </Box>
-                            <Box>
-                                Wager: $100
-                            </Box>
-                        </Grid>
-                        <Grid item xs={2}>
-                            WON
-                        </Grid>
-                    </Grid>
-                </Box>
-            )
-        }
-    }
-    return (
-       betSlipTemplate('Jared Cannonier', 'MONEYLINE', 'Wager: $100', 'OPEN', '5:5')
-    )
+        ) 
  }

@@ -38,6 +38,9 @@ export default function PlacedBets(props){
         } else if (props.bet.bet_type === 'M2'){
             betValue = props.bet.subtype_info.team2
             betType = 'MONEYLINE'
+        } else {
+            betValue = props.bet.bet_value
+            betType = props.bet.bet_type
         }
 
         event = props.bet.subtype_info.team1 + ' vs ' + props.bet.subtype_info.team2
