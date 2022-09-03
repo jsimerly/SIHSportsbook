@@ -66,25 +66,35 @@ export default function App(props){
         })
     }
 
+    function handleLeagueChange(league) {
+        setCurrentLeague(league)
+        localStorage.setItem('currentLeague', JSON.stringify(league))
+    }
+
     function getLeagues() {
+        console.log(leagues)
         fetch('/api/betting/get-all-leagues')
         .then((response) => {
             response.json()
             .then((data) => {
                 setLeagues([...data]);
+                if (currentLeague === null){
+                    handleLeagueChange(data[0])
+                }
             })
         })
     }
 
     function getBets(){
-        fetch('/api/betting/get-league-bet-history' + '?bettor-id=' + currentLeague.bettor_id)
-        .then((response) => {
-            response.json()
-            .then((json)=>{
-                setOpenBets(json.open)
-                setClosedBets(json.closed)
-            })
-        })
+        // fetch('/api/betting/get-league-bet-history' + '?bettor-id=' + currentLeague.bettor_id)
+        // .then((response) => {
+        //     response.json()
+        //     .then((json)=>{
+        //         console.log(json)
+        //         setOpenBets(json.open)
+        //         setClosedBets(json.closed)
+        //     })
+        // })
     }
 
     function handleLogin(userData) {
@@ -96,10 +106,7 @@ export default function App(props){
         setUser(userData)
     }
     
-    function handleLeagueChange(league) {
-        setCurrentLeague(league)
-        localStorage.setItem('currentLeague', JSON.stringify(league))
-    }
+  
 
     return (
         <div>
