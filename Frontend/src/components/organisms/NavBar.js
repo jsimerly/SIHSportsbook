@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { 
     AppBar,
     Toolbar,
@@ -30,11 +30,12 @@ export default function NavBar(props){
 
         fetch('/api/account/logout/', requestOptions)
         .then((response) => {
+
             if (response.status===200) {
                 response.json()
                 .then((data) => {
                     props.handleLogout(data)
-                })
+                });
             }
         });
     }
@@ -42,7 +43,10 @@ export default function NavBar(props){
     function userCorner() {
         if (user.isLoggedIn) {
             return (
-                <Button color='secondary' onClick={() => handleLogOutClicked(props.csrftoken)}> Logout </Button>
+                <Button 
+                    href='/login' 
+                    color='secondary' 
+                    onClick={() => handleLogOutClicked(props.csrftoken)}> Logout </Button>
             )
         } else {
             return (

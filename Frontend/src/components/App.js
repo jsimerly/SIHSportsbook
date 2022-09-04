@@ -86,15 +86,15 @@ export default function App(props){
     }
 
     function getBets(){
-        // fetch('/api/betting/get-league-bet-history' + '?bettor-id=' + currentLeague.bettor_id)
-        // .then((response) => {
-        //     response.json()
-        //     .then((json)=>{
-        //         console.log(json)
-        //         setOpenBets(json.open)
-        //         setClosedBets(json.closed)
-        //     })
-        // })
+        fetch('/api/betting/get-league-bet-history' + '?bettor-id=' + currentLeague.bettor_id)
+        .then((response) => {
+            response.json()
+            .then((json)=>{
+                console.log(json)
+                setOpenBets(json.open)
+                setClosedBets(json.closed)
+            })
+        })
     }
 
     function handleLogin(userData) {

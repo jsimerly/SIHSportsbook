@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from  "react";
 import {
     useNavigate,
+    Link
 } from "react-router-dom";
+
 import { 
     Button, 
     Grid, 
@@ -27,6 +29,7 @@ export default function LoginPage(props){
     }
 
     function handleLogin(){
+        console.log('herere')
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -44,8 +47,11 @@ export default function LoginPage(props){
                 response.json()
                 .then((data) => {
                     props.handleLogin(data)
-                });
-                navigate('/')
+                })
+                .then(
+                    navigate('/')
+                );
+                
             } else {
                 setError(response.json())
             }
