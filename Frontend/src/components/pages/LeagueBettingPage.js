@@ -142,9 +142,9 @@ export default function LeagueBettingPage(props){
                 'Content-Type': 'application/json',
                 'X-CSRFTOKEN' : csrftoken,
             },
+            
             body: JSON.stringify(
                 createBetsMap(selectedBets)
-                
             )
         }
         

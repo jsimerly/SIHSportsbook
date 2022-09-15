@@ -25,6 +25,11 @@ class BettingLeague(models.Model):
         related_name='betting_league',
     )
 
+    league_name = models.CharField(
+        max_length=64,
+        unique=True
+    )
+
     std_vig = models.DecimalField(
         decimal_places=4, 
         max_digits=7, 

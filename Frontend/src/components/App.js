@@ -164,7 +164,7 @@ export default function App(props){
                             path='/new-league'
                             element={
                                 <NewLeaguePage
-
+                                    getCookie={getCookie}
                                 />
                             }
                         />

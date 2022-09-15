@@ -73,6 +73,34 @@ class UpdateNflPlayers(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
+class FindSleeperLeagues(APIView):
+    def post(self, request, format='json'):
+        league_id = request.data['sleeper_id']
+
+        fantasy_league_obj = FantasyLeague.objects.get(sleeper_id=league_id)
+        league_name = fantasy_league_obj.name
+
+        if fantasy_league_obj:
+            betting_league_objs = fantasy_league_obj.betting_league.all()
+            betting_leagues = {}
+            if betting_league_objs:
+                for betting_league_obj in betting_league_objs:
+                    betting_leagues[str(betting_league_obj.id)] = betting_league_obj.league_name
+            
+        else:
+            print('fantasy league not created yet')
+            league_json = get_league(league_id)
+            league_name = league_json['name']
+
+       
+        json = {
+                'league_name' : league_name,
+                'betting_leagues' : betting_leagues,
+            }
+        
+        print(json)
+        return Response(json, status=status.HTTP_200_OK)
+
 class CreateLeague(APIView):
     serializer_class = LeagueSleeperIdSerializer
     permission_classes = [IsAuthenticated]
