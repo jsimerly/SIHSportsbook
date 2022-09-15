@@ -59,7 +59,7 @@ export default function App(props){
             response.json()
             .then((data) => {
                 setUser({...data})
-                if (data.isLoggedIn == false){
+                if (data.isLoggedIn == false || data.isLoggedIn == null){
                     <Navigate to='/login'/>
                 }
             })
@@ -100,6 +100,8 @@ export default function App(props){
     function handleLogin(userData) {
         setUser(userData)
         setCsrftoken(getCookie('csrftoken'))
+        getLeagues()
+        getBets()   
     }
 
     function handleLogout(userData) {
@@ -146,6 +148,7 @@ export default function App(props){
                             element={
                                 <LoginPage 
                                     handleLogin={handleLogin}
+                                    user={user}
                                 />
                             }
                         />

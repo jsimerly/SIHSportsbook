@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from  "react";
 import {
     useNavigate,
-    Link
+    Link,
+    Navigate
 } from "react-router-dom";
 
 import { 
@@ -19,6 +20,12 @@ export default function LoginPage(props){
     const [password, setPassword] = useState()
     const [error, setError] = useState()    
     const navigate = useNavigate()
+
+    useEffect(()=>{
+        if (props.user.isLoggedIn == true){
+            navigate('/')
+        }
+    },[props.user])
 
     function handleEmailChanged(e) {
         setEmail(e.target.value);
@@ -47,11 +54,8 @@ export default function LoginPage(props){
                 response.json()
                 .then((data) => {
                     props.handleLogin(data)
-                })
-                .then(
                     navigate('/')
-                );
-                
+                })                
             } else {
                 setError(response.json())
             }

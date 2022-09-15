@@ -10,10 +10,11 @@ import PlacedBets from "../molecules/PlacedBets";
 import ParlayedPlacedBets from "../molecules/ParlayedPlacedBet";
 
 export default function DrawerComp(props){
+    console.log(props)
     const drawer = (
         <div>
             <LeagueHeader/>
-                {props.leagues.map((league, index) => {
+                {props.leagues?.map((league, index) => {
                     return (
                         <LeagueButton 
                             league={league}
@@ -24,7 +25,7 @@ export default function DrawerComp(props){
           
             <Divider/>
             <List>
-                {props.openBets.map((bet, index) => {
+                {props.openBets?.map((bet, index) => {
                     if (bet.parlayed){
                         return <ParlayedPlacedBets bet={bet}/>
                     }
@@ -33,7 +34,7 @@ export default function DrawerComp(props){
             </List>
             <Divider/>
             <List>
-                {props.closedBets.map((bet, index) => 
+                {props.closedBets?.map((bet, index) => 
                     <ListItem>
                         {bet}
                     </ListItem>
