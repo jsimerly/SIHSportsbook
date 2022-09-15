@@ -11,10 +11,16 @@ import {
     InputLabel,
     Box
  } from '@mui/material';
+import LeagueSearchResults from "../organisms/LeagueSearchResults";
 
 export default function NewLeaguePage(props){
-    const [sleeperId, setSleeperId] = useState() //793159261780803584 784444797430657024
+    const [sleeperId, setSleeperId] = useState() //793159261780803584 784444797430657024 735889493080666112
+    const [leagues, setLeagues] = useState({
+        'league_name' : null,
+        'betting_leagues' : {},
+    })
     const csrftoken = props.getCookie('csrftoken')
+
 
     function handleSearchPressed(){
         console.log(csrftoken)
@@ -34,7 +40,7 @@ export default function NewLeaguePage(props){
             if (response.status===200) {
                 response.json()
                 .then((data) => {
-                    console.log(data)
+                    setLeagues(data)
                 })                
             } else {
                 setError(response.json())
@@ -71,6 +77,11 @@ export default function NewLeaguePage(props){
                     >
                         Search
                     </Button>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <LeagueSearchResults
+                        leagues={leagues}
+                    /> 
                 </Grid>
             </Grid>
         </Box>
