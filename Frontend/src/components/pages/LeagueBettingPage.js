@@ -164,8 +164,6 @@ export default function LeagueBettingPage(props){
     }
 
     return (
-        
-        <div>
             <Grid container justifyContent={'center'}>
                 <Grid item xs={2}>
                     <Box sx={{height: '100vh', border:1 }}>
@@ -202,6 +200,5 @@ export default function LeagueBettingPage(props){
                     />
                 </Grid>
             </Grid>
-        </div>
     )
 }

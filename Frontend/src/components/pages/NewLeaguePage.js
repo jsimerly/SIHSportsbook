@@ -9,21 +9,17 @@ import {
     FormControl,
     Input,
     InputLabel,
-    Box
+    Box,
  } from '@mui/material';
-import LeagueSearchResults from "../organisms/LeagueSearchResults";
+import SearchLeagueResults from "../organisms/SearchLeagueResults";
 
 export default function NewLeaguePage(props){
     const [sleeperId, setSleeperId] = useState() //793159261780803584 784444797430657024 735889493080666112
-    const [leagues, setLeagues] = useState({
-        'league_name' : null,
-        'betting_leagues' : {},
-    })
+    const [leagues, setLeagues] = useState(null)
     const csrftoken = props.getCookie('csrftoken')
 
 
     function handleSearchPressed(){
-        console.log(csrftoken)
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -52,17 +48,40 @@ export default function NewLeaguePage(props){
         setSleeperId(e.target.value)
     }
 
+    function ifSearchResutls(){
+        if (leagues != null){
+            return (
+                <Grid 
+                    item xs={12} 
+                    align="center" 
+                    container
+                >
+                    <SearchLeagueResults
+                        leagues={leagues}
+                        getCookie={props.getCookie}
+                    /> 
+                </Grid>
+            )
+        } else {
+            return (<div></div>)
+        }
+    }
+
     return (
-        <Box sx={{mt:5}}>
+        <Box 
+            sx={{mt:5, width: '35%', border:1}} 
+            justifyContent="center"
+            alignItems="center"
+        >
             <Grid container spacing={1}>
                 <Grid item xs={12} align="center">
                     <Typography component='h5' variant='h5'>
-                        Create or Find a League
+                        Create or Find a League: 735889493080666112 | 793159261780803584
                     </Typography>
                 </Grid>
                 <Grid item xs={12} align="center">
                     <FormControl sx={{minWidth: '40%'}}>
-                        <InputLabel> Sleeper Id </InputLabel>
+                        <InputLabel> Sleeper League Id </InputLabel>
                         <Input
                             onChange={handleLeagueIdChanged}
                         />
@@ -78,11 +97,7 @@ export default function NewLeaguePage(props){
                         Search
                     </Button>
                 </Grid>
-                <Grid item xs={12} align="center">
-                    <LeagueSearchResults
-                        leagues={leagues}
-                    /> 
-                </Grid>
+                {ifSearchResutls()}
             </Grid>
         </Box>
     )

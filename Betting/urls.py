@@ -8,5 +8,6 @@ urlpatterns = [
     path('place-bet-matchup', PlaceMatchupBet.as_view()),
     path('get-matchups', GetMathcupBets.as_view()),
     path('get-all-leagues', GetBettors.as_view()),
-    path('get-league-bet-history', GetAllBetsForSingleLeague.as_view())
+    path('get-league-bet-history', GetAllBetsForSingleLeague.as_view()),
+    path('request-to-join-league', RegquestToJoinLeague.as_view()),
 ]

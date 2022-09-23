@@ -30,8 +30,18 @@ class CreateBettingLeague(APIView):
             return Response(status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class RegquestToJoinLeague(APIView):
+    def post(self, request, format='json'):
+      
+        betting_league = request.data['betting_league_id']
+        betting_league_obj = BettingLeague.objects.filter(id=betting_league).first()
+        fantasy_teams = betting_league_obj.fantasy_league.teams.all()
+        serialized_teams = FantasyTeamSerializer(fantasy_teams, many=True)
+        json = serialized_teams.data
+        return Response(json, status=status.HTTP_200_OK)
+
 class AttachedTeamToBettor(APIView):
-    #add permissions to only be able to do this as a Betting League Owner
+    #allow only for League owner needs to be added later
     def post(self, request, format='json'):
         betting_league = request.data['betting_league_id']
         teams_info = request.data['teams_info']

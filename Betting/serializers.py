@@ -34,3 +34,8 @@ class MatchupBetSerializer(serializers.ModelSerializer):
             'over', 'over_odds', 'under', 'under_odds',
             'spread_team1', 'spread_team1_odds', 'spread_team2', 'spread_team2_odds'
         )
+
+class FantasyTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FantasyTeam
+        fields = ('fun_name', 'sleeper_name', 'id')

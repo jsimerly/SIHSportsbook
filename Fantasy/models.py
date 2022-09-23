@@ -494,7 +494,7 @@ class ScoringSettings(models.Model):
 class FantasyTeam(models.Model):
     #Team
     players = models.ManyToManyField(Player)
-    league = models.ForeignKey(FantasyLeague, on_delete=models.PROTECT, default=0, null=False, related_name='FantasyTeams')
+    league = models.ForeignKey(FantasyLeague, on_delete=models.PROTECT, default=0, null=False, related_name='teams')
 
     #Identity
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True, editable=False)

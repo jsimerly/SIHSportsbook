@@ -78,28 +78,30 @@ class FindSleeperLeagues(APIView):
         league_id = request.data['sleeper_id']
 
         fantasy_league_obj = FantasyLeague.objects.filter(sleeper_id=league_id).first()
-        betting_leagues = {}
+        betting_leagues = []
 
         if fantasy_league_obj:
             league_name = fantasy_league_obj.name
             betting_league_objs = fantasy_league_obj.betting_league.all()
+            print(betting_league_objs)
             
             if betting_league_objs:
                 for betting_league_obj in betting_league_objs:
-                    betting_leagues[str(betting_league_obj.id)] = betting_league_obj.league_name
+                    betting_league = {
+                        'league_name': betting_league_obj.league_name,
+                        'league_id' : betting_league_obj.id
+                    }
+                    betting_leagues.append(betting_league)
             
         else:
-            print('fantasy league not created yet')
             league_json = get_league(league_id)
             league_name = league_json['name']
 
-       
         json = {
                 'league_name' : league_name,
                 'betting_leagues' : betting_leagues,
             }
-        
-        print(json)
+                
         return Response(json, status=status.HTTP_200_OK)
 
 class CreateLeague(APIView):
@@ -109,6 +111,12 @@ class CreateLeague(APIView):
     def post(self, request, format='json'):
         league_id = request.data['sleeper_id']
         owner = request.user.id
+
+        if FantasyLeague.objects.filter(sleeper_id=league_id).exists():
+            json = {
+                'league_status' : 'exists'
+            }
+            return Response(json, status=status.HTTP_200_OK)
 
         league_json = get_league(league_id)
 

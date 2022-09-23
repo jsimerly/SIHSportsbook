@@ -72,7 +72,6 @@ export default function App(props){
     }
 
     function getLeagues() {
-        console.log(leagues)
         fetch('/api/betting/get-all-leagues')
         .then((response) => {
             response.json()
@@ -90,7 +89,6 @@ export default function App(props){
         .then((response) => {
             response.json()
             .then((json)=>{
-                console.log(json)
                 setOpenBets(json.open)
                 setClosedBets(json.closed)
             })
@@ -111,14 +109,19 @@ export default function App(props){
   
 
     return (
-        <div>
+        <Box>
             <BrowserRouter>
                 <NavBar 
                     user={user}
                     csrftoken={csrftoken}
                     handleLogout={handleLogout}
                 />
-                <Box sx={{ pt : 7, pl : 0 , maxHeight: '100%'}}>
+                <Box
+                    sx={{ pt : 7, pl : 0 , maxHeight: '100%', ml: '5%', mr: '5%'}}
+                    display="flex"
+                    justifyContent="center"
+                >
+                    
                     <Routes>
                         <Route 
                             path='' 
@@ -172,7 +175,7 @@ export default function App(props){
                     </Routes>
                 </Box>
             </BrowserRouter>
-        </div>
+        </Box>
     )
 }
 

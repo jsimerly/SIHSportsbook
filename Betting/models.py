@@ -1,4 +1,5 @@
 from pyexpat import model
+from random import choices
 from secrets import choice
 from uuid import uuid4
 import datetime
@@ -51,6 +52,46 @@ class BettingLeague(models.Model):
 
     bet_on_self = models.BooleanField(default=True)
     bet_on_opponent = models.BooleanField(default=False)
+
+class JoinRequests(models.Model):
+    id = models.UUIDField(
+        default=uuid4, 
+        primary_key=True, 
+        unique=True, 
+        editable=False
+    )
+
+    league = models.ForeignKey(
+        BettingLeague,
+        on_delete=models.CASCADE
+    )
+
+    requester = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    request_team = models.ForeignKey(
+        FantasyTeam,
+        on_delete=models.CASCADE
+    )
+
+    STATUS_OPTIONS = (
+        ('OPEN', 'OPEN'),
+        ('ACCEPTED', 'ACCEPTED'),
+        ('REJECTED', 'REJECTED')
+    )
+
+    status = models.CharField(
+        choices=STATUS_OPTIONS, 
+        default='OPEN', 
+        max_length=10
+    )
+
+    request_date = models.DateField()
+    
+
+    
 
 class Bettor(models.Model):
     id = models.UUIDField(
