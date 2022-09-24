@@ -121,6 +121,7 @@ class Player(models.Model):
         blank=True,
         null=True
         )
+        
     nfl_team = models.CharField(
         null=True, 
         max_length=64,
@@ -389,7 +390,7 @@ class FantasyLeague(models.Model):
     free_agents = models.ManyToManyField(Player)
 
     def update_all_rosters(self, sleeper_data):
-        non_free_agents = update_league_all_rosters(self.FantasyTeams.all(), sleeper_data)
+        non_free_agents = update_league_all_rosters(self.teams.all(), sleeper_data)
         free_agents = Player.objects.all().exclude(id__in=non_free_agents)
         self.free_agents.set(free_agents)
 

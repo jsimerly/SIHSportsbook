@@ -8,6 +8,7 @@ import decimal
 from Betting.models import *
 from Fantasy.models import *
 from Fantasy.createLeague import create_league
+from Fantasy.sleeperEndpoint import get_rosters
 
 from .oddsmaker import Oddsmaker
 from .serializers import *
@@ -174,6 +175,12 @@ class GetMathcupBets(APIView):
         if league_id != None:
             betting_league = BettingLeague.objects.filter(id=league_id).first()
             if betting_league:
+                roster_data = get_rosters(betting_league.fantasy_league.sleeper_id)
+
+            
+
+                betting_league.fantasy_league.update_all_rosters(roster_data)
+                
                 matchup_bets = betting_league.matchups.filter(active=True)
 
                 json = []
@@ -332,9 +339,6 @@ class GetAllLeagues(APIView):
                 }
             
                 json.append(league_info)
-            
-                print(bookie_qset)
-                print(json)
             return Response(json, status=status.HTTP_200_OK)
        
         return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)

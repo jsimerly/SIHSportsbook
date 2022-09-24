@@ -69,14 +69,14 @@ export default function NewLeaguePage(props){
 
     return (
         <Box 
-            sx={{mt:5, width: '35%', border:1}} 
+            sx={{mt:5, width: '35%',}} 
             justifyContent="center"
             alignItems="center"
         >
             <Grid container spacing={1}>
                 <Grid item xs={12} align="center">
                     <Typography component='h5' variant='h5'>
-                        Create or Find a League: 735889493080666112 | 793159261780803584
+                        Create or Find a League: 
                     </Typography>
                 </Grid>
                 <Grid item xs={12} align="center">
