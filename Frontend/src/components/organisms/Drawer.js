@@ -10,18 +10,18 @@ import PlacedBets from "../molecules/PlacedBets";
 import ParlayedPlacedBets from "../molecules/ParlayedPlacedBet";
 
 export default function DrawerComp(props){
-    console.log(props)
+    console.log(props.leagues)
     const drawer = (
         <div>
             <LeagueHeader/>
-                {props.leagues?.map((league, index) => {
-                    return (
-                        <LeagueButton 
-                            league={league}
-                            setLeague={props.setLeague}
-                        />
-                    )
-                })}
+            {props.leagues?.map((league, index) => {
+                return (
+                    <LeagueButton 
+                        league={league}
+                        setLeague={props.setLeague}
+                    />
+                )
+            })}
           
             <Divider/>
             <List>

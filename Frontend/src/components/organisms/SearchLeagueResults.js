@@ -40,6 +40,7 @@ export default function SearchLeagueResults(props){
                     </Typography>
                 </Box>
                 <Box>
+                    {console.log(leagues)}
                     <SearchLeagueSingleResult 
                         league_label = {leagues.league_name}
                         league_id = {leagues.league_id}

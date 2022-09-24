@@ -33,10 +33,18 @@ export default function SearchLeagueSingleResult(props){
                     </Box>
                 </Grid>
                 <Grid item xs={3}>
-                    <JoinLeagueButton
-                        league_id = {props.league_id}
-                        getCookie = {props.getCookie}
-                    />
+                    {props.button_type == 'join' ?
+                        <JoinLeagueButton
+                            league_id = {props.league_id}
+                            getCookie = {props.getCookie}
+                        />
+                        :
+                        <CreateLeagueButton
+                            league_id = {props.league_id}
+                            getCookie = {props.getCookie}
+                        />
+                    }
+                    
                 </Grid>
             </Grid>
                 

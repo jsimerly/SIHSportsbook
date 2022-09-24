@@ -45,6 +45,7 @@ class BettingLeague(models.Model):
     bookie = models.ForeignKey(
         User, 
         on_delete=models.PROTECT,
+        related_name = 'bookie'
     )
 
     weekly_allowance = models.DecimalField(decimal_places=2, max_digits=10, default=10)
@@ -88,7 +89,7 @@ class JoinRequests(models.Model):
         max_length=10
     )
 
-    request_date = models.DateField()
+    request_date = models.DateTimeField(auto_now_add=True)
     
 
     

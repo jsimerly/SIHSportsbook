@@ -7,7 +7,8 @@ urlpatterns = [
     path('update-betting-matchups', CreateMatchupBets.as_view()),
     path('place-bet-matchup', PlaceMatchupBet.as_view()),
     path('get-matchups', GetMathcupBets.as_view()),
-    path('get-all-leagues', GetBettors.as_view()),
+    path('get-all-leagues', GetAllLeagues.as_view()),
     path('get-league-bet-history', GetAllBetsForSingleLeague.as_view()),
-    path('request-to-join-league', RegquestToJoinLeague.as_view()),
+    path('request-to-join-league', GetBettingLeagueTeams.as_view()),
+    path('request-to-join-team', RequestToJoinLeague.as_view()),
 ]

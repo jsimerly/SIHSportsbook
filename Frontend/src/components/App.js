@@ -72,6 +72,7 @@ export default function App(props){
     }
 
     function getLeagues() {
+        console.log(leagues)
         fetch('/api/betting/get-all-leagues')
         .then((response) => {
             response.json()
@@ -89,6 +90,7 @@ export default function App(props){
         .then((response) => {
             response.json()
             .then((json)=>{
+                console.log(json)
                 setOpenBets(json.open)
                 setClosedBets(json.closed)
             })
@@ -105,8 +107,6 @@ export default function App(props){
     function handleLogout(userData) {
         setUser(userData)
     }
-    
-  
 
     return (
         <Box>

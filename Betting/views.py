@@ -7,30 +7,41 @@ import decimal
 
 from Betting.models import *
 from Fantasy.models import *
+from Fantasy.createLeague import create_league
 
 from .oddsmaker import Oddsmaker
 from .serializers import *
 
 class CreateBettingLeague(APIView):
-    serializer_class = CreateBettingLeagueSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, format='josn'):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request, format='json'):
+        try:
+            league_id = request.data['fantasy_league_id']
+            league = FantasyLeague.objects.filter(sleeper_id=league_id)
+            league_name = request.data['betting_league_name']
 
-        if serializer.is_valid():
-            league = FantasyLeague.objects.get(id=serializer.data.get('fantasy_league'))
+            if len(league) == 0:
+                create_league_resp = create_league(league_id, request.user.id)
+
+                if create_league_resp['status'] != 'successful':
+                    return Response({'error': create_league_resp['data']}, status=status.HTTP_400_BAD_REQUEST)
+
             bookie = request.user
 
             BettingLeague.objects.create(
-                fantasy_league = league,
-                bookie = bookie
+                fantasy_league = league.first(),
+                bookie = bookie,
+                league_name = league_name,   
             )
 
             return Response(status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class RegquestToJoinLeague(APIView):
+        except Exception as e:
+            print(e)
+            return Response({'error': 'unknown error'}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetBettingLeagueTeams(APIView):
     def post(self, request, format='json'):
       
         betting_league = request.data['betting_league_id']
@@ -39,6 +50,23 @@ class RegquestToJoinLeague(APIView):
         serialized_teams = FantasyTeamSerializer(fantasy_teams, many=True)
         json = serialized_teams.data
         return Response(json, status=status.HTTP_200_OK)
+
+class RequestToJoinLeague(APIView):
+    def post(self, request, format='json'):
+        betting_league_id = request.data['betting_league_id']
+        fantasy_team_id = request.data['fantasy_team_id']
+
+        betting_league_obj = BettingLeague.objects.filter(id=betting_league_id).first()
+        fantasy_team_obj = FantasyTeam.objects.get(id = fantasy_team_id)
+        user = request.user
+
+        join_request = JoinRequests.objects.create(
+            league=betting_league_obj,
+            requester=user,
+            request_team=fantasy_team_obj,
+        )
+
+        return Response(status=status.HTTP_201_CREATED)
 
 class AttachedTeamToBettor(APIView):
     #allow only for League owner needs to be added later
@@ -274,24 +302,39 @@ class PlaceMatchupBet(APIView):
 
         return Response({'data':'data1'},status=status.HTTP_200_OK)
 
-class GetBettors(APIView):
+class GetAllLeagues(APIView):
     def get(self, request, format='json'):
         if request.user.is_authenticated:
             user = User.objects.get(id=request.user.id)
             bettors_qset = user.bettor_set.all()
-
+            bookie_qset = user.bookie.all()
           
             json = []
+            for bookie_league in bookie_qset:
+                league_info = {
+                    'league_id' : bookie_league.id,
+                    'league_name' : bookie_league.fantasy_league.name,
+                    'team' : 'Owner',
+                    'bettor_id' : bookie_league.bookie.id,
+                    'parlay_vig' : bookie_league.parlay_vig,
+                    'bookie_status' : True
+                }
+
+                json.append(league_info)
             for bettor in bettors_qset:
-                leagueInfo = {
+                league_info = {
                     'league_id' : bettor.league.id,
                     'league_name' : bettor.league.fantasy_league.name,
                     'team' : bettor.team.fun_name,
                     'bettor_id' : bettor.id,
-                    'parlay_vig' : bettor.league.parlay_vig
-                } 
-                json.append(leagueInfo)
-
+                    'parlay_vig' : bettor.league.parlay_vig,
+                    'bookie_status' : False
+                }
+            
+                json.append(league_info)
+            
+                print(bookie_qset)
+                print(json)
             return Response(json, status=status.HTTP_200_OK)
        
         return Response({'error': "not logged in"}, status=status.HTTP_204_NO_CONTENT)
@@ -344,7 +387,6 @@ class GetAllBetsForSingleLeague(APIView):
 
 
             for bet_obj in parlayed_qset:
-                print(bet_obj)
                 parlay_info = {
                     'parlayed' : True,
                     'wager': bet_obj.wager,

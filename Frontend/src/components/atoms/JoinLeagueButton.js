@@ -54,7 +54,10 @@ export default function JoinLeagueButton(props){
             )
         }
 
-
+        fetch('/api/betting/request-to-join-team', requestOptions)
+        .then((response) => {
+            console.log(response)
+        })
     }
 
     return (

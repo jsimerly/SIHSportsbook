@@ -99,24 +99,16 @@ class FindSleeperLeagues(APIView):
 
         json = {
                 'league_name' : league_name,
+                'league_id' : league_id,
                 'betting_leagues' : betting_leagues,
             }
                 
         return Response(json, status=status.HTTP_200_OK)
 
 class CreateLeague(APIView):
-    serializer_class = LeagueSleeperIdSerializer
-    permission_classes = [IsAuthenticated]
-
     def post(self, request, format='json'):
         league_id = request.data['sleeper_id']
         owner = request.user.id
-
-        if FantasyLeague.objects.filter(sleeper_id=league_id).exists():
-            json = {
-                'league_status' : 'exists'
-            }
-            return Response(json, status=status.HTTP_200_OK)
 
         league_json = get_league(league_id)
 
@@ -181,7 +173,7 @@ class CreateLeague(APIView):
         league_scoring_settings['rec_yds'] = round(league_json['scoring_settings']['rec_yd'], 3)
         league_scoring_settings['rec_tds'] = round(league_json['scoring_settings']['rec_td'], 3)
         league_scoring_settings['rec_2pts'] = round(league_json['scoring_settings']['rec_2pt'], 3)
-
+        print(league_json['scoring_settings'])
         league_scoring_settings['rec_prem_rb'] = round(league_json['scoring_settings']['bonus_rec_rb'], 3)
         league_scoring_settings['rec_prem_te'] = round(league_json['scoring_settings']['bonus_rec_te'], 3)
         league_scoring_settings['rec_prem_wr'] = round(league_json['scoring_settings']['bonus_rec_wr'], 3)
