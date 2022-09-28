@@ -9,9 +9,12 @@ from Betting.models import *
 from Fantasy.models import *
 from Fantasy.createLeague import create_league
 from Fantasy.sleeperEndpoint import get_rosters
+from Fantasy.updateManager import update_league_rosters, update_fantasy_league_matchups, update_all_player_proj
+
 
 from .oddsmaker import Oddsmaker
 from .serializers import *
+from .updateManager import create_matchups_bets
 
 class CreateBettingLeague(APIView):
     permission_classes = [IsAuthenticated]
@@ -27,14 +30,20 @@ class CreateBettingLeague(APIView):
 
                 if create_league_resp['status'] != 'successful':
                     return Response({'error': create_league_resp['data']}, status=status.HTTP_400_BAD_REQUEST)
+                
+                update_league_rosters(league_id)
+                update_fantasy_league_matchups(league_id)
+                update_all_player_proj(league_id)
 
             bookie = request.user
 
-            BettingLeague.objects.create(
+            betting_league = BettingLeague.objects.create(
                 fantasy_league = league.first(),
                 bookie = bookie,
                 league_name = league_name,   
             )
+
+            create_matchups_bets(betting_league)
 
             return Response(status=status.HTTP_200_OK)
 
