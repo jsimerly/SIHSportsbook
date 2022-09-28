@@ -1,16 +1,10 @@
-from pyexpat import model
-from random import choices
-from secrets import choice
 from uuid import uuid4
 import datetime
-from django.forms import CharField
 import pytz
 
 from django.contrib.auth import get_user_model
+from django.utils.timezone import now
 from django.db import models
-
-
-
 
 from Fantasy.models import FantasyLeague, FantasyTeam, Matchup
 
@@ -53,6 +47,8 @@ class BettingLeague(models.Model):
 
     bet_on_self = models.BooleanField(default=True)
     bet_on_opponent = models.BooleanField(default=False)
+    
+    last_update = models.DateTimeField(auto_now_add=True, blank=True)
 
 class JoinRequests(models.Model):
     id = models.UUIDField(

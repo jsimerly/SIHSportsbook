@@ -23,7 +23,7 @@ class CreateBettingLeague(APIView):
             league_name = request.data['betting_league_name']
 
             if len(league) == 0:
-                create_league_resp = create_league(league_id, request.user.id)
+                create_league_resp = create_league(league_id, request.user)
 
                 if create_league_resp['status'] != 'successful':
                     return Response({'error': create_league_resp['data']}, status=status.HTTP_400_BAD_REQUEST)
