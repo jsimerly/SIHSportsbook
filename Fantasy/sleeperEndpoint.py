@@ -1,7 +1,6 @@
 import requests
 import json
 
-
 def json_fetch(https):
     j = requests.get(https)
     j = json.loads(j.text)
@@ -34,9 +33,10 @@ def get_nfl_state():
     return json_fetch(url)
 
 #get matchups for specific week
-def get_matchup_for_league(league_id, week=None):
+def get_matchups_for_league(league_id, week=None):
     if week is None:
-        week = 15 #NflState.objects.get(pk=1).week
+        from .models import NflState
+        week = NflState.objects.get(pk=1).week
     url = f'https://api.sleeper.app/v1/league/{league_id}/matchups/{str(week)}'
     return json_fetch(url)
 

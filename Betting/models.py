@@ -124,7 +124,7 @@ class MatchupBets(models.Model):
     active = models.BooleanField(default=True)
     
     betting_league = models.ForeignKey(BettingLeague, on_delete=models.CASCADE, related_name='matchups')
-    fantasy_matchup = models.ForeignKey(Matchup, on_delete=models.CASCADE, related_name='betting_matchups')
+    fantasy_matchup = models.ForeignKey(Matchup, on_delete=models.CASCADE, related_name='betting_matchup')
 
     team1 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='bet_matchup_away')
     team2 = models.ForeignKey(FantasyTeam, on_delete=models.PROTECT, related_name='bet_matchup_home')

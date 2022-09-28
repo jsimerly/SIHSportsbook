@@ -221,9 +221,7 @@ class PlayerCurrentStats(models.Model):
 
 def update_target_team_roster(team_json, team_obj):
     players = []
-    print(team_json)
     for player_id in team_json:
-        print(player_id)
         player_obj = Player.objects.get(sleeper_id=player_id)
         players.append(player_obj)
 

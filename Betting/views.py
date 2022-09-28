@@ -14,7 +14,7 @@ from Fantasy.updateManager import update_league_rosters, update_fantasy_league_m
 
 from .oddsmaker import Oddsmaker
 from .serializers import *
-from .updateManager import create_matchups_bets
+from .updateManager import create_or_update_matchups_bets
 
 class CreateBettingLeague(APIView):
     permission_classes = [IsAuthenticated]
@@ -184,9 +184,10 @@ class GetMathcupBets(APIView):
         if league_id != None:
             betting_league = BettingLeague.objects.filter(id=league_id).first()
             if betting_league:
-                roster_data = get_rosters(betting_league.fantasy_league.sleeper_id)
-
-            
+                fantasy_league = betting_league.fantasy_league
+                update_fantasy_league_matchups(fantasy_league.sleeper_id)
+                create_or_update_matchups_bets(betting_league)
+                roster_data = get_rosters(fantasy_league.sleeper_id)
 
                 betting_league.fantasy_league.update_all_rosters(roster_data)
                 

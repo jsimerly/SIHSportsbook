@@ -1,11 +1,12 @@
 from .oddsmaker import Oddsmaker
 from .models import MatchupBets
 
-def create_matchups_bets(betting_league):
+def create_or_update_matchups_bets(betting_league):
     fantasy_league_matchups = betting_league.fantasy_league.matchup_set.filter(active=True)
     vig = betting_league.std_vig
 
     for matchup in fantasy_league_matchups:
+     
         ou_dict = Oddsmaker.create_over_under(matchup.team1, matchup.team2, vig)
         ml_dict = Oddsmaker.create_moneylines(matchup.team1, matchup.team2, vig)
         spread_dict = Oddsmaker.create_spreads(matchup.team1, matchup.team2, vig)
@@ -50,4 +51,5 @@ def create_matchups_bets(betting_league):
                     spread_team1_odds =  spread_dict['odds']['team1'],
                     spread_team2 = spread_dict['values']['team2'],
                     spread_team2_odds = spread_dict['odds']['team2'],
-                )          
+                ) 
+        
