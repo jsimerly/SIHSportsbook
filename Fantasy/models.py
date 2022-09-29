@@ -245,29 +245,30 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
                 print(e)
                 continue
 
-            proj += player.proj.pass_yds * league_settings.pass_yds
-            proj += player.proj.pass_tds * league_settings.pass_tds
-            proj += player.proj.pass_ints * league_settings.pass_ints
+            proj += player.proj.pass_yds * league_settings.pass_yd
+            proj += player.proj.pass_tds * league_settings.pass_td
+            proj += player.proj.pass_ints * league_settings.pass_int
             
-            proj += player.proj.rush_yds * league_settings.rush_yds
-            proj += player.proj.rush_tds * league_settings.rush_tds
+            proj += player.proj.rush_yds * league_settings.rush_yd
+            proj += player.proj.rush_tds * league_settings.rush_td
 
-            proj += player.proj.rec_yds * league_settings.rec_yds
+            proj += player.proj.rec_yds * league_settings.rec_yd
 
             if Player.RB in player.pos:
-                proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_rb)
+                proj += player.proj.rec_rec * (league_settings.rec + league_settings.bonus_rec_rb)
             elif Player.WR in player.pos:
-                proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_wr)
+                proj += player.proj.rec_rec * (league_settings.rec + league_settings.bonus_rec_wr)
             elif Player.TE in player.pos:
-                proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_te)
+                proj += player.proj.rec_rec * (league_settings.rec + league_settings.bonus_rec_te)
             else:
-                proj += player.proj.rec_rec * league_settings.ppr
+                proj += player.proj.rec_rec * league_settings.rec
 
-            proj -= player.proj.fumbles * league_settings.fumble_lost
+            proj -= player.proj.fumbles * league_settings.fum_lost
 
             proj_map[player] = round(proj, 3)
             
     proj_map = sorted(proj_map.items(), key=lambda x: x[1], reverse=True)
+    print(proj_map)
     return proj_map
 
 def get_top_free_agent(pos, free_agents):
@@ -361,7 +362,7 @@ def update_league_all_rosters(team_qset, roster_data_from_sleeper):
 
 def update_league_all_proj(league):
     t0 = time.time()
-    team_qset = league.FantasyTeams.all()
+    team_qset = league.teams.all()
 
     for team in team_qset:
         update_target_team_proj(team, league)

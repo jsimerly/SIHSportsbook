@@ -43,7 +43,7 @@ class CreateBettingLeague(APIView):
                 league_name = league_name,   
             )
 
-            create_matchups_bets(betting_league)
+            create_or_update_matchups_bets(betting_league)
 
             return Response(status=status.HTTP_200_OK)
 
@@ -185,11 +185,14 @@ class GetMathcupBets(APIView):
             betting_league = BettingLeague.objects.filter(id=league_id).first()
             if betting_league:
                 fantasy_league = betting_league.fantasy_league
-                update_fantasy_league_matchups(fantasy_league.sleeper_id)
-                create_or_update_matchups_bets(betting_league)
+
                 roster_data = get_rosters(fantasy_league.sleeper_id)
 
-                betting_league.fantasy_league.update_all_rosters(roster_data)
+                fantasy_league.update_all_proj()
+                fantasy_league.update_all_rosters(roster_data)
+
+                update_fantasy_league_matchups(fantasy_league.sleeper_id)
+                create_or_update_matchups_bets(betting_league)
                 
                 matchup_bets = betting_league.matchups.filter(active=True)
 

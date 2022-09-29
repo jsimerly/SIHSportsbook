@@ -47,15 +47,11 @@ def update_fantasy_league_matchups(sleeper_id):
         else:
             matchups[matchup_id] = [roster_id]
 
-    print(matchups)
     update_nfl_state()
     
     for matchup_id, values in matchups.items():
         team1_obj = teams.get(roster_id=values[0])
-        team2_obj = teams.get(roster_id=values[1])
-
-        print(team1_obj)
-        print(team2_obj)
+        team2_obj = teams.get(roster_id=values[1])      
 
         matchup = Matchup.objects.filter(
                 Q(week=week) & 
