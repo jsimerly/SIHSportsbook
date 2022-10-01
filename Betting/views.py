@@ -13,7 +13,7 @@ from Fantasy.updateManager import update_league_rosters, update_fantasy_league_m
 
 from .oddsmaker import Oddsmaker
 from .serializers import *
-from .updateManager import create_or_update_matchups_bets
+from .Updaters.updateManager import create_or_update_matchups_bets
 
 class CreateBettingLeague(APIView):
     permission_classes = [IsAuthenticated]
@@ -51,7 +51,6 @@ class CreateBettingLeague(APIView):
 
 class GetBettingLeagueTeams(APIView):
     def post(self, request, format='json'):
-      
         betting_league = request.data['betting_league_id']
         betting_league_obj = BettingLeague.objects.filter(id=betting_league).first()
         fantasy_teams = betting_league_obj.fantasy_league.teams.all()
@@ -118,7 +117,6 @@ class CreateMatchupBets(APIView):
         league_id = request.data.get('id')
         betting_league = BettingLeague.objects.get(id=league_id)
         fantasty_league_matchups = betting_league.fantasy_league.matchup_set.filter(active=True)
-        update_pos_group('qb')
 
         vig = betting_league.std_vig
 
@@ -189,6 +187,15 @@ class GetMathcupBets(APIView):
 
                 fantasy_league.update_all_proj()
                 fantasy_league.update_all_rosters(roster_data)
+
+                print('REMEMBER TO TURN THESE ON AN THROTTLE THEM')
+
+                # update_pos_group('qb', '2022', '4')
+                # update_pos_group('rb', '2022', '4')
+                # update_pos_group('wr', '2022', '4')
+                # update_pos_group('te', '2022', '4')
+                # update_pos_group('k', '2022', '4')
+                # update_pos_group('def', '2022', '4')
 
                 update_fantasy_league_matchups(fantasy_league.sleeper_id)
                 create_or_update_matchups_bets(betting_league)

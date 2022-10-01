@@ -58,14 +58,18 @@ def strip_k(url):
         player_stats = row.findAll('span', {'class':'playerStat'})
         player_proj = row.find('span', {'class':'playerWeekProjectedPts'})
         
-        player_dict['name'] = player_name
-        player_dict['fgm'] = clean_data(player_stats[0].text)
-        player_dict['fgm_0_19'] = clean_data(player_stats[1].text)
-        player_dict['fgm_20_29'] = clean_data(player_stats[2].text)
-        player_dict['fgm_30_39'] = clean_data(player_stats[3].text)
-        player_dict['fgm_40_49'] = clean_data(player_stats[4].text)
-        player_dict['fgm_50p'] = clean_data(player_stats[5].text)
-        player_dict['fp_est'] = clean_data(player_stats.text)
+        try:
+            player_dict['name'] = player_name
+            player_dict['fgm'] = clean_data(player_stats[0].text)
+            player_dict['fgm_0_19'] = clean_data(player_stats[1].text)
+            player_dict['fgm_20_29'] = clean_data(player_stats[2].text)
+            player_dict['fgm_30_39'] = clean_data(player_stats[3].text)
+            player_dict['fgm_40_49'] = clean_data(player_stats[4].text)
+            player_dict['fgm_50p'] = clean_data(player_stats[5].text)
+            player_dict['fp_est'] = clean_data(player_proj.text)
+        except Exception as e:
+            print(e)
+            continue
 
         all_players.append(player_dict)
     return all_players
@@ -80,17 +84,21 @@ def strip_def(url):
         player_name = row.find('a', {'class' : 'playerName'}).text
         player_stats = row.findAll('span', {'class':'playerStat'})
         player_proj = row.find('span', {'class':'playerWeekProjectedPts'})
-        
-        player_dict['name'] = player_name
-        player_dict['sack'] = clean_data(player_stats[0].text)
-        player_dict['def_int'] = clean_data(player_stats[1].text)
-        player_dict['fum_rec'] = clean_data(player_stats[2].text)
-        player_dict['safe'] = clean_data(player_stats[3].text)
-        player_dict['def_td'] = clean_data(player_stats[4].text)
-        player_dict['def_2pt'] = clean_data(player_stats[5].text)
-        player_dict['def_td'] = clean_data(player_stats[6].text)
-        player_dict['pts_allow'] = clean_data(player_stats[7].text)
-        player_dict['fp_est'] = clean_data(player_proj.text)
+
+        try:
+            player_dict['name'] = player_name
+            player_dict['sack'] = clean_data(player_stats[0].text)
+            player_dict['def_int'] = clean_data(player_stats[1].text)
+            player_dict['fum_rec'] = clean_data(player_stats[2].text)
+            player_dict['safe'] = clean_data(player_stats[3].text)
+            player_dict['def_td'] = clean_data(player_stats[4].text)
+            player_dict['def_2pt'] = clean_data(player_stats[5].text)
+            player_dict['def_td'] = clean_data(player_stats[6].text)
+            player_dict['pts_allow'] = clean_data(player_stats[7].text)
+            player_dict['fp_est'] = clean_data(player_proj.text)
+        except Exception as e:
+            print(e)
+            continue
 
         all_players.append(player_dict)
     return all_players
@@ -115,7 +123,7 @@ def fetch_player_data(pos, season, week):
         
         url = f'https://fantasy.nfl.com/research/projections?offset={offset}&position={pos_num}&statCategory=projectedStats&statSeason={season}&statType=weekProjectedStats&statWeek={week}'
         player_data = strip_func(url)
-        all_player_data.append(player_data)
+        all_player_data= all_player_data + player_data
         
         offset += 25
         time.sleep(random.randint(0, 3))

@@ -1,5 +1,5 @@
-from .oddsmaker import Oddsmaker
-from .models import MatchupBets
+from ..oddsmaker import Oddsmaker
+from ..models import MatchupBets
 
 def create_or_update_matchups_bets(betting_league):
     fantasy_league_matchups = betting_league.fantasy_league.matchup_set.filter(active=True)

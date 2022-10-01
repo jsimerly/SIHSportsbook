@@ -235,9 +235,9 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
 
     for player in player_qset:
         if Player.DST in player.pos:
-            proj_map[player] = player.proj.def_total
+            proj_map[player] = player.proj.fp_est
         elif Player.K in player.pos:
-            proj_map[player] = player.proj.k_total
+            proj_map[player] = player.proj.fp_est
         else:
             proj = 0
 
@@ -257,20 +257,20 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
             proj += player.proj.rec_yds * league_settings.rec_yd
 
             if Player.RB in player.pos:
-                proj += player.proj.rec_rec * (league_settings.rec + league_settings.bonus_rec_rb)
+                proj += player.proj.rec * (league_settings.rec + league_settings.bonus_rec_rb)
             elif Player.WR in player.pos:
-                proj += player.proj.rec_rec * (league_settings.rec + league_settings.bonus_rec_wr)
+                proj += player.proj.rec * (league_settings.rec + league_settings.bonus_rec_wr)
             elif Player.TE in player.pos:
-                proj += player.proj.rec_rec * (league_settings.rec + league_settings.bonus_rec_te)
+                proj += player.proj.rec * (league_settings.rec + league_settings.bonus_rec_te)
             else:
-                proj += player.proj.rec_rec * league_settings.rec
+                proj += player.proj.rec * league_settings.rec
 
-            proj -= player.proj.fumbles * league_settings.fum_lost
+            proj -= player.proj.fum * league_settings.fum_lost
 
             proj_map[player] = round(proj, 3)
             
     proj_map = sorted(proj_map.items(), key=lambda x: x[1], reverse=True)
-    print(proj_map)
+
     return proj_map
 
 def get_top_free_agent(pos, free_agents):

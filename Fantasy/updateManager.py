@@ -82,28 +82,35 @@ def update_fantasy_league_matchups(sleeper_id):
     for old_matchup in old_matchups:
         old_matchup.betting_matchup.update(active=False)
 
-def update_player_proj(pk, player_data):
-    player = Player.objects.get(pk=pk)
+def update_proj_obj(proj_obj, **kwargs):
+    for k, v in kwargs.items():
+        setattr(proj_obj, k, v)
+    proj_obj.save()
+
+def update_player_proj(sleeper_id, player_data):
+    player = Player.objects.get(sleeper_id=sleeper_id)
 
     try:
         player_proj = player.proj
     except:
-        player_proj = PlayerProjections(player=player)
+        player_proj = PlayerProjections.objects.create(player=player)
 
-    player_proj.update(player_data)
+    update_proj_obj(player_proj, **player_data)
 
 def update_pos_group(pos, season, week):
     player_data = fetch_player_data(pos, season,week)
 
     for player_info in player_data:
-        name = player_info.name 
+        name = player_info['name']
         try:
-            pk = FP_TO_ID[pos][name]
+            sleeper_id = FP_TO_ID[pos][name]
         except Exception as e:
             print(name + 'FP_TO_ID Error | ' + str(e))
             continue
 
-        update_player_proj(pk, player_info)
+        del player_info['name']
+
+        update_player_proj(sleeper_id, player_info)
 
 
 
