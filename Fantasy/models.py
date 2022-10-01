@@ -147,7 +147,6 @@ class PlayerProjections(models.Model):
         unique=True
         )
 
-    total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     fp_est = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     
     pass_yds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
@@ -157,25 +156,28 @@ class PlayerProjections(models.Model):
     rush_yds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     rush_tds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
-    rec_rec = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    rec = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     rec_yds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     rec_tds = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     
-    fumbles = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fum = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
-    fg = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fgm = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fgm_0_19 = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fgm_20_29  = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fgm_30_39  = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fgm_40_49 =  models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fgm_50p  = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+
     xpt = models.DecimalField(decimal_places=3, max_digits=8, default=0)
-    k_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     
-    def_sack = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    sack = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     def_int = models.DecimalField(decimal_places=3, max_digits=8, default=0)
-    def_fum_rec = models.DecimalField(decimal_places=3, max_digits=8, default=0)
-    def_forced_fum = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    fum_rec = models.DecimalField(decimal_places=3, max_digits=8, default=0)
     def_td = models.DecimalField(decimal_places=3, max_digits=8, default=0)
-    def_saftey = models.DecimalField(decimal_places=3, max_digits=8, default=0)
-    def_pa = models.DecimalField(decimal_places=3, max_digits=8, default=0)
-    def_yds_against = models.DecimalField(decimal_places=3, max_digits=8, default=0)
-    def_total = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    safe = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    pts_allow = models.DecimalField(decimal_places=3, max_digits=8, default=0)
+    def_2pt = models.DecimalField(decimal_places=3, max_digits=8, default=0)
 
     def __str__(self):
         return f'Player Proj Obj: {self.player}' 

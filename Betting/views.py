@@ -9,8 +9,7 @@ from Betting.models import *
 from Fantasy.models import *
 from Fantasy.createLeague import create_league
 from Fantasy.sleeperEndpoint import get_rosters
-from Fantasy.updateManager import update_league_rosters, update_fantasy_league_matchups, update_all_player_proj
-
+from Fantasy.updateManager import update_league_rosters, update_fantasy_league_matchups, update_pos_group
 
 from .oddsmaker import Oddsmaker
 from .serializers import *
@@ -33,7 +32,6 @@ class CreateBettingLeague(APIView):
                 
                 update_league_rosters(league_id)
                 update_fantasy_league_matchups(league_id)
-                update_all_player_proj(league_id)
 
             bookie = request.user
 
@@ -120,6 +118,7 @@ class CreateMatchupBets(APIView):
         league_id = request.data.get('id')
         betting_league = BettingLeague.objects.get(id=league_id)
         fantasty_league_matchups = betting_league.fantasy_league.matchup_set.filter(active=True)
+        update_pos_group('qb')
 
         vig = betting_league.std_vig
 
