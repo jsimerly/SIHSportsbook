@@ -83,7 +83,6 @@ class FindSleeperLeagues(APIView):
         if fantasy_league_obj:
             league_name = fantasy_league_obj.name
             betting_league_objs = fantasy_league_obj.betting_league.all()
-            print(betting_league_objs)
             
             if betting_league_objs:
                 for betting_league_obj in betting_league_objs:
@@ -173,7 +172,7 @@ class CreateLeague(APIView):
         league_scoring_settings['rec_yds'] = round(league_json['scoring_settings']['rec_yd'], 3)
         league_scoring_settings['rec_tds'] = round(league_json['scoring_settings']['rec_td'], 3)
         league_scoring_settings['rec_2pts'] = round(league_json['scoring_settings']['rec_2pt'], 3)
-        print(league_json['scoring_settings'])
+ 
         league_scoring_settings['rec_prem_rb'] = round(league_json['scoring_settings']['bonus_rec_rb'], 3)
         league_scoring_settings['rec_prem_te'] = round(league_json['scoring_settings']['bonus_rec_te'], 3)
         league_scoring_settings['rec_prem_wr'] = round(league_json['scoring_settings']['bonus_rec_wr'], 3)

@@ -183,19 +183,57 @@ class GetMathcupBets(APIView):
             if betting_league:
                 fantasy_league = betting_league.fantasy_league
 
+                
+
+                print('REMEMBER TO TURN THESE ON AN THROTTLE THEM')
+                zero_kwargs = {
+                    'fp_est' : 0,
+
+                    'pass_yds' : 0,
+                    'pass_tds' : 0,
+                    'pass_ints' : 0,
+
+                    'rush_yds' : 0,
+                    'rush_tds' : 0,
+
+                    'rec' : 0,
+                    'rec_yds' : 0,
+                    'rec_tds' : 0,
+
+                    'fum' : 0,
+
+                    'fgm' : 0,
+                    'fgm_0_19' : 0,
+                    'fgm_20_29' : 0,
+                    'fgm_30_39' : 0,
+                    'fgm_40_49' : 0,
+                    'fgm_50p' : 0,
+                    'xpt' : 0,
+
+                    'sack' : 0,
+                    'def_int' : 0,
+                    'fum_rec' : 0,
+                    'def_td' : 0,
+                    'safe' : 0,
+                    'pts_allow' : 0,
+                    'def_2pt' : 0,
+
+                }
+
+                all_projections = PlayerProjections.objects.filter(~Q(fp_est=0))
+                all_projections.update(**zero_kwargs)
+
+                update_pos_group('qb', '2022', '4')
+                update_pos_group('rb', '2022', '4')
+                update_pos_group('wr', '2022', '4')
+                update_pos_group('te', '2022', '4')
+                update_pos_group('k', '2022', '4')
+                update_pos_group('def', '2022', '4')
+
                 roster_data = get_rosters(fantasy_league.sleeper_id)
 
                 fantasy_league.update_all_proj()
                 fantasy_league.update_all_rosters(roster_data)
-
-                print('REMEMBER TO TURN THESE ON AN THROTTLE THEM')
-
-                # update_pos_group('qb', '2022', '4')
-                # update_pos_group('rb', '2022', '4')
-                # update_pos_group('wr', '2022', '4')
-                # update_pos_group('te', '2022', '4')
-                # update_pos_group('k', '2022', '4')
-                # update_pos_group('def', '2022', '4')
 
                 update_fantasy_league_matchups(fantasy_league.sleeper_id)
                 create_or_update_matchups_bets(betting_league)

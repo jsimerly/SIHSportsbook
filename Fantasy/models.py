@@ -255,6 +255,7 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
             proj += player.proj.rush_tds * league_settings.rush_td
 
             proj += player.proj.rec_yds * league_settings.rec_yd
+            proj += player.proj.rec_tds * league_settings.rec_td
 
             if Player.RB in player.pos:
                 proj += player.proj.rec * (league_settings.rec + league_settings.bonus_rec_rb)
@@ -266,6 +267,8 @@ def create_unique_ranked_proj_map(player_qset, league_settings):
                 proj += player.proj.rec * league_settings.rec
 
             proj -= player.proj.fum * league_settings.fum_lost
+
+            # print(player.name + ' : ' + str(proj))
 
             proj_map[player] = round(proj, 3)
             
@@ -340,6 +343,10 @@ def update_target_team_proj(team_obj, league):
 
     for player in starters:
         team_proj += player[1]
+
+    print(team_obj.fun_name)
+    for player in starters:
+        print(player)
 
     team_obj.current_proj = team_proj
     team_obj.save()

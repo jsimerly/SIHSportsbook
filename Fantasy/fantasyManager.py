@@ -1,7 +1,7 @@
 from django.apps import apps
 
 if apps.ready: 
-    print('ready')
+
     from decimal import Decimal
     import time
     from django.db.models import Q
@@ -10,7 +10,7 @@ if apps.ready:
 
     def update_target_team_roster(team_json, team_obj):
         players = []
-        print(team_json)
+
         for player_id in team_json:
             player_obj = Player.objects.get(sleeper_id=player_id)
             players.append(player_obj)
@@ -36,17 +36,18 @@ if apps.ready:
                 proj += player.proj.rush_tds * league_settings.rush_tds
 
                 proj += player.proj.rec_yds * league_settings.rec_yds
+                proj += player.proj.rec_tds * league_settings.rec_tds
 
                 if player.pos == Player.RB:
-                    proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_rb)
+                    proj += player.proj.rec * (league_settings.rec + league_settings.bonus_rec_rb)
                 elif player.pos == Player.WR:
-                    proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_wr)
+                    proj += player.proj.rec * (league_settings.rec + league_settings.bonus_rec_wr)
                 elif player.pos == Player.TE:
-                    proj += player.proj.rec_rec * (league_settings.ppr + league_settings.rec_prem_te)
+                    proj += player.proj.rec * (league_settings.rec + league_settings.bonus_rec_te)
                 else:
-                    proj += player.proj.rec_rec * league_settings.ppr
+                    proj += player.proj.rec * league_settings.rec
 
-                proj -= player.proj.fumbles * league_settings.fumble_lost
+                proj -= player.proj.fum * league_settings.fumble_lost
 
                 proj_map[player] = round(proj, 3)
                 
@@ -116,6 +117,7 @@ if apps.ready:
         ranked_super_flex = sorted(super_flex_map.items(), key=lambda x: x[1], reverse=True)
         starters.extend(get_best_players(ranked_super_flex, league.settings.n_super_flex))
 
+        
         for player in starters:
             team_proj += player[1]
 
