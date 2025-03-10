@@ -15,7 +15,7 @@ SIHSportsbook holds a special place in my heart as the project that truly helped
 
 ## What It Does
 
-SIHSportsbook transforms fantasy football projections into a true betting experience for fantasy league members. The system:
+SIHSportsbook turns fantasy football projections into a betting lines and O/Us for your fantasy league matchups. The system:
 
 - Takes Sleeper app projections and win rate predictions
 - Converts fantasy metrics into realistic betting odds
