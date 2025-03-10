@@ -11,7 +11,7 @@
 
 ## The Project That Changed Everything
 
-SIHSportsbook holds a special place in my heart as the project that truly helped me break free from tutorial hell and establish myself as a developer. This was my first substantial application where I went beyond basic scripts and notebooks, tackling real challenges and creating something uniquely valuable for my fantasy football league community... Well not actually, I did play test this with some of my friends and feedback was pretty good, but before I actually got the whole league into it, sleeper stopped supporting their projections API. Oh well, now I know how to make fun stuff anyway.
+SIHSportsbook holds a special place in my heart as the project that truly helped me break free from tutorial hell and establish myself as a developer. This was my first substantial application where I went beyond basic scripts and notebooks, tackling real challenges and creating something uniquely interesting... Well not actually, I did play test this with some of my friends and feedback was pretty good, but before I actually got the whole league into it, sleeper stopped supporting their projections API. Oh well, now I know how to make fun stuff anyway.
 
 ## What It Does
 
