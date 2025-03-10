@@ -110,12 +110,7 @@ docker-compose up -d
 ```
 
 ## License
-[Your chosen license]
-
-## Acknowledgements
-- My fantasy league members who trusted my odds enough to use them
-- The Sleeper API for providing reliable data
-- Everyone who encouraged me when I was stuck debugging at 2 AM
+MIT License
 
 ---
 
